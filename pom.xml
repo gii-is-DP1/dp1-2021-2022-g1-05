@@ -31,7 +31,24 @@
         <spring-format.version>0.0.19</spring-format.version>
 
     </properties>
-
+	
+	<developers>
+		<developer>
+			<id>Marioespiro</id>
+			<name>Marioespiro</name>
+			<email>mario200112@gmail.com</email>
+			<url>https://github.com/Marioespiro</url>
+			<roles>
+				<role>mental breakdown enjoyer</role>
+			</roles>
+			<properties>
+				<picUrl>
+					https://avatars.githubusercontent.com/u/80323773?v=4
+				</picUrl>
+			</properties>
+		</developer>
+	</developers>
+	
     <dependencies>
         <!-- Spring and Spring Boot dependencies -->
         <dependency>
