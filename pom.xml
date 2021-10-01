@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.springframework.samples</groupId>
-    <artifactId>spring-petclinic</artifactId>
+    <artifactId>G1-05</artifactId>
     <version>2.2.0.BUILD-SNAPSHOT</version>
 
     <parent>
@@ -12,7 +12,7 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.2.4.RELEASE</version>
     </parent>
-    <name>petclinic</name>
+    <name>G1-05</name>
 
     <properties>
 
@@ -31,23 +31,38 @@
         <spring-format.version>0.0.19</spring-format.version>
 
     </properties>
+
 	
-	<developers>
-		<developer>
-			<id>Marioespiro</id>
-			<name>Marioespiro</name>
-			<email>mario200112@gmail.com</email>
-			<url>https://github.com/Marioespiro</url>
-			<roles>
-				<role>mental breakdown enjoyer</role>
-			</roles>
-			<properties>
-				<picUrl>
-					https://avatars.githubusercontent.com/u/80323773?v=4
-				</picUrl>
-			</properties>
-		</developer>
-	</developers>
+    <developers>
+      <developer>
+        <id>Marioespiro</id>
+        <name>Marioespiro</name>
+        <email>mario200112@gmail.com</email>
+        <url>https://github.com/Marioespiro</url>
+        <roles>
+          <role>mental breakdown enjoyer</role>
+        </roles>
+        <properties>
+          <picUrl>
+            https://avatars.githubusercontent.com/u/80323773?v=4
+          </picUrl>
+        </properties>
+      </developer>
+      <developer>
+       <id>manpadtab</id>
+       <name>Manuel Padilla Tabuenca</name>
+       <email>mpadillatabuenca@gmail.com</email>
+       <url>http://www.tmht.com/leo</url>
+       <roles>
+         <role>ELRICHMC</role>
+       </roles>
+       <properties>
+         <picUrl>
+            https://pbs.twimg.com/media/Eh4n9GhUMAAdO8x?format=jpg&name=large
+         </picUrl>
+       </properties>
+      </developer>
+    </developers>
 	
     <dependencies>
         <!-- Spring and Spring Boot dependencies -->
