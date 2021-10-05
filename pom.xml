@@ -57,6 +57,18 @@
 				<picUrl>https://avatars.githubusercontent.com/u/80274500?v=4</picUrl>
 			</properties>
 		</developer>
+        <developer>
+            <id>javteroro</id>
+            <name>Javi</name>
+            <email>javteroro@alum.us.es</email>
+            <url>https://github.com/javi-11</url>
+            <roles>
+                <role>Front-end</role>
+            </roles>
+            <properties>
+                <picUrl>https://avatars.githubusercontent.com/u/80274511?v=4</picUrl>
+            </properties>
+        </developer>
 	<!-- More developers ...-->
 	</developers>
 
@@ -78,16 +90,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        <dependency>  
-            <groupId>org.springframework.security</groupId>  
-            <artifactId>spring-security-taglibs</artifactId>  
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
         </dependency>
         <!-- Databases - Uses H2 by default -->
         <!-- dependency>
                 <groupId>org.hsqldb</groupId>
                 <artifactId>hsqldb</artifactId>
                 <scope>runtime</scope>
-        </dependency-->        
+        </dependency-->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -97,7 +109,7 @@
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- validation 
+        <!-- validation
         <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
@@ -182,7 +194,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <!-- Spring Boot Actuator displays build-related information if a META-INF/build-info.properties 
+                        <!-- Spring Boot Actuator displays build-related information if a META-INF/build-info.properties
                         file is present -->
                         <goals>
                             <goal>build-info</goal>
@@ -218,7 +230,7 @@
                 </executions>
             </plugin>
 
-            <!-- Spring Boot Actuator displays build-related information if a git.properties 
+            <!-- Spring Boot Actuator displays build-related information if a git.properties
             file is present at the classpath -->
             <plugin>
                 <groupId>pl.project13.maven</groupId>
