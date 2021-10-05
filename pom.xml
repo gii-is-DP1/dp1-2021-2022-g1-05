@@ -32,6 +32,34 @@
 
     </properties>
 
+	<developers>
+		<developer>
+			<id>maresprod5</id>
+			<name>Mario</name>
+			<email>maresprod5@alum.us.es</email>
+			<url>https://github.com/Marioespiro</url>
+			<roles>
+				<role>big shot</role>
+			</roles>
+			<properties>
+				<picUrl>https://avatars.githubusercontent.com/u/80323773?v=4</picUrl>
+			</properties>
+		</developer>
+		<developer>
+			<id>manpadtab</id>
+			<name>Manuel Jesús</name>
+			<email>manpadtab@alum.us.es</email>
+			<url>https://github.com/mpadillatabuenca</url>
+			<roles>
+				<role>tech master</role>
+			</roles>
+			<properties>
+				<picUrl>https://avatars.githubusercontent.com/u/80274500?v=4</picUrl>
+			</properties>
+		</developer>
+	<!-- More developers ...-->
+	</developers>
+
     <dependencies>
         <!-- Spring and Spring Boot dependencies -->
         <dependency>
