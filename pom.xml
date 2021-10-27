@@ -69,6 +69,18 @@
                 <picUrl>https://avatars.githubusercontent.com/u/80274511?v=4</picUrl>
             </properties>
         </developer>
+        <developer>
+			<id>juacasben</id>
+			<name>Juan José</name>
+			<email>juacasben@alum.us.es</email>
+			<url>https://github.com/JuanJoCasamitjana</url>
+			<roles>
+				<role>trasher</role>
+			</roles>
+			<properties>
+				<picUrl>https://avatars.githubusercontent.com/u/73534780?s=400&v=4</picUrl>
+			</properties>
+		</developer>
 	<!-- More developers ...-->
 	</developers>
 
