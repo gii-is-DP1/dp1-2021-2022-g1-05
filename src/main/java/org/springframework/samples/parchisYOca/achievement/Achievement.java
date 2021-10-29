@@ -14,9 +14,6 @@ import javax.persistence.Table;
 @Table(name = "achievements")
 public class Achievement extends NamedEntity {
 
-    @Id
-    private Integer id;
-    private String name;
     private String description;
     private String badgeURL;
 }

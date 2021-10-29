@@ -21,7 +21,7 @@
             <div class="form-group has-feedback">
                 <parchisYOca:inputField label="name" name="name"/>
                 <parchisYOca:inputField label="description" name="description"/>
-ç
+
 
             </div>
 
