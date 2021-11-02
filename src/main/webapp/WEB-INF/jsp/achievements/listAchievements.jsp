@@ -13,6 +13,7 @@
         <tr>
             <th style="width: 150px;">Name</th>
             <th style="width: 200px;">Description</th>
+            <th style="width: 220px;">Badge URL</th>
             <th>Actions</th>
 
         </tr>
@@ -25,6 +26,9 @@
             </td>
             <td>
                 <c:out value="${achievement.description}"/>
+            </td>
+            <td>
+                <img style="width: 200px; class="img-responsive" src="${achievement.badgeURL}"/>
             </td>
             <td>
                 <spring:url value="/achievements/delete/{achievementId}" var="achievementUrl">

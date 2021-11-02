@@ -27,7 +27,6 @@ public class AchievementController {
         Iterable<Achievement> achievements = achievementService.findAll();
         modelMap.addAttribute("achievements",achievements);
         return vista;
-
     }
 
     @GetMapping(path="/new")
