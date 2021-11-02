@@ -5,7 +5,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
-<parchisYOca:layout pageName="achievements">
+<petclinic:layout pageName="achievements">
     <h2>Achievements</h2>
 
     <table id="achievementsTable" class="table table-striped">
@@ -13,6 +13,7 @@
         <tr>
             <th style="width: 150px;">Name</th>
             <th style="width: 200px;">Description</th>
+            <th style="width: 220px;">Badge URL</th>
             <th>Actions</th>
 
         </tr>
@@ -21,10 +22,13 @@
         <c:forEach items="${achievements}" var="achievement">
         <tr>
             <td>
-                <c:out value="${user.name}"/>
+                <c:out value="${achievement.name}"/>
             </td>
             <td>
-                <c:out value="${user.description}"/>
+                <c:out value="${achievement.description}"/>
+            </td>
+            <td>
+                <img style="width: 200px; class="img-responsive" src="${achievement.badgeURL}"/>
             </td>
             <td>
                 <spring:url value="/achievements/delete/{achievementId}" var="achievementUrl">
@@ -36,4 +40,4 @@
             </c:forEach>
         </tbody>
     </table>
-</parchisYOca:layout>
+</petclinic:layout>

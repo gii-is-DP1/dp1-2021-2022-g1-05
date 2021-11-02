@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.springframework.samples.parchisYOca.model.NamedEntity;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Getter
@@ -14,9 +13,7 @@ import javax.persistence.Table;
 @Table(name = "achievements")
 public class Achievement extends NamedEntity {
 
-    @Id
-    private Integer id;
-    private String name;
     private String description;
     private String badgeURL;
+
 }

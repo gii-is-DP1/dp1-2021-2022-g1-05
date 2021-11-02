@@ -8,12 +8,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
 import javax.websocket.server.PathParam;
 import java.util.Optional;
 
 @Controller
+@RequestMapping("/achievements")
 public class AchievementController {
 
     @Autowired
@@ -21,11 +23,10 @@ public class AchievementController {
 
     @GetMapping()
     public String listadoLogros(ModelMap modelMap){
-        String vista = "achievements/listadoLogros";
+        String vista = "achievements/listAchievements";
         Iterable<Achievement> achievements = achievementService.findAll();
         modelMap.addAttribute("achievements",achievements);
         return vista;
-
     }
 
     @GetMapping(path="/new")
