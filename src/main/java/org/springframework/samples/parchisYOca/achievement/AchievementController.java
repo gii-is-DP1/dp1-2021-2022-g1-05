@@ -52,11 +52,13 @@ public class AchievementController {
 
     @GetMapping(path="/delete/{achievementId}")
     public String borrarLogro(@PathVariable("achievementId") int achievementId, ModelMap modelMap){
-        String view = "achievements/listEvents";
+        String view = "achievements/listAchievements";
         Optional<Achievement> achievement = achievementService.findAchievementById(achievementId);
         if(achievement.isPresent()){
             achievementService.delete(achievement.get());
             modelMap.addAttribute("message", "Achievement successfully deleted!");
+            view=listadoLogros(modelMap);
+
         }else{
             modelMap.addAttribute("message", "Achievement not found!");
             view=listadoLogros(modelMap);
