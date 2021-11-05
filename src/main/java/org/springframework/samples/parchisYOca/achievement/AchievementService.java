@@ -24,7 +24,7 @@ public class AchievementService {
 
     @Transactional(readOnly = true)
     public Optional<Achievement> findAchievementById(int achievementId){
-        return achievementRepository.findById(Integer.toString(achievementId));
+        return achievementRepository.findById(achievementId);
     }
 
     @Transactional
