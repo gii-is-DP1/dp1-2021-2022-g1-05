@@ -42,7 +42,5 @@ public class User extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Authorities> authorities;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "users")
-    private Set<Achievement> achievements;
 
 }
