@@ -26,7 +26,5 @@ public class Achievement extends NamedEntity {
     @URL
     private String badgeURL;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Set<User> users;
 
 }
