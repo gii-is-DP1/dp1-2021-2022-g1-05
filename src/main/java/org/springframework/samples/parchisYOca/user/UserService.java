@@ -34,7 +34,9 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void delete(User user) throws DataAccessException{
         userRepository.delete(user);
     }
+
 }
