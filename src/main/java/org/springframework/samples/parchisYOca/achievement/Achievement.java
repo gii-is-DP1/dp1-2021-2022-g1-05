@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.samples.parchisYOca.model.NamedEntity;
+import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.user.User;
 
 import javax.persistence.CascadeType;
@@ -26,5 +27,7 @@ public class Achievement extends NamedEntity {
     @URL
     private String badgeURL;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    private Set<Player> players;
 
 }
