@@ -3,10 +3,7 @@ package org.springframework.samples.parchisYOca.user;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.URL;
-import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
-import org.springframework.samples.parchisYOca.model.NamedEntity;
 import org.springframework.samples.parchisYOca.user.Authorities;
 
 import javax.persistence.*;
@@ -26,21 +23,14 @@ public class User extends BaseEntity {
     private String email;
 
     @NotEmpty
-    @Length(min=1, max=12)
-    private String username;
-
-    @NotEmpty
     @Length(min=7)
     @Pattern(regexp = ".*[0-9].*")
     private String password;
 
-    @URL
-    private String avatarURL;
-
     boolean enabled;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Set<Authorities> authorities;
+    private Set<Authorities> Authorities;
 
 
 }

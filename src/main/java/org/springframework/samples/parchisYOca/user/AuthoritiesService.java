@@ -52,7 +52,7 @@ public class AuthoritiesService {
 			//user.get().getAuthorities().add(authority);
 			authoritiesRepository.save(authority);
 		}else
-			throw new DataAccessException("User '"+user.get().getUsername()+"' not found!") {};
+			throw new DataAccessException("User with email '"+user.get().getEmail()+"' not found!") {};
 	}
 
 
