@@ -18,8 +18,10 @@ package org.springframework.samples.parchisYOca.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.user.User;
-import org.springframework.samples.parchisYOca.user.UserService;
+import org.springframework.samples.petclinic.user.Authorities;
+import org.springframework.samples.petclinic.user.AuthoritiesRepository;
+import org.springframework.samples.petclinic.user.User;
+import org.springframework.samples.petclinic.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,32 +30,32 @@ import java.util.Optional;
 @Service
 public class AuthoritiesService {
 
-	private AuthoritiesRepository authoritiesRepository;
-	private UserService userService;
+    private org.springframework.samples.petclinic.user.AuthoritiesRepository authoritiesRepository;
+    private org.springframework.samples.petclinic.user.UserService userService;
 
-	@Autowired
-	public AuthoritiesService(AuthoritiesRepository authoritiesRepository, UserService userService) {
-		this.authoritiesRepository = authoritiesRepository;
-		this.userService = userService;
-	}
+    @Autowired
+    public AuthoritiesService(AuthoritiesRepository authoritiesRepository, UserService userService) {
+        this.authoritiesRepository = authoritiesRepository;
+        this.userService = userService;
+    }
 
-	@Transactional
-	public void saveAuthorities(Authorities authorities) throws DataAccessException {
-		authoritiesRepository.save(authorities);
-	}
+    @Transactional
+    public void saveAuthorities(org.springframework.samples.petclinic.user.Authorities authorities) throws DataAccessException {
+        authoritiesRepository.save(authorities);
+    }
 
-	@Transactional
-	public void saveAuthorities(Integer id, String role) throws DataAccessException {
-		Authorities authority = new Authorities();
-		Optional<User> user = userService.findUserById(id);
-		if(user.isPresent()) {
-			authority.setUser(user.get());
-			authority.setAuthority(role);
-			//user.get().getAuthorities().add(authority);
-			authoritiesRepository.save(authority);
-		}else
-			throw new DataAccessException("User with email '"+user.get().getEmail()+"' not found!") {};
-	}
+    @Transactional
+    public void saveAuthorities(String username, String role) throws DataAccessException {
+        org.springframework.samples.petclinic.user.Authorities authority = new Authorities();
+        Optional<User> user = userService.findUser(username);
+        if(user.isPresent()) {
+            authority.setUser(user.get());
+            authority.setAuthority(role);
+            //user.get().getAuthorities().add(authority);
+            authoritiesRepository.save(authority);
+        }else
+            throw new DataAccessException("User '"+username+"' not found!") {};
+    }
 
 
 }
