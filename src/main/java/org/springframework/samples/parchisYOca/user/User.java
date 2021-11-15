@@ -19,8 +19,7 @@ import java.util.Set;
 public class User extends BaseEntity {
 
     @NotEmpty
-    @Email
-    private String email;
+    private String username;
 
     @NotEmpty
     @Length(min=7)

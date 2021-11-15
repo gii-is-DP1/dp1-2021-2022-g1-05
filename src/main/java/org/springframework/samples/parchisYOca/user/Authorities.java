@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 public class Authorities extends BaseEntity{
 
 	@ManyToOne
-    @JoinColumn(name = "email")
+    @JoinColumn(name = "username")
     User user;
 
 	@Size(min = 3, max = 50)

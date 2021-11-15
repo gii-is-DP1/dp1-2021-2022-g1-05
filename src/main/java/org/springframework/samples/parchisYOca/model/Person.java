@@ -21,6 +21,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 
@@ -32,8 +33,7 @@ public class Person extends BaseEntity {
     @URL
     private String avatarURL;
 
-    @NotEmpty
-    @Length(min=1, max=12)
-    private String username;
+    @Email
+    private String email;
 
 }
