@@ -1,4 +1,4 @@
-package org.springframework.samples.petclinic.web;
+package org.springframework.samples.parchisYOca.web;
 
 
 import org.springframework.security.core.Authentication;
