@@ -21,5 +21,9 @@ public class Player extends Person {
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "players")
     private Set<Achievement> achievements;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "username", referencedColumnName = "username")
+    private User user;
+
 }
 
