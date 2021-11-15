@@ -15,7 +15,6 @@
             <petclinic:inputField label="Username" name="user.username"/>
             <petclinic:inputField label="Password" name="user.password"/>
             <petclinic:inputField label="Email" name="email"/>
-            <petclinic:inputField label="Avatar     URL" name="avatarURL"/>
 
         </div>
         <div class="form-group">

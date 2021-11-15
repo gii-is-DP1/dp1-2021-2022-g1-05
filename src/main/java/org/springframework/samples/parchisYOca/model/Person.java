@@ -30,9 +30,6 @@ import javax.validation.constraints.NotEmpty;
 @MappedSuperclass
 public class Person extends BaseEntity {
 
-    @URL
-    private String avatarURL;
-
     @Email
     private String email;
 

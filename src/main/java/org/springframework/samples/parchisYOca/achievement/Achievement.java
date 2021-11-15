@@ -23,10 +23,6 @@ public class Achievement extends NamedEntity {
     @NotEmpty
     private String description;
 
-    @NotEmpty
-    @URL
-    private String badgeURL;
-
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Player> players;
 
