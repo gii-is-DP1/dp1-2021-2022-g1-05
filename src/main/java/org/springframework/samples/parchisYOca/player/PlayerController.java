@@ -3,12 +3,15 @@ package org.springframework.samples.parchisYOca.player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
+import org.springframework.samples.parchisYOca.user.UserValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -16,7 +19,7 @@ import java.util.Map;
 @Controller
 public class PlayerController {
 
-    private static final String VIEWS_PLAYER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdatePlayerForm";
+    private static final String VIEWS_PLAYER_CREATE_OR_UPDATE_FORM = "players/createOrUpdatePlayerForm";
 
 
     private final PlayerService playerService;
@@ -32,6 +35,7 @@ public class PlayerController {
     public void setAllowedFields(WebDataBinder dataBinder) {
         dataBinder.setDisallowedFields("id");
     }
+
 
     @GetMapping(value = "/players/new")
     public String initCreationForm(Map<String, Object> model) {
@@ -51,6 +55,13 @@ public class PlayerController {
 
             return "redirect:/players/" + player.getId();
         }
+    }
+
+    @GetMapping("/players/{playerId}")
+    public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
+        ModelAndView mav = new ModelAndView("players/playerDetails");
+        mav.addObject(this.playerService.findPlayerById(playerId));
+        return mav;
     }
 
 }
