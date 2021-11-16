@@ -3,6 +3,7 @@ package org.springframework.samples.parchisYOca.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
+import org.springframework.samples.petclinic.pet.PetValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -28,6 +29,13 @@ public class UserController {
         dataBinder.setDisallowedFields("id");
     }
 
+    @InitBinder("user")
+    public void initUserBinder(WebDataBinder dataBinder) {
+        dataBinder.setValidator(new UserValidator());
+    }
+
+
+
     @GetMapping(value = "/users/new")
     public String initCreationForm(Map<String, Object> model) {
         Player player = new Player();
@@ -46,4 +54,6 @@ public class UserController {
             return "redirect:/";
         }
     }
+
+
 }

@@ -23,6 +23,7 @@ import org.hibernate.validator.constraints.URL;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 
 @Getter
@@ -31,6 +32,7 @@ import javax.validation.constraints.NotEmpty;
 public class Person extends BaseEntity {
 
     @Email
+    @NotEmpty
     private String email;
 
 }
