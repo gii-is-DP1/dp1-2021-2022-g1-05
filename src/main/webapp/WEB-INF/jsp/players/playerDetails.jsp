@@ -6,23 +6,56 @@
 
 <parchisYOca:layout pageName="players">
 
-    <h2>Player Information</h2>
-
-    <table class="table table-striped">
-        <tr>
-            <th>Email</th>
-            <td><b><c:out value="${player.email}"/></b></td>
-        </tr>
-        <tr>
-            <th>Username</th>
-            <td><c:out value="${player.username}"/></td>
-        </tr>
-    </table>
+    <h2>Player profile</h2>
 
     <spring:url value="{playerId}/edit" var="editUrl">
         <spring:param name="playerId" value="${player.id}"/>
     </spring:url>
-    <a href="${fn:escapeXml(editUrl)}" class="btn btn-default">Edit Player</a>
+    <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Edit Player</a>
+
+    <br>
+    <br>
+    <br>
+
+    <h3>Player credentials</h3>
+
+    <table class="table table-striped">
+        <tr>
+            <th>Email</th>
+            <td><c:out value="${player.email}"/></td>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <td><c:out value="${user.username}"/></td>
+        </tr>
+    </table>
+
+    <br>
+
+    <h3>Player achievements</h3>
+
+    <table id="achievementsPlayerTable" class="table table-striped">
+        <thead>
+        <tr>
+            <th style="width: 150px;">Achievement name</th>
+            <th style="width: 200px;">Achievement description</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach items="${player.achievements}" var="achievement">
+        <tr>
+            <td>
+                <c:out value="${achievement.name}"/>
+            </td>
+            <td>
+                <c:out value="${achievement.description}"/>
+            </td>
+
+            </c:forEach>
+        </tbody>
+    </table>
+
 
 
 </parchisYOca:layout>
