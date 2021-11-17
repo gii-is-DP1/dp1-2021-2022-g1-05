@@ -8,7 +8,7 @@
 <flippingboards:layout pageName="home">
     <div class="row">
         <div class="col-md text-center">
-            <img src="/resources/images/Logo.png" style="width: 35%"/>
+            <img src="/resources/images/Logo.png" style="width: 25%"/>
         </div>
     </div>
     <div class="row" style="margin-top: 3%">

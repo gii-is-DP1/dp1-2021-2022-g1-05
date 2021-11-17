@@ -4,10 +4,10 @@
 
 <petclinic:layout pageName="error">
 
-    <spring:url value="/resources/images/pets.png" var="petsImage"/>
-    <img src="${petsImage}"/>
+    <spring:url value="/resources/images/congrats.png" var="gooseAward"/>
+    <img src="${gooseAward}" style="width: 24%"/>
 
-    <h2>Something happened...</h2>
+    <h2>Congrats! You broke the page.</h2>
 
     <p>${exception.message}</p>
 
