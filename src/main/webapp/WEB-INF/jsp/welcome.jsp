@@ -23,17 +23,5 @@
         </div>
         <div class="col-md-3"></div>
     </div>
-    <hr/>
-    <h1>Morralla a borrar en un futuro:</h1>
-    <h2><fmt:message key="welcome"/></h2>
-    <div class="row">
-        <h2> Project ${title}</h2>
-        <p><h2>Group ${group}</h2></p>
-        <p><ul>
-        <c:forEach items="${persons}" var="person">
-            <li>${person.firstName} ${person.lastName}</li>
-        </c:forEach>
-        </ul></p>
-    </div>
-    <img class="img-responsive" src="/resources/images/ena.png"/>
+
 </flippingboards:layout>
