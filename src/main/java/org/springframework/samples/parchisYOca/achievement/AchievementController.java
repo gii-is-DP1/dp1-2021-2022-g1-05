@@ -2,6 +2,7 @@ package org.springframework.samples.parchisYOca.achievement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
+import org.springframework.samples.parchisYOca.achievement.exceptions.DuplicatedAchievementNameException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -43,7 +44,12 @@ public class AchievementController {
             modelMap.addAttribute("achievement",achievement);
             return "achievements/editAchievement";
         }else{
-            achievementService.save(achievement);
+            try{
+                achievementService.save(achievement);
+            } catch (DuplicatedAchievementNameException e) {
+                e.printStackTrace();
+            }
+
             modelMap.addAttribute("message", "Achievement successfully saved!");
             view=listadoLogros(modelMap);
         }
