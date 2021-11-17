@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.samples.parchisYOca.user.UserValidator;
+import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,7 +63,28 @@ public class PlayerController {
     public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
         ModelAndView mav = new ModelAndView("players/playerDetails");
         mav.addObject(this.playerService.findPlayerById(playerId));
+        mav.addObject(this.playerService.findPlayerById(playerId).getUser());
         return mav;
+    }
+
+    @GetMapping(value = "/players/{playerId}/edit")
+    public String initUpdatePlayerForm(@PathVariable("playerId") int playerId, Model model) {
+        Player player = this.playerService.findPlayerById(playerId);
+        model.addAttribute(player);
+        return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
+    }
+
+    @PostMapping(value = "/players/{playerId}/edit")
+    public String processUpdatePlayerForm(@Valid Player player, BindingResult result,
+                                         @PathVariable("playerId") int playerId) {
+        if (result.hasErrors()) {
+            return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
+        }
+        else {
+            player.setId(playerId);
+            this.playerService.savePlayer(player);
+            return "redirect:/players/{playerId}";
+        }
     }
 
 }

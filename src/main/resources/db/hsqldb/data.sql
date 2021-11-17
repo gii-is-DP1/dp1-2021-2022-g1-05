@@ -8,4 +8,7 @@ INSERT INTO players(id, email, username) VALUES(1, 'manu@gmail.com', 'ManuK');
 
 INSERT INTO authorities(id, authority, user_id) VALUES(1, 'player', 1);
 
+INSERT INTO achievements_players(achievements_id, players_id) VALUES(2, 1);
+INSERT INTO achievements_players(achievements_id, players_id) VALUES(3, 1);
+
 

@@ -25,7 +25,7 @@ public class PlayerService {
 
     @Transactional(readOnly = true)
     public Player findPlayerById(int id) throws DataAccessException {
-        return playerRepository.findById(id).get();
+        return (Player) playerRepository.findById(id).get();
     }
 
 

@@ -8,13 +8,14 @@ import org.springframework.samples.parchisYOca.model.BaseEntity;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name="users")
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable { //Implementing serializable to fix an issue
 
     @NotEmpty
     private String username;

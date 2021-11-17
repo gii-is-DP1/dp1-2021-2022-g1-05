@@ -8,15 +8,14 @@ import org.springframework.samples.parchisYOca.user.Authorities;
 import org.springframework.samples.parchisYOca.user.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name="players")
-public class Player extends Person {
+public class Player extends Person implements Serializable { //Implementing serializable to fix an issue
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "players")
     private Set<Achievement> achievements;
