@@ -19,6 +19,7 @@ import java.util.Set;
 @Table(name = "achievements")
 public class Achievement extends BaseEntity {
 
+    @NotEmpty
     @Size(min = 3, max = 50)
     @Column(name = "name", unique=true)
     private String name;

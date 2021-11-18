@@ -5,6 +5,7 @@ import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,6 +66,14 @@ public class PlayerController {
         mav.addObject(this.playerService.findPlayerById(playerId));
         mav.addObject(this.playerService.findPlayerById(playerId).getUser());
         return mav;
+    }
+
+    @GetMapping(value = "/players")
+    public String showAllPlayers(ModelMap modelMap) {
+        String vista = "players/listPlayers";
+        Iterable<Player> players = playerService.findAll();
+        modelMap.addAttribute("players", players);
+        return vista;
     }
 
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
@@ -19,7 +20,6 @@ public class AchievementServiceTests {
     private AchievementService achievementService;
 
     @Test
-    @Disabled("No poner datos absolutos, no se debería saber que el total son 3")
     public void testCountWithInitialData(){
         int count = achievementService.achievementCount();
         assertEquals(count,3);
@@ -44,7 +44,16 @@ public class AchievementServiceTests {
         Achievement newAchievement = new Achievement();
         newAchievement.setName("Nuevo logro");
         newAchievement.setDescription("Logro de prueba");
-        assertNotEquals(achievementService.findAchievementById(4), Optional.empty());
+        achievementService.save(newAchievement);
+        Iterable<Achievement> achievements = achievementService.findAll();
+        boolean pass = false;
+        for(Achievement achievement : achievements) {
+            if(achievement.equals(newAchievement)) {
+                pass = true;
+                break;
+            }
+        }
+        assertTrue(pass);
     }
 
     @Test
@@ -52,7 +61,7 @@ public class AchievementServiceTests {
         Achievement newAchievement = new Achievement();
         newAchievement.setDescription("Solo tengo descripción");
 
-        assertThrows(NullPointerException.class, () ->{
+        assertThrows(ConstraintViolationException.class, () ->{
             achievementService.save(newAchievement);
         });
     }
@@ -80,7 +89,7 @@ public class AchievementServiceTests {
 
     @Test
     public void testAddNullAchievement(){
-        assertThrows(NullPointerException.class, () ->{
+        assertThrows(InvalidDataAccessApiUsageException.class, () ->{
             achievementService.save(null);
         });
     }

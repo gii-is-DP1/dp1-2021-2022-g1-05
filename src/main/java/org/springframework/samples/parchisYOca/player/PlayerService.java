@@ -7,6 +7,8 @@ import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+
 @Service
 public class PlayerService {
 
@@ -37,5 +39,10 @@ public class PlayerService {
         userService.saveUser(player.getUser());
         //creating authorities
         authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+    }
+
+    @Transactional(readOnly = true)
+    public Iterable<Player> findAll() throws DataAccessException {
+        return playerRepository.findAll();
     }
 }
