@@ -44,7 +44,7 @@ public class UserController {
             return VIEWS_PLAYER_CREATE_FORM;
         }
         else {
-            //creating owner, user, and authority
+            //creating player, user, and authority
             this.playerService.savePlayer(player);
             return "redirect:/";
         }
