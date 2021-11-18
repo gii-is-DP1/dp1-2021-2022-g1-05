@@ -2,6 +2,7 @@ package org.springframework.samples.parchisYOca.user;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
 
@@ -14,10 +15,12 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name="users")
-public class User extends BaseEntity implements Serializable { //Implementing serializable to fix an issue
+public class User implements Serializable { //Implementing serializable to fix an issue
 
     @NotEmpty
+    @Id
     private String username;
 
     @NotEmpty

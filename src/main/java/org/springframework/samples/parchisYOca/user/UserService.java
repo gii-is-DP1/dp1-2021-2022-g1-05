@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.crypto.Data;
 import java.util.Optional;
 
 @Service
@@ -25,16 +26,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> findUserById(int userId) throws DataAccessException{
-        return userRepository.findById(userId);
+    public Optional<User> findUserByUsername(String username) throws DataAccessException{
+        return userRepository.findById(username);
     }
-
-
-    @Transactional
-    public void delete(User user) throws DataAccessException{
-        userRepository.delete(user);
-    }
-
 
     @Transactional
     public void saveUser(User user) throws DataAccessException {

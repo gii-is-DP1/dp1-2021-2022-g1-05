@@ -71,9 +71,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	        + "from users "
 	        + "where username = ?")
 	      .authoritiesByUsernameQuery(
-	       "select username, authority "
-	        + "from authorities natural join users "
-	        + "where username = ?")
+              "select username, authority "
+                  + "from authorities "
+                  + "where username = ?")
 	      .passwordEncoder(passwordEncoder());
 	}
 

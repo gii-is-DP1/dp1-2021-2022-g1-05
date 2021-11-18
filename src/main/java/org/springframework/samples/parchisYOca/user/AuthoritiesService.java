@@ -40,21 +40,20 @@ public class AuthoritiesService {
     }
 
     @Transactional
-    public void saveAuthorities(org.springframework.samples.parchisYOca.user.Authorities authorities) throws DataAccessException {
+    public void saveAuthorities(Authorities authorities) throws DataAccessException {
         authoritiesRepository.save(authorities);
     }
 
     @Transactional
-    public void saveAuthorities(Integer userId, String role) throws DataAccessException {
-        org.springframework.samples.parchisYOca.user.Authorities authority = new Authorities();
-        Optional<User> user = userService.findUserById(userId);
+    public void saveAuthorities(String username, String role) throws DataAccessException {
+        Authorities authority = new Authorities();
+        Optional<User> user = userService.findUserByUsername(username);
         if(user.isPresent()) {
             authority.setUser(user.get());
             authority.setAuthority(role);
-            //user.get().getAuthorities().add(authority);
             authoritiesRepository.save(authority);
         }else
-            throw new DataAccessException("User '"+user.get().getUsername()+"' not found!") {};
+            throw new DataAccessException("User '"+username+"' not found!") {};
     }
 
 

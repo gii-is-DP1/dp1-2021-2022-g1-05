@@ -2,7 +2,6 @@ package org.springframework.samples.parchisYOca.achievement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.achievement.exceptions.DuplicatedAchievementNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +28,13 @@ public class AchievementService {
         return achievementRepository.findById(achievementId);
     }
 
-    /* //MÉTODO SAVE SIN FLORITURAS, VOLVER A USAR ESTE SI NOS TIRAN PARA ATRÁS EL OTRO
     @Transactional
     public void save(Achievement achievement) throws DataAccessException{
         achievementRepository.save(achievement);
     }
-    */
 
+
+    /* Método save que hizo mario con florituras pero no vale pa na
     @Transactional(rollbackFor = DuplicatedAchievementNameException.class)
     public void save(Achievement achievement) throws DataAccessException, DuplicatedAchievementNameException{
         Iterable<Achievement> achievements = achievementRepository.findAll();
@@ -51,7 +50,7 @@ public class AchievementService {
         } else {
             achievementRepository.save(achievement);
         }
-    }
+    }*/
 
     public void delete(Achievement achievement) throws DataAccessException{
         achievementRepository.delete(achievement);
