@@ -2,6 +2,7 @@ package org.springframework.samples.parchisYOca.player;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.model.Person;
 import org.springframework.samples.parchisYOca.user.Authorities;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(name="players")
 public class Player extends Person implements Serializable { //Implementing serializable to fix an issue
 

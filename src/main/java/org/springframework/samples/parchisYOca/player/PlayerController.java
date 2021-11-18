@@ -3,8 +3,6 @@ package org.springframework.samples.parchisYOca.player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
-import org.springframework.samples.parchisYOca.user.UserValidator;
-import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -55,9 +53,11 @@ public class PlayerController {
             //creating owner, user and authorities
             this.playerService.savePlayer(player);
 
-            return "redirect:/players/" + player.getId();
+            return "redirect:/welcome";
         }
     }
+
+
 
     @GetMapping("/players/{playerId}")
     public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
@@ -66,6 +66,7 @@ public class PlayerController {
         mav.addObject(this.playerService.findPlayerById(playerId).getUser());
         return mav;
     }
+
 
     @GetMapping(value = "/players/{playerId}/edit")
     public String initUpdatePlayerForm(@PathVariable("playerId") int playerId, Model model) {

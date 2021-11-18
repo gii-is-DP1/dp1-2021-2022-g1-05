@@ -36,6 +36,6 @@ public class PlayerService {
         //creating user
         userService.saveUser(player.getUser());
         //creating authorities
-        authoritiesService.saveAuthorities(player.getId(), "player");
+        authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
     }
 }
