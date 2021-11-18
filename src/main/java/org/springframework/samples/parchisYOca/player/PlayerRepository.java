@@ -9,7 +9,11 @@ import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.petclinic.owner.Owner;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface PlayerRepository extends CrudRepository<Player, Integer> {
+
+    @Query("SELECT player FROM Player player JOIN FETCH player.user WHERE player.user.username = :username")
+    Optional<Player> findPlayerByUsername(String username) throws DataAccessException;
 
 }

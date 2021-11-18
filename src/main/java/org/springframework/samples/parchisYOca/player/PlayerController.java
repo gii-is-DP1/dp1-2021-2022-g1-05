@@ -3,6 +3,9 @@ package org.springframework.samples.parchisYOca.player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -30,34 +33,10 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-
-
     @InitBinder
     public void setAllowedFields(WebDataBinder dataBinder) {
         dataBinder.setDisallowedFields("id");
     }
-
-
-    @GetMapping(value = "/players/new")
-    public String initCreationForm(Map<String, Object> model) {
-        Player player = new Player();
-        model.put("player", player);
-        return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
-    }
-
-    @PostMapping(value = "/players/new")
-    public String processCreationForm(@Valid Player player, BindingResult result) {
-        if (result.hasErrors()) {
-            return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
-        }
-        else {
-            //creating owner, user and authorities
-            this.playerService.savePlayer(player);
-
-            return "redirect:/welcome";
-        }
-    }
-
 
 
     @GetMapping("/players/{playerId}")
@@ -85,7 +64,7 @@ public class PlayerController {
     }
 
     @PostMapping(value = "/players/{playerId}/edit")
-    public String processUpdatePlayerForm(@Valid Player player, BindingResult result,
+        public String processUpdatePlayerForm(@Valid Player player, BindingResult result,
                                          @PathVariable("playerId") int playerId) {
         if (result.hasErrors()) {
             return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;

@@ -15,7 +15,6 @@
             <parchisYOca:inputField label="Username" name="user.username"/>
             <parchisYOca:inputField label="Password" name="user.password"/>
             <parchisYOca:inputField label="Email" name="email"/>
-            <form:input type="hidden" path="id"/>
 
         </div>
         <div class="form-group">

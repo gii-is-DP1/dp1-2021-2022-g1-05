@@ -30,15 +30,6 @@ public class UserService {
         return userRepository.findById(username);
     }
 
-
-    @Transactional
-    public void delete(User user) throws DataAccessException{
-        userRepository.delete(user);
-    }
-
-
-
-
     @Transactional
     public void saveUser(User user) throws DataAccessException {
         user.setEnabled(true);
