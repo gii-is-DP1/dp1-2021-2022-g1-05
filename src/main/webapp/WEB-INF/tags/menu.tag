@@ -32,10 +32,10 @@
 				</flippingboards:menuItem>
 
                 <sec:authorize access="hasAuthority('admin')">
-				<flippingboards:menuItem active="${name eq 'owners'}" url="/owners/find"
+				<flippingboards:menuItem active="${name eq 'owners'}" url="/players"
 					title="find owners">
 					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-					<span>Find owners</span>
+					<span>Find players</span>
 				</flippingboards:menuItem>
 
 
