@@ -29,11 +29,6 @@ public class UserController {
         dataBinder.setDisallowedFields("id");
     }
 
-    @InitBinder("user")
-    public void initUserBinder(WebDataBinder dataBinder) {
-        dataBinder.setValidator(new UserValidator());
-    }
-
 
 
     @GetMapping(value = "/users/new")

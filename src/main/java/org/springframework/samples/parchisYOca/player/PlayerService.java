@@ -7,6 +7,8 @@ import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class PlayerService {
 
@@ -25,7 +27,12 @@ public class PlayerService {
 
     @Transactional(readOnly = true)
     public Player findPlayerById(int id) throws DataAccessException {
-        return (Player) playerRepository.findById(id).get();
+        return playerRepository.findById(id).get();
+    }
+
+    @Transactional(readOnly = true)
+    public Player findPlayerByUsername(String username) throws DataAccessException {
+        return playerRepository.findPlayerByUsername(username).get();
     }
 
 

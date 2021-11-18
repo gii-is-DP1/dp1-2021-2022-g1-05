@@ -19,7 +19,6 @@ public class AchievementServiceTests {
     private AchievementService achievementService;
 
     @Test
-    @Disabled("No poner datos absolutos, no se debería saber que el total son 3")
     public void testCountWithInitialData(){
         int count = achievementService.achievementCount();
         assertEquals(count,3);
