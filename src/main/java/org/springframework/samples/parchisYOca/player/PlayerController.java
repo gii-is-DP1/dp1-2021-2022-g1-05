@@ -42,6 +42,13 @@ public class PlayerController {
     @GetMapping("/players/{playerId}")
     public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
         ModelAndView mav = new ModelAndView("players/playerDetails");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication.getPrincipal().toString() != "anonymousUser"){
+            if(authentication.isAuthenticated()){
+                User authenticatedUser = (User) authentication.getPrincipal();
+                mav.addObject("authenticatedPlayer",playerService.findPlayerByUsername(authenticatedUser.getUsername()));
+            }
+        }
         mav.addObject(this.playerService.findPlayerById(playerId));
         mav.addObject(this.playerService.findPlayerById(playerId).getUser());
         return mav;
@@ -58,9 +65,20 @@ public class PlayerController {
 
     @GetMapping(value = "/players/{playerId}/edit")
     public String initUpdatePlayerForm(@PathVariable("playerId") int playerId, Model model) {
-        Player player = this.playerService.findPlayerById(playerId);
-        model.addAttribute(player);
-        return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication.getPrincipal().toString() != "anonymousUser") {
+            if (authentication.isAuthenticated()) {
+                User authenticatedUser = (User) authentication.getPrincipal();
+                Player authenticatedPlayer = playerService.findPlayerByUsername(authenticatedUser.getUsername());
+                if (playerId == authenticatedPlayer.getId()) {
+                    model.addAttribute(authenticatedPlayer);
+                    return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
+                }
+            }
+        }
+
+        return "redirect:/";
     }
 
     @PostMapping(value = "/players/{playerId}/edit")

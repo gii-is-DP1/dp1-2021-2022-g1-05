@@ -8,13 +8,15 @@
 
     <h2>Player profile</h2>
 
-    <spring:url value="{playerId}/edit" var="editUrl">
-        <spring:param name="playerId" value="${player.id}"/>
-    </spring:url>
-    <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Edit Player</a>
+    <c:if test="${player.id eq authenticatedPlayer.id}">
+        <spring:url value="{playerId}/edit" var="editUrl">
+            <spring:param name="playerId" value="${player.id}"/>
+        </spring:url>
+        <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Edit Player</a>
+        <br>
+        <br>
+    </c:if>
 
-    <br>
-    <br>
     <br>
 
     <h3>Player credentials</h3>
