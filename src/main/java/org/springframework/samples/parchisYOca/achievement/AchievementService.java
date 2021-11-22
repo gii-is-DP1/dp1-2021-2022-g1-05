@@ -29,8 +29,9 @@ public class AchievementService {
     }
 
     @Transactional
-    public void save(Achievement achievement) throws DataAccessException{
+    public Achievement save(Achievement achievement) throws DataAccessException{
         achievementRepository.save(achievement);
+        return achievement;
     }
 
 
