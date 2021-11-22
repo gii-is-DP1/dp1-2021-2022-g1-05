@@ -6,57 +6,64 @@
 
 <parchisYOca:layout pageName="players">
 
-    <h2>Player profile</h2>
 
-    <c:if test="${player.id eq authenticatedPlayer.id}">
-        <spring:url value="{playerId}/edit" var="editUrl">
-            <spring:param name="playerId" value="${player.id}"/>
-        </spring:url>
-        <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Edit Player</a>
-        <br>
-        <br>
-    </c:if>
 
-    <br>
+    <c:choose>
+        <c:when test="${player.id eq authenticatedPlayer.id}">
+            <h2>Player profile</h2>
+            <spring:url value="{playerId}/edit" var="editUrl">
+                <spring:param name="playerId" value="${player.id}"/>
+            </spring:url>
+            <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Edit Player</a>
+            <br>
+            <br>
 
-    <h3>Player credentials</h3>
 
-    <table class="table table-striped">
-        <tr>
-            <th>Email</th>
-            <td><c:out value="${player.email}"/></td>
-        </tr>
-        <tr>
-            <th>Username</th>
-            <td><c:out value="${user.username}"/></td>
-        </tr>
-    </table>
+            <br>
 
-    <br>
+            <h3>Player credentials</h3>
 
-    <h3>Player achievements</h3>
+            <table class="table table-striped">
+                <tr>
+                    <th>Email</th>
+                    <td><c:out value="${player.email}"/></td>
+                </tr>
+                <tr>
+                    <th>Username</th>
+                    <td><c:out value="${user.username}"/></td>
+                </tr>
+            </table>
 
-    <table id="achievementsPlayerTable" class="table table-striped">
-        <thead>
-        <tr>
-            <th style="width: 150px;">Achievement name</th>
-            <th style="width: 200px;">Achievement description</th>
+            <br>
 
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${player.achievements}" var="achievement">
-        <tr>
-            <td>
-                <c:out value="${achievement.name}"/>
-            </td>
-            <td>
-                <c:out value="${achievement.description}"/>
-            </td>
+            <h3>Player achievements</h3>
 
-            </c:forEach>
-        </tbody>
-    </table>
+            <table id="achievementsPlayerTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <th style="width: 150px;">Achievement name</th>
+                    <th style="width: 200px;">Achievement description</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach items="${player.achievements}" var="achievement">
+                <tr>
+                    <td>
+                        <c:out value="${achievement.name}"/>
+                    </td>
+                    <td>
+                        <c:out value="${achievement.description}"/>
+                    </td>
+
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:when>
+        <c:otherwise>
+            <h1>You dont have permission to visualize this data</h1>
+        </c:otherwise>
+    </c:choose>
 
 
 

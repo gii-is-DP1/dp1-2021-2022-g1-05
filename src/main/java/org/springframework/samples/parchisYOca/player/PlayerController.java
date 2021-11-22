@@ -68,19 +68,20 @@ public class PlayerController {
     @GetMapping(value = "/players/{playerId}/edit")
     public String initUpdatePlayerForm(@PathVariable("playerId") int playerId, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication.getPrincipal().toString() != "anonymousUser") {
-            if (authentication.isAuthenticated()) {
+        if(authentication.getPrincipal().toString() != "anonymousUser"){
+            if(authentication.isAuthenticated()){
                 User authenticatedUser = (User) authentication.getPrincipal();
-                Player authenticatedPlayer = playerService.findPlayerByUsername(authenticatedUser.getUsername());
-                if (playerId == authenticatedPlayer.getId()) {
-                    model.addAttribute(authenticatedPlayer);
+                Player player = this.playerService.findPlayerByUsername(authenticatedUser.getUsername());
+                if (playerId == player.getId() || player.getUser().getAuthorities().contains("admin")){
+                    model.addAttribute(player);
                     return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
+                } else {
                 }
             }
-        }
 
-        return "redirect:/";
+        }
+        return "redirect:";
+
     }
 
     @PostMapping(value = "/players/{playerId}/edit")
