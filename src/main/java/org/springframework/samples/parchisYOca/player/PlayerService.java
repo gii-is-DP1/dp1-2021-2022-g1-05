@@ -38,13 +38,16 @@ public class PlayerService {
 
 
     @Transactional
-    public void savePlayer(Player player) throws DataAccessException {
+    public Player savePlayer(Player player) throws DataAccessException{
         //creating player
         playerRepository.save(player);
         //creating user
         userService.saveUser(player.getUser());
         //creating authorities
         authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+
+        return player;
+
     }
 
     @Transactional(readOnly = true)

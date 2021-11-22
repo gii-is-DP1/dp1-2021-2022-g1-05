@@ -29,7 +29,7 @@ public class AchievementServiceTests {
         newAchievement.setDescription("Logro de prueba");
         Achievement addedAchievement = achievementService.save(newAchievement);
 
-        assertThat(addedAchievement).isEqualTo(achievementService.findAchievementById(addedAchievement.getId()));
+        assertThat(addedAchievement).isEqualTo(achievementService.findAchievementById(addedAchievement.getId()).get());
     }
 
     @Test

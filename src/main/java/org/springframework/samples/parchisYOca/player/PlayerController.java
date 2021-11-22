@@ -1,10 +1,12 @@
 package org.springframework.samples.parchisYOca.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -19,13 +21,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Controller
 public class PlayerController {
 
-    private static final String VIEWS_PLAYER_CREATE_OR_UPDATE_FORM = "players/createOrUpdatePlayerForm";
+    private static final String VIEWS_PLAYER_UPDATE_FORM = "players/UpdatePlayerForm";
 
 
     private final PlayerService playerService;
@@ -45,10 +49,19 @@ public class PlayerController {
     public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
         ModelAndView mav = new ModelAndView("players/playerDetails");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication.getPrincipal().toString() != "anonymousUser"){
+
+
+        if(authentication.getPrincipal().toString() != "anonymousUser"){ //To check if the user is logged
             if(authentication.isAuthenticated()){
-                User authenticatedUser = (User) authentication.getPrincipal();
-                mav.addObject("authenticatedPlayer",playerService.findPlayerByUsername(authenticatedUser.getUsername()));
+
+                User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+                Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername());
+                List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
+
+                System.out.println(authorities.get(0).toString());
+                if (playerId == player.getId() || authorities.get(0).toString().equals("admin")){
+                    mav.addObject("hasPermission", "true"); //To check if user has permission to see data
+                }
             }
         }
         mav.addObject(this.playerService.findPlayerById(playerId));
@@ -68,16 +81,21 @@ public class PlayerController {
     @GetMapping(value = "/players/{playerId}/edit")
     public String initUpdatePlayerForm(@PathVariable("playerId") int playerId, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication.getPrincipal().toString() != "anonymousUser"){
+
+        if(authentication.getPrincipal().toString() != "anonymousUser"){    //To check if the user is logged
             if(authentication.isAuthenticated()){
-                User authenticatedUser = (User) authentication.getPrincipal();
+
+                User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
                 Player player = this.playerService.findPlayerByUsername(authenticatedUser.getUsername());
-                if (playerId == player.getId() || player.getUser().getAuthorities().contains("admin")){
+                List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
+
+                if (playerId == player.getId() || authorities.get(0).toString().equals("admin")){
+                    model.addAttribute("hasPermission", "true");  //To check if user has permission to see data
                     model.addAttribute(player);
-                    return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
-                } else {
+                    return VIEWS_PLAYER_UPDATE_FORM;
                 }
             }
+
 
         }
         return "redirect:";
@@ -88,7 +106,7 @@ public class PlayerController {
         public String processUpdatePlayerForm(@Valid Player player, BindingResult result,
                                          @PathVariable("playerId") int playerId) {
         if (result.hasErrors()) {
-            return VIEWS_PLAYER_CREATE_OR_UPDATE_FORM;
+            return VIEWS_PLAYER_UPDATE_FORM;
         }
         else {
             player.setId(playerId);
