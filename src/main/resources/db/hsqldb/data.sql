@@ -3,10 +3,16 @@ INSERT INTO achievements(id, name, description) VALUES(2, 'NombreAchievement2', 
 INSERT INTO achievements(id, name, description) VALUES(3, 'NombreAchievement3', 'Descripción achievement 3');
 
 INSERT INTO users(username, password, enabled) VALUES('ManuK', 1234567, 'true');
+INSERT INTO users(username, password, enabled) VALUES('marioespiro', 'admin121', 'true');
+INSERT INTO users(username, password, enabled) VALUES('pedro', 'pedro121', 'true');
 
 INSERT INTO players(id, email, username) VALUES(1, 'manu@gmail.com', 'ManuK');
+INSERT INTO players(id, email, username) VALUES(2, 'mario@testmail.com', 'marioespiro');
+INSERT INTO players(id, email, username) VALUES(3, 'pedro@pedromail.com', 'pedro');
 
 INSERT INTO authorities(id, authority, username) VALUES(1, 'admin', 'ManuK');
+INSERT INTO authorities(id, authority, username) VALUES(2, 'admin', 'marioespiro');
+INSERT INTO authorities(id, authority, username) VALUES(3, 'player', 'pedro');
 
 INSERT INTO achievements_players(achievements_id, players_id) VALUES(2, 1);
 INSERT INTO achievements_players(achievements_id, players_id) VALUES(3, 1);
