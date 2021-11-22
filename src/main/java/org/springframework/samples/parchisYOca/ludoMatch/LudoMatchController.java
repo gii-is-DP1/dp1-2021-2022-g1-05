@@ -13,7 +13,7 @@ import javax.validation.Valid;
 import java.util.Optional;
 
 @Controller
-@RequestMapping ("/LudoMatch")
+@RequestMapping ("/ludoMatch")
 
 public class LudoMatchController {
     @Autowired
@@ -21,7 +21,7 @@ public class LudoMatchController {
 
     @GetMapping()
     public String listadoPartidas(ModelMap modelMap){
-        String vista="LudoMatch/matchList";
+        String vista="ludoMatch/matchList";
         Iterable<LudoMatch> matchList = ludoMatchService.findAll();
         modelMap.addAttribute("matches",matchList);
         return vista;
@@ -29,13 +29,13 @@ public class LudoMatchController {
 
     @GetMapping(path="/new")
     public String crearPartida(ModelMap modelMap){
-        String view = "LudoMatch/createLudoMatch";
+        String view = "ludoMatch/createLudoMatch";
         modelMap.addAttribute("LudoMatch", new LudoMatch());
         return view;
     }
     @PostMapping(path="/save")
     public String ModificarPartida(@Valid LudoMatch ludoMatch, BindingResult result, ModelMap modelMap){
-        String view="LudoMatch/matchList";
+        String view="ludoMatch/matchList";
         if(result.hasErrors()){
             modelMap.addAttribute("ludoMatch",ludoMatch);
             return "ludoMatch/editLudoMatch";
@@ -49,7 +49,7 @@ public class LudoMatchController {
 
     @GetMapping(path="/delete/{ludoMatchId}")
     public String borrarPartida(@PathVariable("ludoMatchId") int ludoMatchId, ModelMap modelMap){
-        String view = "LudoMatch/matchList";
+        String view = "ludoMatch/matchList";
         Optional<LudoMatch> ludoMatch = ludoMatchService.findLudoMatchById(ludoMatchId);
         if(ludoMatch.isPresent()){
             ludoMatchService.delete(ludoMatch.get());
