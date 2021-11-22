@@ -19,7 +19,7 @@ import java.util.Set;
 @Table(name="users")
 public class User implements Serializable { //Implementing serializable to fix an issue
 
-    @NotEmpty
+
     @Id
     private String username;
 
