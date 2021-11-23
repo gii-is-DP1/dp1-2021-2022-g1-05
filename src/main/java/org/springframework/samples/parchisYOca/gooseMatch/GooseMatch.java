@@ -28,10 +28,10 @@ public class GooseMatch extends BaseEntity {
     private Date startDate;
 
     @DateTimeFormat
-    private Date endDate;
+    private Date endDate = null;
 
     @NotEmpty
-    @Size(max=4)
+    @Size(max=5)
     private String matchCode;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gooseMatch")
