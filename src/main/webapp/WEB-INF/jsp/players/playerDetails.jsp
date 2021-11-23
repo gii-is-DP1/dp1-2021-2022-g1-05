@@ -9,7 +9,7 @@
 
 
     <c:choose>
-        <c:when test="${player.id eq authenticatedPlayer.id}">
+        <c:when test="${hasPermission eq 'true'}">
             <h2>Player profile</h2>
             <spring:url value="{playerId}/edit" var="editUrl">
                 <spring:param name="playerId" value="${player.id}"/>

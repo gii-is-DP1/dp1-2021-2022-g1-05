@@ -21,6 +21,7 @@ public class User implements Serializable { //Implementing serializable to fix a
 
 
     @Id
+    @NotEmpty
     private String username;
 
     @NotEmpty

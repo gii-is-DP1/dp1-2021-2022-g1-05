@@ -8,9 +8,9 @@
 
 <parchisYOca:layout pageName="players">
     <h2>
-        <c:if test="${player['new']}">New </c:if> Player
+        Modify player
     </h2>
-    <form:form modelAttribute="player" class="form-horizontal" id="add-owner-form">
+    <form:form modelAttribute="player" class="form-horizontal" id="modify-player-form">
         <div class="form-group has-feedback">
             <parchisYOca:inputField label="Username" name="user.username"/>
             <parchisYOca:inputField label="Password" name="user.password"/>
@@ -19,14 +19,7 @@
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <c:choose>
-                    <c:when test="${player['new']}">
-                        <button class="btn btn-default" type="submit">Add Player</button>
-                    </c:when>
-                    <c:otherwise>
-                        <button class="btn btn-default" type="submit">Update Player</button>
-                    </c:otherwise>
-                </c:choose>
+                <button class="btn btn-default" type="submit">Update player</button>
             </div>
         </div>
     </form:form>
