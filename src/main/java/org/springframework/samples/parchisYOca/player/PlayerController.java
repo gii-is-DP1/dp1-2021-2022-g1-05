@@ -115,6 +115,36 @@ public class PlayerController {
         }
     }
 
+    @GetMapping(path="/players/disable/{playerId}")
+    public String disablePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
+        String view = "players/listPlayers";
+        Player player = playerService.findPlayerById(playerId);
+        if(!player.equals(null)){
+            playerService.disable(player);
+            modelMap.addAttribute("message", "Player successfully deleted!");
+            view=showAllPlayers(modelMap);
 
+        }else{
+            modelMap.addAttribute("message", "Player not found!");
+            view=showAllPlayers(modelMap);
+        }
+        return "redirect:/players";
+    }
+
+    @GetMapping(path="/players/enable/{playerId}")
+    public String enablePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
+        String view = "players/listPlayers";
+        Player player = playerService.findPlayerById(playerId);
+        if(!player.equals(null)){
+            playerService.enable(player);
+            modelMap.addAttribute("message", "Player successfully enabled!");
+            view=showAllPlayers(modelMap);
+
+        }else{
+            modelMap.addAttribute("message", "Player not found!");
+            view=showAllPlayers(modelMap);
+        }
+        return "redirect:/players";
+    }
 
 }

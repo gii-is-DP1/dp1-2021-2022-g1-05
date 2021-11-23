@@ -27,7 +27,7 @@ public class Achievement extends BaseEntity {
     @NotEmpty
     private String description;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     private Set<Player> players;
 
 }
