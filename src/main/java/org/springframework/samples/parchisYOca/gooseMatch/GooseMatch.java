@@ -8,10 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -25,16 +22,17 @@ import java.util.Set;
 public class GooseMatch extends BaseEntity {
 
     @DateTimeFormat
-    private Date startDate;
+    private Date startDate = null;
 
     @DateTimeFormat
     private Date endDate = null;
 
     @NotEmpty
-    @Size(max=5)
+    @Size(max=6)
+    @Column(unique = true)
     private String matchCode;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gooseMatch")
-    @Size(min=2, max=4)
+    @Size(min=1, max=4) //Change before submitting
     private Set<PlayerGooseStats> stats;
 }

@@ -6,6 +6,17 @@
 <%@ taglib prefix="ParchisYOca" tagdir="/WEB-INF/tags" %>
 
 <ParchisYOca:layout pageName="createGooseMatch">
-    <h2>Creating a Goose game match</h2>
+    <h1>Goose match lobby</h1>
+
+    <h2>Joined players:</h2>
+    <ol>
+        <c:forEach items="${stats}" var="stat">
+                    <li><p><c:out value="${stat.player.user.username}"/></p></li>
+        </c:forEach>
+    </ol>
+
+    <a href="/gooseMatches/${matchId}"><button class="btn btn-default" type="submit">Start game</button></a>
+
+
 
 </ParchisYOca:layout>
