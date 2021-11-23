@@ -9,7 +9,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -38,17 +42,40 @@ public class UserController {
         return VIEWS_PLAYER_CREATE_FORM;
     }
 
+
     @PostMapping(value = "/users/new")
     public String processCreationForm(@Valid Player player, BindingResult result) {
         if (result.hasErrors()) {
             return VIEWS_PLAYER_CREATE_FORM;
-        }
-        else {
+        } else {
             //creating player, user, and authority
             this.playerService.savePlayer(player);
             return "redirect:/";
         }
+
     }
 
 
+    //Método hecho para ver como funcionan las excepciones en formularios, comentar si no se necesita
+    /*@PostMapping(value = "/users/new")
+    public String processCreationForm(@Valid Player player, BindingResult result, Map<String, Object> model) {
+        if (!result.hasErrors()) {
+            try{
+
+                //creating player, user, and authority
+                this.playerService.savePlayer(player);
+            }catch(ConstraintViolationException ex){
+                List<String> excepciones = new ArrayList<>();
+                for(ConstraintViolation violacion : ex.getConstraintViolations()){
+                    excepciones.add(violacion.getMessage());
+                }
+                model.put("exceptions", excepciones);
+            }
+            return VIEWS_PLAYER_CREATE_FORM;
+        }
+        else {
+            return VIEWS_PLAYER_CREATE_FORM;
+
+        }
+    }*/
 }
