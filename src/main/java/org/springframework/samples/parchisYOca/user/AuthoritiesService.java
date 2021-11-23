@@ -56,5 +56,9 @@ public class AuthoritiesService {
             throw new DataAccessException("User '"+username+"' not found!") {};
     }
 
+    public void deleteAuthorities(Authorities authorities) throws DataAccessException {
+        authoritiesRepository.delete(authorities);
+    }
+
 
 }

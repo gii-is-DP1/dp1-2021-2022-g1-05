@@ -13,6 +13,7 @@
         <tr>
             <th style="width: 150px;">Name</th>
             <th style="width: 200px;">Email</th>
+            <th style="width: 150px;">Enabled</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -29,10 +30,21 @@
                     <c:out value="${player.email}"/>
                 </td>
                 <td>
-                    <spring:url value="/players/delete/{playerId}" var="playerUrl">
-                        <spring:param name="playerId" value="${player.id}"/>
-                    </spring:url>
-                    <a href="${fn:escapeXml(playerUrl)}">Delete</a>
+                    <c:out value="${player.user.enabled}"/>
+                </td>
+                <td>
+                    <c:if test="${player.user.enabled eq true}">
+                        <spring:url value="/players/disable/{playerId}" var="playerUrl">
+                            <spring:param name="playerId" value="${player.id}"/>
+                        </spring:url>
+                        <a href="${fn:escapeXml(playerUrl)}">Disable</a>
+                    </c:if>
+                    <c:if test="${player.user.enabled eq false}">
+                        <spring:url value="/players/enable/{playerId}" var="playerUrl">
+                            <spring:param name="playerId" value="${player.id}"/>
+                        </spring:url>
+                        <a href="${fn:escapeXml(playerUrl)}">Enable</a>
+                    </c:if>
                 </td>
 
             </tr>
