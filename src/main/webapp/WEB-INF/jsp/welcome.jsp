@@ -18,7 +18,7 @@
             <button type="button" class="btn btn-primary btn-lg btn-block">Join ludo game</button>
         </div>
         <div class="col-md-3 text-center" style="padding-right: 80px">
-            <button type="button" class="btn btn-info btn-lg btn-block">Create goose game</button>
+            <a href="/gooseMatches/new"><button type="button" class="btn btn-info btn-lg btn-block">Create goose game</button></a>
             <button type="button" class="btn btn-info btn-lg btn-block">Join goose game</button>
         </div>
         <div class="col-md-3"></div>
