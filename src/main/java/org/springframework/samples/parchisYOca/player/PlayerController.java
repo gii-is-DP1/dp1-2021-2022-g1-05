@@ -122,14 +122,14 @@ public class PlayerController {
         Player player = playerService.findPlayerById(playerId);
         if(!player.equals(null)){
             playerService.disable(player);
-            modelMap.addAttribute("message", "Player successfully deleted!");
+            modelMap.addAttribute("message", "Player successfully disabled!");
             view=showAllPlayers(modelMap);
 
         }else{
             modelMap.addAttribute("message", "Player not found!");
             view=showAllPlayers(modelMap);
         }
-        return "redirect:/players";
+        return view;
     }
 
     @GetMapping(path="/players/enable/{playerId}")
@@ -145,7 +145,7 @@ public class PlayerController {
             modelMap.addAttribute("message", "Player not found!");
             view=showAllPlayers(modelMap);
         }
-        return "redirect:/players";
+        return view;
     }
 
 }
