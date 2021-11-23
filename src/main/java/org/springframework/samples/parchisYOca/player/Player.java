@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.model.Person;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.user.Authorities;
 import org.springframework.samples.parchisYOca.user.User;
 
@@ -25,6 +26,9 @@ public class Player extends Person implements Serializable { //Implementing seri
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "player")
+    private Set<PlayerGooseStats> stats;
 
 }
 

@@ -23,4 +23,9 @@
             </div>
         </div>
     </form:form>
+
+        <c:forEach items="${exceptions}" var="exception">
+            <p><c:out value="${exception}"/></p>
+        </c:forEach>
+
 </parchisYOca:layout>

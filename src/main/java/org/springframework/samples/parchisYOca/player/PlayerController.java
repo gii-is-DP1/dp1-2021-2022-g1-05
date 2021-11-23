@@ -86,11 +86,12 @@ public class PlayerController {
             if(authentication.isAuthenticated()){
 
                 User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-                Player player = this.playerService.findPlayerByUsername(authenticatedUser.getUsername());
+                Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername());
                 List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
 
-                if (playerId == player.getId() || authorities.get(0).toString().equals("admin")){
+                if (playerId == authenticatedPlayer.getId() || authorities.get(0).toString().equals("admin")){
                     model.addAttribute("hasPermission", "true");  //To check if user has permission to see data
+                    Player player = playerService.findPlayerById(playerId);
                     model.addAttribute(player);
                     return VIEWS_PLAYER_UPDATE_FORM;
                 }

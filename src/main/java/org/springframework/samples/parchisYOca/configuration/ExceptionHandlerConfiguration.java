@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ExceptionHandlerConfiguration
 {
-	@Autowired
+	/*@Autowired
 	private BasicErrorController errorController;
     // add any exceptions/validations/binding problems
 
@@ -25,5 +25,5 @@ public class ExceptionHandlerConfiguration
         request.setAttribute("javax.servlet.error.status_code", 400);
         request.setAttribute("exeption", ex);
         return "exception";
-    }
+    }*/
 }
