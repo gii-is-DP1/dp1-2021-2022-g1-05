@@ -14,8 +14,8 @@
     <div class="row" style="margin-top: 3%">
         <div class="col-md-3"></div>
         <div class="col-md-3 text-center" style="padding-left: 80px">
-            <button type="button" class="btn btn-primary btn-lg btn-block">Create ludo game</button>
-            <button type="button" class="btn btn-primary btn-lg btn-block">Join ludo game</button>
+            <a href="/ludoMatches/new"><button type="button" class="btn btn-primary btn-lg btn-block">Create ludo game</button></a>
+            <a href="/ludoMatches/join"><button type="button" class="btn btn-primary btn-lg btn-block">Join ludo game</button></a>
         </div>
         <div class="col-md-3 text-center" style="padding-right: 80px">
             <a href="/gooseMatches/new"><button type="button" class="btn btn-info btn-lg btn-block">Create goose game</button></a>

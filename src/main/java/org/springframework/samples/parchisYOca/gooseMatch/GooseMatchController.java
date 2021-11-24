@@ -124,41 +124,4 @@ public class GooseMatchController {
         return view;
     }
 
-    /*@GetMapping(value = "/players/{playerId}/edit")
-    public String initUpdatePlayerForm(@PathVariable("playerId") int playerId, Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if(authentication.getPrincipal().toString() != "anonymousUser"){    //To check if the user is logged
-            if(authentication.isAuthenticated()){
-
-                User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-                Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername());
-                List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
-
-                if (playerId == authenticatedPlayer.getId() || authorities.get(0).toString().equals("admin")){
-                    model.addAttribute("hasPermission", "true");  //To check if user has permission to see data
-                    Player player = playerService.findPlayerById(playerId);
-                    model.addAttribute(player);
-                    return VIEWS_PLAYER_UPDATE_FORM;
-                }
-            }
-
-
-        }
-        return "redirect:";
-
-    }
-
-    @PostMapping(value = "/players/{playerId}/edit")
-        public String processUpdatePlayerForm(@Valid Player player, BindingResult result,
-                                         @PathVariable("playerId") int playerId) {
-        if (result.hasErrors()) {
-            return VIEWS_PLAYER_UPDATE_FORM;
-        }
-        else {
-            player.setId(playerId);
-            this.playerService.savePlayer(player);
-            return "redirect:/players/{playerId}";
-        }
-    }*/
 }
