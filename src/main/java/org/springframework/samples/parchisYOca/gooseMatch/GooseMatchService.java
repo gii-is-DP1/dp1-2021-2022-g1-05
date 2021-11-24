@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.crypto.Data;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -25,8 +26,8 @@ public class GooseMatchService {
     }
 
     @Transactional(readOnly = true)
-    public GooseMatch findGooseMatchByMatchCode(String matchCode) throws DataAccessException{
-        return gooseMatchRepository.findMatchByMatchCode(matchCode).get();
+    public Optional<GooseMatch> findGooseMatchByMatchCode(String matchCode) throws DataAccessException{
+        return gooseMatchRepository.findMatchByMatchCode(matchCode);
     }
 
     @Transactional(readOnly = true)
@@ -34,11 +35,10 @@ public class GooseMatchService {
         return gooseMatchRepository.findById(id).get();
     }
 
-    //TO-DO RN: Not join or create match when one is running
-    /*@Transactional
-    public Collection<GooseMatch> findCurrentGooseMatchByPlayerId(int playerId) throws DataAccessException{
-        return gooseMatchRepository.findCurrentMatchesByPlayerId(playerId);
-    }*/
+    @Transactional
+    public Collection<GooseMatch> findLobbyByUsername(String username) throws DataAccessException{
+        return gooseMatchRepository.findLobbyByUsername(username);
+    }
 
     @Transactional
     public GooseMatch save(GooseMatch gooseMatch) throws DataAccessException {
