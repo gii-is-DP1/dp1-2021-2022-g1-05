@@ -2,6 +2,7 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsRepository;
@@ -31,6 +32,11 @@ public class LudoMatchService {
     @Transactional(readOnly = true)
     public LudoMatch findludoMatchById(int id) throws DataAccessException {
         return ludoMatchRepository.findById(id).get();
+    }
+
+    @Transactional(readOnly = true)
+    public Iterable<LudoMatch> findAll() throws DataAccessException{
+        return ludoMatchRepository.findAll();
     }
 
     @Transactional

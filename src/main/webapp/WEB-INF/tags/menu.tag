@@ -32,12 +32,21 @@
 				</flippingboards:menuItem>
 
                 <sec:authorize access="hasAuthority('admin')">
-				<flippingboards:menuItem active="${name eq 'owners'}" url="/players"
-					title="find owners">
-					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-					<span>Find players</span>
-				</flippingboards:menuItem>
-
+                    <flippingboards:menuItem active="${name eq 'owners'}" url="/players"
+                        title="find players">
+                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                        <span>Players</span>
+                    </flippingboards:menuItem>
+                    <flippingboards:menuItem active="${name eq 'ludoMatches'}" url="/ludoMatches"
+                         title="find ludo matches">
+                        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        <span>Ludo matches</span>
+                    </flippingboards:menuItem>
+                    <flippingboards:menuItem active="${name eq 'gooseMatches'}" url="/gooseMatches"
+                                             title="find goose matches">
+                        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        <span>Goose matches</span>
+                    </flippingboards:menuItem>
 
                     <flippingboards:menuItem active="${name eq 'achievements'}" url="/achievements"
                                              title="global achievement list">

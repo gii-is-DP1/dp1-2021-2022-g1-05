@@ -2,6 +2,7 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsRepository;
@@ -33,6 +34,11 @@ public class GooseMatchService {
     @Transactional(readOnly = true)
     public GooseMatch findGooseMatchById(int id) throws DataAccessException {
         return gooseMatchRepository.findById(id).get();
+    }
+
+    @Transactional(readOnly = true)
+    public Iterable<GooseMatch> findAll() throws DataAccessException{
+        return gooseMatchRepository.findAll();
     }
 
     @Transactional
