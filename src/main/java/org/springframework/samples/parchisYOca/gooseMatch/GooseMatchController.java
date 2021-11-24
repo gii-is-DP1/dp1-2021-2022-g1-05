@@ -57,6 +57,7 @@ public class GooseMatchController {
         GooseMatch gooseMatch = gooseMatchService.findGooseMatchByMatchCode(matchCode);
 
         modelMap.addAttribute("stats", gooseMatch.getStats());
+        modelMap.addAttribute("matchCode", matchCode);
         modelMap.addAttribute("match", gooseMatch);
         modelMap.addAttribute("matchId",gooseMatch.getId());
 

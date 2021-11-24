@@ -75,7 +75,7 @@
 											<p class="text-left">
 												<strong><sec:authentication property="name" /></strong>
                                                 <spring:url value="/players/{playerId}" var="playerUrl">
-                                                    <spring:param name="playerId" value="${player.id}"/>
+                                                    <spring:param name="playerId" value="${playerId}"/>
                                                 </spring:url>
                                                 <a href="${fn:escapeXml(playerUrl)}" class="btn btn-primary btn-block btn-sm">My profile</a>
 											</p>
