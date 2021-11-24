@@ -19,7 +19,7 @@
         </div>
         <div class="col-md-3 text-center" style="padding-right: 80px">
             <a href="/gooseMatches/new"><button type="button" class="btn btn-info btn-lg btn-block">Create goose game</button></a>
-            <button type="button" class="btn btn-info btn-lg btn-block">Join goose game</button>
+            <a href="/gooseMatches/join"><button type="button" class="btn btn-info btn-lg btn-block">Join goose game</button></a>
         </div>
         <div class="col-md-3"></div>
     </div>
