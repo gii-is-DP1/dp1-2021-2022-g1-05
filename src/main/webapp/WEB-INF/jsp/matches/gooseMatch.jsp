@@ -5,7 +5,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="ParchisYOca" tagdir="/WEB-INF/tags" %>
 
-<ParchisYOca:layout pageName="LudoMatch">
-    <h2>Ludo game match!</h2>
+<ParchisYOca:layout pageName="gooseMatch">
+    <h2>Goose game match!</h2>
 
 </ParchisYOca:layout>

@@ -1,6 +1,7 @@
 package org.springframework.samples.parchisYOca.gooseMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -64,7 +65,7 @@ public class GooseMatchController {
     public String  joinGooseMatchForm(Map<String, Object> model){
         GooseMatch match = new GooseMatch();
         model.put("match", match);
-        return "gooseMatches/joinMatchForm";
+        return "matches/joinMatchForm";
     }
 
     @PostMapping(value = "/gooseMatches/join")
@@ -96,7 +97,7 @@ public class GooseMatchController {
                 modelMap.addAttribute("message", "Lobby not found!");
             }
         }
-        return "gooseMatches/joinMatchForm";
+        return "matches/joinMatchForm";
     }
 
 
@@ -111,17 +112,25 @@ public class GooseMatchController {
         modelMap.addAttribute("match", gooseMatch);
         modelMap.addAttribute("matchId",gooseMatch.getId());
 
-        return "gooseMatches/gooseMatchLobby";
+        return "matches/gooseMatchLobby";
     }
 
 
     @GetMapping(value = "/gooseMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId){
-        String view = "gooseMatches/gooseMatch";
+        String view = "matches/gooseMatch";
         GooseMatch match = gooseMatchService.findGooseMatchById(matchId);
         match.setStartDate(new Date());
         gooseMatchService.save(match);
         return view;
+    }
+
+    @GetMapping(value="/gooseMatches")
+    public String listadoPartidas(ModelMap modelMap){
+        String vista = "matches/listGooseMatches";
+        Iterable<GooseMatch> gooseMatches = gooseMatchService.findAll();
+        modelMap.addAttribute("gooseMatches",gooseMatches);
+        return vista;
     }
 
 }

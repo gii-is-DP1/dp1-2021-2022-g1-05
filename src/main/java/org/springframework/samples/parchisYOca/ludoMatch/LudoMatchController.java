@@ -1,6 +1,7 @@
 package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
@@ -59,7 +60,7 @@ public class LudoMatchController {
     public String  joinLudoMatchForm(Map<String, Object> model){
         LudoMatch match = new LudoMatch();
         model.put("match", match);
-        return "ludoMatches/joinMatchForm";
+        return "matches/joinMatchForm";
     }
 
     @PostMapping(value = "/ludoMatches/join")
@@ -91,7 +92,7 @@ public class LudoMatchController {
                 modelMap.addAttribute("message", "Lobby not found!");
             }
         }
-        return "ludoMatches/joinMatchForm";
+        return "matches/joinMatchForm";
     }
 
 
@@ -106,15 +107,23 @@ public class LudoMatchController {
         modelMap.addAttribute("match", ludoMatch);
         modelMap.addAttribute("matchId",ludoMatch.getId());
 
-        return "ludoMatches/ludoMatchLobby";
+        return "matches/ludoMatchLobby";
     }
 
     @GetMapping(value = "/ludoMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId){
-        String view = "ludoMatches/ludoMatch";
+        String view = "matches/ludoMatch";
         LudoMatch match = ludoMatchService.findludoMatchById(matchId);
         match.setStartDate(new Date());
         ludoMatchService.save(match);
         return view;
+    }
+
+    @GetMapping(value="/ludoMatches")
+    public String listadoPartidas(ModelMap modelMap){
+        String vista = "matches/listLudoMatches";
+        Iterable<LudoMatch> ludoMatches = ludoMatchService.findAll();
+        modelMap.addAttribute("ludoMatches",ludoMatches);
+        return vista;
     }
 }
