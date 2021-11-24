@@ -36,7 +36,7 @@ public class GooseMatchController {
         this.playerService = playerService;
     }
 
-    @GetMapping("gooseMatches/new")
+    @GetMapping("/gooseMatches/new")
     public String createGooseMatch(){
         String matchCode = RandomStringGenerator.getRandomString(MATCH_CODE_LENGTH);
         GooseMatch gooseMatch = new GooseMatch();
@@ -49,6 +49,26 @@ public class GooseMatchController {
         gooseMatchService.saveGooseMatchWithPlayer(gooseMatch, player);
         return "redirect:/gooseMatches/lobby/"+matchCode;
     }
+
+    @GetMapping(value = "/gooseMatches/join")
+    public String  joinGooseMatchForm(Map<String, Object> model){
+        GooseMatch match = new GooseMatch();
+        model.put("match", match);
+        return "gooseMatches/joinMatchForm";
+    }
+
+    @PostMapping(value = "gooseMatches/join")
+    public String joinGooseMatch(){
+        return "a";
+    }
+
+
+    /*
+    @GetMapping(value = "/gooseMatches/{matchCode}")
+    public String joinGooseMatch(@PathVariable("matchCode") String matchCode){
+
+    }
+    */
 
     @GetMapping(value = "/gooseMatches/lobby/{matchCode}")
     public String initCreationLobby(@PathVariable("matchCode") String matchCode, ModelMap modelMap, HttpServletResponse response) {
@@ -63,6 +83,7 @@ public class GooseMatchController {
 
         return "gooseMatches/gooseMatchLobby";
     }
+
 
     @GetMapping(value = "/gooseMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId){
