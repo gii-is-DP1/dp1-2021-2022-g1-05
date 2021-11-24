@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class WelcomeController {
 
 
 	  @GetMapping({"/","/welcome"})
-	  public String welcome(Map<String, Object> model) {
+	  public String welcome(ModelMap model) {
 
           //Used to load the logged user to the model
           Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -41,6 +42,7 @@ public class WelcomeController {
               }
 
           }
+          System.out.println(model.get("message"));
 	    return "welcome";
 	  }
 }
