@@ -44,7 +44,8 @@ public class UserController {
 
 
     @PostMapping(value = "/users/new")
-    public String processCreationForm(@Valid Player player, BindingResult result) {
+    public String processCreationForm(@RequestParam(name="user.password") String password, @Valid Player player, BindingResult result) {
+        System.out.println(password);
         if (result.hasErrors()) {
             return VIEWS_PLAYER_CREATE_FORM;
         } else {
