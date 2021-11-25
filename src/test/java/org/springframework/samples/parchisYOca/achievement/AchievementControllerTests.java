@@ -42,7 +42,8 @@ public class AchievementControllerTests {
     @Test
     void testListAchievements() throws Exception {
         mockMvc.perform(get("/achievements"))
-            .andExpect(status().isOk()).andExpect(view().name("achievements/listAchievements"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("achievements/listAchievements"))
             .andExpect(model().attributeExists("achievements"));
 
     }

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class LudoMatchService {
@@ -31,7 +33,7 @@ public class LudoMatchService {
         return ludoMatchRepository.findMatchByMatchCode(matchCode);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) //TODO manu arregla esto, que devuelva optional pa tenerlo todo igual
     public LudoMatch findludoMatchById(int id) throws DataAccessException {
         return ludoMatchRepository.findById(id).get();
     }
@@ -64,8 +66,15 @@ public class LudoMatchService {
         if(isOwner){
             playerStats.setIsOwner(1);
         }
-        playerLudoStatsRepository.save(playerStats);
+        PlayerLudoStats addedStats = playerLudoStatsRepository.save(playerStats);
+        Set<PlayerLudoStats> statsSet = new HashSet<>();
+        if (ludoMatchDB.getStats() != null) {
+            statsSet = ludoMatchDB.getStats();
+        }
+        statsSet.add(addedStats);
+        ludoMatchDB.setStats(statsSet);
 
+        ludoMatchDB = ludoMatchRepository.save(ludoMatchDB);
         return ludoMatchDB;
 
     }

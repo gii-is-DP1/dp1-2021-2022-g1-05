@@ -54,7 +54,7 @@ public class GooseMatchService {
 
     @Transactional
     public GooseMatch saveGooseMatchWithPlayer(GooseMatch gooseMatch, Player player, Boolean isOwner) throws DataAccessException {
-        //Saves the match
+        //        //Saves the match
         GooseMatch gooseMatchDB = gooseMatchRepository.save(gooseMatch);
 
         //Saves the relation between player and match

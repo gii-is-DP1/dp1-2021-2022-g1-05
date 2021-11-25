@@ -19,6 +19,9 @@ import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class AchievementServiceTests {
+
+    private static final int TEST_ACHIEVEMENT_ID = 1;
+
     @Autowired
     private AchievementService achievementService;
 
@@ -58,7 +61,7 @@ public class AchievementServiceTests {
 
     @Test
     @Transactional
-    public void testAddWithDuplicatedName(){        //MEJORA POSIBLE: Crear Excepción propia que maneje nombres duplicados
+    public void testAddWithDuplicatedName(){        //TODO MEJORA POSIBLE: Crear Excepción propia que maneje nombres duplicados
         Achievement newAchievement = new Achievement();
         newAchievement.setName("NombreAchievement1");
         newAchievement.setDescription("Tengo un nombre que ya existe");
@@ -79,12 +82,12 @@ public class AchievementServiceTests {
     @Test
     @Transactional
     public void testDeleteExistingAchievement(){
-        Optional<Achievement> achievementToDelete = achievementService.findAchievementById(3);
+        Optional<Achievement> achievementToDelete = achievementService.findAchievementById(TEST_ACHIEVEMENT_ID);
         if(achievementToDelete.equals(Optional.empty())) {
             fail();
         } else {
             achievementService.delete(achievementToDelete.get());
-            assertEquals(achievementService.findAchievementById(3), Optional.empty());
+            assertThat(achievementService.findAchievementById(TEST_ACHIEVEMENT_ID).isEmpty());
         }
     }
 
