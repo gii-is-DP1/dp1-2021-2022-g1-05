@@ -10,6 +10,7 @@ import org.springframework.samples.petclinic.model.BaseEntity;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
