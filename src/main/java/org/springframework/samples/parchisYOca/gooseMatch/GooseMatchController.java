@@ -60,7 +60,7 @@ public class GooseMatchController {
         }
 
         gooseMatch.setMatchCode(matchCode);
-        gooseMatchService.saveGooseMatchWithOwner(gooseMatch, player);
+        gooseMatchService.saveGooseMatchWithPlayer(gooseMatch, player, true);
         return "redirect:/gooseMatches/lobby/"+matchCode;
     }
 
@@ -91,7 +91,7 @@ public class GooseMatchController {
         } else{
             if(gooseMatch.isPresent()) { //If the game exists
                 if(!(gooseMatch.get().getStats().size()>=4)) { //If the game is not full
-                    gooseMatchService.saveGooseMatchWithPlayer(gooseMatch.get(),player);
+                    gooseMatchService.saveGooseMatchWithPlayer(gooseMatch.get(),player, false);
                     return "redirect:/gooseMatches/lobby/"+matchCode;
                 }else{
                     modelMap.addAttribute("message", "The lobby is full!");

@@ -55,7 +55,7 @@ public class LudoMatchController {
         }
 
         ludoMatch.setMatchCode(matchCode);
-        ludoMatchService.saveLudoMatchWithOwner(ludoMatch, player);
+        ludoMatchService.saveludoMatchWithPlayer(ludoMatch, player, true);
         return "redirect:/ludoMatches/lobby/"+matchCode;
     }
 
@@ -86,7 +86,7 @@ public class LudoMatchController {
         } else{
             if(ludoMatch.isPresent()) { //If the game exists
                 if(!(ludoMatch.get().getStats().size()>=4)) { //If the game is not full
-                    ludoMatchService.saveludoMatchWithPlayer(ludoMatch.get(),player);
+                    ludoMatchService.saveludoMatchWithPlayer(ludoMatch.get(),player, false);
                     return "redirect:/ludoMatches/lobby/"+matchCode;
                 }else{
                     modelMap.addAttribute("message", "The lobby is full!");
