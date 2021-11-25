@@ -16,4 +16,6 @@ public interface PlayerRepository extends CrudRepository<Player, Integer> {
     @Query("SELECT player FROM Player player JOIN FETCH player.user WHERE player.user.username = :username")
     Optional<Player> findPlayerByUsername(String username) throws DataAccessException;
 
+    @Query("SELECT player FROM Player player  WHERE player.email = :email")
+    Optional<Player> findPlayerByEmail(String email) throws DataAccessException;
 }

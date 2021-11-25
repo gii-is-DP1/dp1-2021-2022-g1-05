@@ -26,6 +26,9 @@ INSERT INTO authorities(id, authority, username) VALUES(5, 'player', 'jose');
 INSERT INTO authorities(id, authority, username) VALUES(6, 'player', 'antonio');
 INSERT INTO authorities(id, authority, username) VALUES(7, 'player', 'paco');
 
+INSERT INTO ludo_Matches(id, match_Code) VALUES(1, '111111');
+INSERT INTO goose_Matches(id, match_Code) VALUES(1, '111111');
+
 INSERT INTO achievements_players(achievements_id, players_id) VALUES(2, 1);
 INSERT INTO achievements_players(achievements_id, players_id) VALUES(3, 1);
 

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
@@ -25,13 +26,15 @@ public class LudoMatchController {
 
     private final LudoMatchService ludoMatchService;
     private final PlayerService playerService;
+    private final PlayerLudoStatsService playerLudoStatsService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
 
     @Autowired
-    public LudoMatchController(LudoMatchService ludoMatchService, PlayerService playerService, UserService userService, AuthoritiesService authoritiesService){
+    public LudoMatchController(LudoMatchService ludoMatchService, PlayerService playerService, PlayerLudoStatsService playerLudoStatsService, UserService userService, AuthoritiesService authoritiesService){
         this.ludoMatchService = ludoMatchService;
         this.playerService = playerService;
+        this.playerLudoStatsService = playerLudoStatsService;
     }
 
     //TODO not showing you already have a match error
@@ -42,7 +45,7 @@ public class LudoMatchController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername());
+        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
         List<LudoMatch> playerInLudoMatches = new ArrayList<>(ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()));
         if(playerInLudoMatches.size() != 0){
@@ -52,7 +55,7 @@ public class LudoMatchController {
         }
 
         ludoMatch.setMatchCode(matchCode);
-        ludoMatchService.saveludoMatchWithPlayer(ludoMatch, player);
+        ludoMatchService.saveLudoMatchWithOwner(ludoMatch, player);
         return "redirect:/ludoMatches/lobby/"+matchCode;
     }
 
@@ -69,7 +72,7 @@ public class LudoMatchController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername());
+        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
         List<LudoMatch> playerInLudoMatches = new ArrayList<>(ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()));
 
@@ -102,6 +105,11 @@ public class LudoMatchController {
 
         LudoMatch ludoMatch = ludoMatchService.findludoMatchByMatchCode(matchCode).get();
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+
+        modelMap.addAttribute("numberOfPlayers", ludoMatch.getStats().size());
+        modelMap.addAttribute("isOwner", playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), ludoMatch.getId()).getIsOwner());
         modelMap.addAttribute("stats", ludoMatch.getStats());
         modelMap.addAttribute("matchCode", matchCode);
         modelMap.addAttribute("match", ludoMatch);

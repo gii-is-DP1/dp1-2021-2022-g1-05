@@ -25,6 +25,7 @@ public class PlayerLudoStats extends BaseEntity {
     private Integer scoredTokens = 0;
     private Integer takeOuts = 0;
     private Integer walkedSquares = 0;
+    private Integer isOwner = 0;
 
     @ManyToOne
     Player player;
