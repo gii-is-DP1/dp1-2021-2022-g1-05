@@ -67,6 +67,8 @@ public class LudoMatchService {
             playerStats.setIsOwner(1);
         }
         PlayerLudoStats addedStats = playerLudoStatsRepository.save(playerStats);
+
+        //From here its the new method
         Set<PlayerLudoStats> statsSet = new HashSet<>();
         if (ludoMatchDB.getStats() != null) {
             statsSet = ludoMatchDB.getStats();
