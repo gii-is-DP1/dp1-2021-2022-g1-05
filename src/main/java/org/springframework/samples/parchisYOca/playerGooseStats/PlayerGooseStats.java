@@ -25,6 +25,7 @@ public class PlayerGooseStats extends BaseEntity {
     private Integer landedBridges = 0;
     private Integer landedJails = 0;
     private Integer landedSpecials = 0;
+    private Integer isOwner = 0;
 
     @ManyToOne
     Player player;

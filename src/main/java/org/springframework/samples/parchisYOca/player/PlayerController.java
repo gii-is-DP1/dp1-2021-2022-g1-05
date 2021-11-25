@@ -55,7 +55,7 @@ public class PlayerController {
             if(authentication.isAuthenticated()){
 
                 User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-                Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername());
+                Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
                 List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
 
                 System.out.println(authorities.get(0).toString());
@@ -86,7 +86,7 @@ public class PlayerController {
             if(authentication.isAuthenticated()){
 
                 User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-                Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername());
+                Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
                 List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
 
                 if (playerId == authenticatedPlayer.getId() || authorities.get(0).toString().equals("admin")){

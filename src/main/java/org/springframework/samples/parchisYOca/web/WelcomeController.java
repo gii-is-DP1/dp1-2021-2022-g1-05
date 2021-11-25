@@ -37,7 +37,7 @@ public class WelcomeController {
           if(authentication.getPrincipal().toString() != "anonymousUser"){
               if (authentication.isAuthenticated()){
                   User currentUser = (User) authentication.getPrincipal();
-                  Player player = playerService.findPlayerByUsername(currentUser.getUsername());
+                  Player player = playerService.findPlayerByUsername(currentUser.getUsername()).get();
                   model.put("playerId", player.getId());
               }
 

@@ -3,7 +3,9 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsRepository;
 import org.springframework.stereotype.Service;
@@ -59,6 +61,22 @@ public class LudoMatchService {
         PlayerLudoStats playerStats = new PlayerLudoStats();
         playerStats.setPlayer(player);
         playerStats.setLudoMatch(ludoMatchDB);
+        playerLudoStatsRepository.save(playerStats);
+
+        return ludoMatchDB;
+
+    }
+
+    @Transactional
+    public LudoMatch saveLudoMatchWithOwner(LudoMatch ludoMatch, Player player) throws DataAccessException {
+        //Saves the match
+        LudoMatch ludoMatchDB = ludoMatchRepository.save(ludoMatch);
+
+        //Saves the relation between player and match
+        PlayerLudoStats playerStats = new PlayerLudoStats();
+        playerStats.setPlayer(player);
+        playerStats.setLudoMatch(ludoMatchDB);
+        playerStats.setIsOwner(1);
         playerLudoStatsRepository.save(playerStats);
 
         return ludoMatchDB;

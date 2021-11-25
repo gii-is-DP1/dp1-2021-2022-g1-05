@@ -40,6 +40,7 @@ public class PlayerServiceTests {
     }
 
     @Test
+    @Transactional
     public void testInsertPlayerWithoutEmail(){
         Player player = new Player();
         User user = new User();
@@ -54,6 +55,7 @@ public class PlayerServiceTests {
     }
 
     @Test
+    @Transactional
     public void testInsertPlayerWithoutUsername(){
         Player player = new Player();
         player.setEmail("pepeReturns@gmail.com");
@@ -68,6 +70,7 @@ public class PlayerServiceTests {
     }
 
     @Test
+    @Transactional
     public void testInsertPlayerWithWrongPassword(){
         Player player = new Player();
         player.setEmail("pepeIsUnstoppable@gmail.com");
@@ -83,6 +86,7 @@ public class PlayerServiceTests {
     }
 
     @Test
+    @Transactional
     public void testAddWithDuplicatedName(){        //MEJORA POSIBLE: Crear Excepción propia que maneje nombres duplicados
         Player player = new Player();
         player.setEmail("pepeYouAreWrong@gmail.com");
@@ -99,6 +103,7 @@ public class PlayerServiceTests {
     }
 
     @Test
+    @Transactional
     public void testAddNullPlayer(){
         Player player = new Player();
         User user = new User();
@@ -107,6 +112,30 @@ public class PlayerServiceTests {
         assertThrows(JpaSystemException.class, () ->{
             playerService.savePlayer(player);
         });
+    }
+
+    @Test
+    @Transactional
+    public void getWithEmail(){
+        assertThat(playerService.findPlayerByEmail("manu@gmail.com").isPresent());
+    }
+
+    @Test
+    @Transactional
+    public void getWithWrongEmail(){
+        assertThat(playerService.findPlayerByEmail("asdasdasd@gmail.com").isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void getWithUsername(){
+        assertThat(playerService.findPlayerByEmail("ManuK").isPresent());
+    }
+
+    @Test
+    @Transactional
+    public void getWithWrongUsername(){
+        assertThat(playerService.findPlayerByEmail("").isEmpty());
     }
 
 }

@@ -9,6 +9,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Optional;
@@ -23,6 +24,7 @@ public class AchievementServiceTests {
 
 
     @Test
+    @Transactional
     public void testAddCorrectAchievement(){
         Achievement newAchievement = new Achievement();
         newAchievement.setName("Nuevo logro");
@@ -33,6 +35,7 @@ public class AchievementServiceTests {
     }
 
     @Test
+    @Transactional
     public void testAddWithNoName(){
         Achievement newAchievement = new Achievement();
         newAchievement.setDescription("Solo tengo descripción");
@@ -43,6 +46,7 @@ public class AchievementServiceTests {
     }
 
     @Test
+    @Transactional
     public void testAddWithNoDescription(){
         Achievement newAchievement = new Achievement();
         newAchievement.setName("Solo tengo nombre");
@@ -53,6 +57,7 @@ public class AchievementServiceTests {
     }
 
     @Test
+    @Transactional
     public void testAddWithDuplicatedName(){        //MEJORA POSIBLE: Crear Excepción propia que maneje nombres duplicados
         Achievement newAchievement = new Achievement();
         newAchievement.setName("NombreAchievement1");
@@ -64,6 +69,7 @@ public class AchievementServiceTests {
     }
 
     @Test
+    @Transactional
     public void testAddNullAchievement(){
         assertThrows(InvalidDataAccessApiUsageException.class, () ->{
             achievementService.save(null);
@@ -71,6 +77,7 @@ public class AchievementServiceTests {
     }
 
     @Test
+    @Transactional
     public void testDeleteExistingAchievement(){
         Optional<Achievement> achievementToDelete = achievementService.findAchievementById(3);
         if(achievementToDelete.equals(Optional.empty())) {
@@ -82,6 +89,7 @@ public class AchievementServiceTests {
     }
 
     @Test
+    @Transactional
     public void testDeleteNullAchievement(){
 
         assertThrows(DataAccessException.class, () -> {

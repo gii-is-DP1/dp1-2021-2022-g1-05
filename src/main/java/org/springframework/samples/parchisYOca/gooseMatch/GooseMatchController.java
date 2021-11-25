@@ -6,6 +6,7 @@ import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsRepository;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
@@ -30,13 +31,15 @@ public class GooseMatchController {
 
     private final GooseMatchService gooseMatchService;
     private final PlayerService playerService;
+    private final PlayerGooseStatsService playerGooseStatsService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
 
     @Autowired
-    public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService, UserService userService, AuthoritiesService authoritiesService){
+    public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService, PlayerGooseStatsService playerGooseStatsService){
         this.gooseMatchService = gooseMatchService;
         this.playerService = playerService;
+        this.playerGooseStatsService = playerGooseStatsService;
     }
 
     //TODO not showing you already have a match error
@@ -47,7 +50,7 @@ public class GooseMatchController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername());
+        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
         List<GooseMatch> playerInGooseMatches = new ArrayList<>(gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()));
         if(playerInGooseMatches.size() != 0){
@@ -57,7 +60,7 @@ public class GooseMatchController {
         }
 
         gooseMatch.setMatchCode(matchCode);
-        gooseMatchService.saveGooseMatchWithPlayer(gooseMatch, player);
+        gooseMatchService.saveGooseMatchWithOwner(gooseMatch, player);
         return "redirect:/gooseMatches/lobby/"+matchCode;
     }
 
@@ -74,7 +77,7 @@ public class GooseMatchController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername());
+        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
         List<GooseMatch> playerInGooseMatches = new ArrayList<>(gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()));
 
@@ -105,8 +108,13 @@ public class GooseMatchController {
     public String initCreationLobby(@PathVariable("matchCode") String matchCode, ModelMap modelMap, HttpServletResponse response) {
         response.addHeader("Refresh", "5");
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+
         GooseMatch gooseMatch = gooseMatchService.findGooseMatchByMatchCode(matchCode).get();
 
+        modelMap.addAttribute("numberOfPlayers", gooseMatch.getStats().size());
+        modelMap.addAttribute("isOwner", playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), gooseMatch.getId()).getIsOwner());
         modelMap.addAttribute("stats", gooseMatch.getStats());
         modelMap.addAttribute("matchCode", matchCode);
         modelMap.addAttribute("match", gooseMatch);
