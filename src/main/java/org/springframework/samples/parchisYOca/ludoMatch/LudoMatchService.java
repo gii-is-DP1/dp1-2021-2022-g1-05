@@ -53,7 +53,7 @@ public class LudoMatchService {
     }
 
     @Transactional
-    public LudoMatch saveludoMatchWithPlayer(LudoMatch ludoMatch, Player player) throws DataAccessException {
+    public LudoMatch saveludoMatchWithPlayer(LudoMatch ludoMatch, Player player, Boolean isOwner) throws DataAccessException {
         //Saves the match
         LudoMatch ludoMatchDB = ludoMatchRepository.save(ludoMatch);
 
@@ -61,22 +61,9 @@ public class LudoMatchService {
         PlayerLudoStats playerStats = new PlayerLudoStats();
         playerStats.setPlayer(player);
         playerStats.setLudoMatch(ludoMatchDB);
-        playerLudoStatsRepository.save(playerStats);
-
-        return ludoMatchDB;
-
-    }
-
-    @Transactional
-    public LudoMatch saveLudoMatchWithOwner(LudoMatch ludoMatch, Player player) throws DataAccessException {
-        //Saves the match
-        LudoMatch ludoMatchDB = ludoMatchRepository.save(ludoMatch);
-
-        //Saves the relation between player and match
-        PlayerLudoStats playerStats = new PlayerLudoStats();
-        playerStats.setPlayer(player);
-        playerStats.setLudoMatch(ludoMatchDB);
-        playerStats.setIsOwner(1);
+        if(isOwner){
+            playerStats.setIsOwner(1);
+        }
         playerLudoStatsRepository.save(playerStats);
 
         return ludoMatchDB;

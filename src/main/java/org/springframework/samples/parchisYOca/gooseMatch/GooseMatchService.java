@@ -53,7 +53,7 @@ public class GooseMatchService {
     }
 
     @Transactional
-    public GooseMatch saveGooseMatchWithPlayer(GooseMatch gooseMatch, Player player) throws DataAccessException {
+    public GooseMatch saveGooseMatchWithPlayer(GooseMatch gooseMatch, Player player, Boolean isOwner) throws DataAccessException {
         //Saves the match
         GooseMatch gooseMatchDB = gooseMatchRepository.save(gooseMatch);
 
@@ -61,22 +61,9 @@ public class GooseMatchService {
         PlayerGooseStats playerStats = new PlayerGooseStats();
         playerStats.setPlayer(player);
         playerStats.setGooseMatch(gooseMatchDB);
-        playerGooseStatsRepository.save(playerStats);
-
-        return gooseMatchDB;
-
-    }
-
-    @Transactional
-    public GooseMatch saveGooseMatchWithOwner(GooseMatch gooseMatch, Player player) throws DataAccessException {
-        //Saves the match
-        GooseMatch gooseMatchDB = gooseMatchRepository.save(gooseMatch);
-
-        //Saves the relation between player and match
-        PlayerGooseStats playerStats = new PlayerGooseStats();
-        playerStats.setPlayer(player);
-        playerStats.setGooseMatch(gooseMatchDB);
-        playerStats.setIsOwner(1);
+        if(isOwner){
+            playerStats.setIsOwner(1);
+        }
         playerGooseStatsRepository.save(playerStats);
 
         return gooseMatchDB;
