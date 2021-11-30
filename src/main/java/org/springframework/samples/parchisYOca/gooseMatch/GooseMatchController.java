@@ -34,6 +34,8 @@ public class GooseMatchController {
     private final PlayerGooseStatsService playerGooseStatsService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
+    private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
+    private static final Integer INDEX_OF_LOBBY = 0;
 
     @Autowired
     public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService, PlayerGooseStatsService playerGooseStatsService){
@@ -53,8 +55,8 @@ public class GooseMatchController {
         Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
         List<GooseMatch> playerInGooseMatches = new ArrayList<>(gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()));
-        if(playerInGooseMatches.size() != 0){
-            GooseMatch playerInGooseMatch = playerInGooseMatches.get(0);
+        if(playerInGooseMatches.size() != INDEX_OF_LOBBY){
+            GooseMatch playerInGooseMatch = playerInGooseMatches.get(INDEX_OF_LOBBY);
             modelMap.addAttribute("message", "You are already at a lobby: "+playerInGooseMatch.getMatchCode());
             return "redirect:/";
         }
@@ -82,15 +84,15 @@ public class GooseMatchController {
         List<GooseMatch> playerInGooseMatches = new ArrayList<>(gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()));
 
 
-        if(playerInGooseMatches.size()!=0){ //If player is in a match
-            if(matchCode.equals(playerInGooseMatches.get(0).getMatchCode())){   //If the player enters the lobby they are in
+        if(playerInGooseMatches.size()!=INDEX_OF_LOBBY){ //If player is in a match
+            if(matchCode.equals(playerInGooseMatches.get(INDEX_OF_LOBBY).getMatchCode())){   //If the player enters the lobby they are in
                 return "redirect:/gooseMatches/lobby/" + matchCode;
             }else{
-                modelMap.addAttribute("message", "You are already at a lobby: "+playerInGooseMatches.get(0).getMatchCode());
+                modelMap.addAttribute("message", "You are already at a lobby: "+playerInGooseMatches.get(INDEX_OF_LOBBY).getMatchCode());
             }
         } else{
             if(gooseMatch.isPresent()) { //If the game exists
-                if(!(gooseMatch.get().getStats().size()>=4)) { //If the game is not full
+                if(!(gooseMatch.get().getStats().size()>=MAX_NUMBER_OF_PLAYERS)) { //If the game is not full
                     gooseMatchService.saveGooseMatchWithPlayer(gooseMatch.get(),player, false);
                     return "redirect:/gooseMatches/lobby/"+matchCode;
                 }else{

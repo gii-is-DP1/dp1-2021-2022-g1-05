@@ -29,6 +29,8 @@ public class LudoMatchController {
     private final PlayerLudoStatsService playerLudoStatsService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
+    private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
+    private static final Integer INDEX_OF_LOBBY = 0;
 
     @Autowired
     public LudoMatchController(LudoMatchService ludoMatchService, PlayerService playerService, PlayerLudoStatsService playerLudoStatsService, UserService userService, AuthoritiesService authoritiesService){
@@ -48,8 +50,8 @@ public class LudoMatchController {
         Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
         List<LudoMatch> playerInLudoMatches = new ArrayList<>(ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()));
-        if(playerInLudoMatches.size() != 0){
-            LudoMatch playerInLudoMatch = playerInLudoMatches.get(0);
+        if(playerInLudoMatches.size() != INDEX_OF_LOBBY){
+            LudoMatch playerInLudoMatch = playerInLudoMatches.get(INDEX_OF_LOBBY);
             modelMap.addAttribute("message", "You are already at a lobby: "+playerInLudoMatch.getMatchCode());
             return "redirect:/";
         }
@@ -77,15 +79,15 @@ public class LudoMatchController {
         List<LudoMatch> playerInLudoMatches = new ArrayList<>(ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()));
 
 
-        if(playerInLudoMatches.size()!=0){ //If player is in a match
-            if(matchCode.equals(playerInLudoMatches.get(0).getMatchCode())){   //If the player enters the lobby they are in
+        if(playerInLudoMatches.size()!=INDEX_OF_LOBBY){ //If player is in a match
+            if(matchCode.equals(playerInLudoMatches.get(INDEX_OF_LOBBY).getMatchCode())){   //If the player enters the lobby they are in
                 return "redirect:/ludoMatches/lobby/" + matchCode;
             }else{
-                modelMap.addAttribute("message", "You are already at a lobby: "+playerInLudoMatches.get(0).getMatchCode());
+                modelMap.addAttribute("message", "You are already at a lobby: "+playerInLudoMatches.get(INDEX_OF_LOBBY).getMatchCode());
             }
         } else{
             if(ludoMatch.isPresent()) { //If the game exists
-                if(!(ludoMatch.get().getStats().size()>=4)) { //If the game is not full
+                if(!(ludoMatch.get().getStats().size()>=MAX_NUMBER_OF_PLAYERS)) { //If the game is not full
                     ludoMatchService.saveludoMatchWithPlayer(ludoMatch.get(),player, false);
                     return "redirect:/ludoMatches/lobby/"+matchCode;
                 }else{
