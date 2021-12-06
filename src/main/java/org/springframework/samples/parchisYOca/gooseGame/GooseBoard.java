@@ -32,6 +32,7 @@ public class GooseBoard {
 			board.put(goose, GooseSquare.Goose);
 		}
 		board.put(40, GooseSquare.Maze);
+		board.put(6, GooseSquare.Bridge);
 		board.put(12, GooseSquare.Bridge);
 		board.put(31, GooseSquare.Well);
 		board.put(19, GooseSquare.Hotel);
