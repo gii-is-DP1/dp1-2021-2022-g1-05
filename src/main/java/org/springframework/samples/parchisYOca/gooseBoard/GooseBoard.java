@@ -33,7 +33,7 @@ public class GooseBoard extends BaseEntity {
     private GooseMatch match;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "board")
-    @Size(max=4) //TODO Change before submitting
+    @Size(max=4)
     private Set<GooseChip> chips;
 
     public Integer rollDice() {
