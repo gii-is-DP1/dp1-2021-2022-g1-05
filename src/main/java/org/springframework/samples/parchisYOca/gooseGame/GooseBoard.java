@@ -9,7 +9,7 @@ import org.springframework.samples.parchisYOca.gooseGame.GooseSquare;
 
 
 public class GooseBoard {
-	private GooseSquare squareType;
+	/*private GooseSquare squareType;
 	private Integer squareNumber;
 	
 	
@@ -58,6 +58,6 @@ public class GooseBoard {
 			}
 		}
 		return boardBySquare;
-	}
+	}*/
 
 }
