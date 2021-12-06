@@ -8,6 +8,7 @@ import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsRe
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -24,4 +25,5 @@ public class PlayerGooseStatsService {
     public PlayerGooseStats findGooseStatsByUsernamedAndMatchId(String username, Integer matchId) throws DataAccessException {
         return playerGooseStatsRepository.findPlayerGooseStatsByUsernamedAndMatchId(username, matchId).get();
     }
+
 }

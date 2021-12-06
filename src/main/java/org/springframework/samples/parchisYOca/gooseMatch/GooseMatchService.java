@@ -6,11 +6,11 @@ import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsRepository;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.crypto.Data;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
@@ -56,18 +56,29 @@ public class GooseMatchService {
 
     @Transactional
     public GooseMatch saveGooseMatchWithPlayer(GooseMatch gooseMatch, Player player, Boolean isOwner) throws DataAccessException {
-        //        //Saves the match
+        //Saves the match
         GooseMatch gooseMatchDB = gooseMatchRepository.save(gooseMatch);
 
         //Saves the relation between player and match
         PlayerGooseStats playerStats = new PlayerGooseStats();
         playerStats.setPlayer(player);
         playerStats.setGooseMatch(gooseMatchDB);
+
+        //To assign the in game id
+        if(gooseMatchDB.getStats()==null){
+            playerStats.setInGameId(1);
+        }else{
+            Integer playersInGame = gooseMatchDB.getStats().size();
+            playerStats.setInGameId(playersInGame+1);
+        }
+
+
         if(isOwner){
             playerStats.setIsOwner(1);
         }
         PlayerGooseStats addedStats = playerGooseStatsRepository.save(playerStats);
         Set<PlayerGooseStats> statsSet = new HashSet<>();
+
 
         //From here its the new method
         if (gooseMatchDB.getStats() != null) {

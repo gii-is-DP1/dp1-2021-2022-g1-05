@@ -33,6 +33,6 @@ public class LudoMatch extends BaseEntity {
     private String matchCode;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ludoMatch")
-    @Size(min=1, max=4) //Change before submitting
+    @Size(min=1, max=4)
     private Set<PlayerLudoStats> stats;
 }

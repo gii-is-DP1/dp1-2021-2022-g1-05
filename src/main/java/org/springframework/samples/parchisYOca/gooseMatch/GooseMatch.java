@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.Singular;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
@@ -33,6 +34,9 @@ public class GooseMatch extends BaseEntity {
     private String matchCode;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gooseMatch")
-    @Size(min=1, max=4) //Change before submitting
+    @Size(min=1, max=4)
     private Set<PlayerGooseStats> stats;
+
+    @OneToOne
+    private GooseBoard board;
 }
