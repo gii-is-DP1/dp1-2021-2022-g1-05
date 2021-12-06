@@ -63,6 +63,15 @@ public class LudoMatchService {
         PlayerLudoStats playerStats = new PlayerLudoStats();
         playerStats.setPlayer(player);
         playerStats.setLudoMatch(ludoMatchDB);
+
+        //To assign the in game id
+        if(ludoMatchDB.getStats()==null){
+            playerStats.setInGameId(1);
+        }else{
+            Integer playersInGame = ludoMatchDB.getStats().size();
+            playerStats.setInGameId(playersInGame+1);
+        }
+
         if(isOwner){
             playerStats.setIsOwner(1);
         }

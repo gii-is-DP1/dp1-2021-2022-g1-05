@@ -105,14 +105,14 @@ public class PlayerControllerTests {
     }
 
 
-    /*@WithMockUser(value = "spring") TODO I dont know why its not working
+    /*@WithMockUser(value = "ManuK") TODO I dont know why its not working
     @Test
     void testProcessCreationWithRepeatedUsername() throws Exception {
         mockMvc.perform(post("/users/new").param("email", "manutest@gmail.com").param("user.password", "1234567")
             .param("user.username", "ManuK").with(csrf())).andExpect(view().name("users/createPlayerForm"));
     }
 
-    @WithMockUser(value = "spring")
+    @WithMockUser(value = "ManuK")
     @Test
     void testProcessCreationWithRepeatedEmail() throws Exception {
         mockMvc.perform(post("/users/new").param("email", "manu@gmail.com").param("user.password", "1234567")
