@@ -1,6 +1,10 @@
 package org.springframework.samples.parchisYOca.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
@@ -22,10 +26,14 @@ import java.util.Map;
 public class WelcomeController {
 
     private final PlayerService playerService;
+    private final GooseMatchService gooseMatchService;
+    private final LudoMatchService ludoMatchService;
 
     @Autowired
-    public WelcomeController(PlayerService playerService, UserService userService, AuthoritiesService authoritiesService) {
+    public WelcomeController(PlayerService playerService, GooseMatchService gooseMatchService, LudoMatchService ludoMatchService) {
         this.playerService = playerService;
+        this.gooseMatchService = gooseMatchService;
+        this.ludoMatchService = ludoMatchService;
     }
 
 
@@ -39,10 +47,20 @@ public class WelcomeController {
                   User currentUser = (User) authentication.getPrincipal();
                   Player player = playerService.findPlayerByUsername(currentUser.getUsername()).get();
                   model.put("playerId", player.getId());
+
+                  List<GooseMatch> playerInGooseMatches = new ArrayList<>(gooseMatchService.findLobbyByUsername(currentUser.getUsername()));
+                  if(playerInGooseMatches.size() != 0){
+                      model.addAttribute("inGooseMatch", 1);
+                  }
+
+                  List<LudoMatch> playerInLudoMatches = new ArrayList<>(ludoMatchService.findLobbyByUsername(currentUser.getUsername()));
+                  if(playerInLudoMatches.size() != 0){
+                      model.addAttribute("inLudoMatch", 1);
+                  }
+
               }
 
           }
-          System.out.println(model.get("message"));
 	    return "welcome";
 	  }
 }

@@ -39,7 +39,6 @@ public class LudoMatchController {
         this.playerLudoStatsService = playerLudoStatsService;
     }
 
-    //TODO not showing you already have a match error
     @GetMapping("/ludoMatches/new")
     public String createMatch(ModelMap modelMap){
         String matchCode = RandomStringGenerator.getRandomString(MATCH_CODE_LENGTH);

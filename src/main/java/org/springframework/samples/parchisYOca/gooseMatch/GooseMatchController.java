@@ -44,7 +44,6 @@ public class GooseMatchController {
         this.playerGooseStatsService = playerGooseStatsService;
     }
 
-    //TODO not showing you already have a match error
     @GetMapping("/gooseMatches/new")
     public String createGooseMatch(ModelMap modelMap){
         String matchCode = RandomStringGenerator.getRandomString(MATCH_CODE_LENGTH);
