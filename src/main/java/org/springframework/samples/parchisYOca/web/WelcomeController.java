@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ public class WelcomeController {
 
 	  @GetMapping({"/","/welcome"})
 	  public String welcome(ModelMap model) {
-
           //Used to load the logged user to the model
           Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
           if(authentication.getPrincipal().toString() != "anonymousUser"){
