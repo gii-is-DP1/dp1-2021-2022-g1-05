@@ -29,6 +29,12 @@ public class GooseBoard extends BaseEntity {
     @Positive
     private Integer height;
 
+    public GooseBoard(){
+        this.background="";
+        this.width=1000;
+        this.height=1000;
+    }
+
     @OneToOne(mappedBy = "board")
     private GooseMatch match;
 
@@ -36,10 +42,6 @@ public class GooseBoard extends BaseEntity {
     @Size(max=4)
     private Set<GooseChip> chips;
 
-    public Integer rollDice() {
-        Integer rnd = new Random().ints(1,1,6).findFirst().getAsInt();
-        return rnd;
-    }
 
 
 }
