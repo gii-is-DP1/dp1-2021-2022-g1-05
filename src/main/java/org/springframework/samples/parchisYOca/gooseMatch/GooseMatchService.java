@@ -75,6 +75,7 @@ public class GooseMatchService {
 
         if(isOwner){
             playerStats.setIsOwner(1);
+            playerStats.setHasTurn(1);
         }
         PlayerGooseStats addedStats = playerGooseStatsRepository.save(playerStats);
         Set<PlayerGooseStats> statsSet = new HashSet<>();

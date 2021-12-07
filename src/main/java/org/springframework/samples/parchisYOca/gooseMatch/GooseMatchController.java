@@ -1,6 +1,8 @@
 package org.springframework.samples.parchisYOca.gooseMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
+import org.springframework.samples.parchisYOca.gooseBoard.GooseBoardService;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
@@ -32,16 +34,18 @@ public class GooseMatchController {
     private final GooseMatchService gooseMatchService;
     private final PlayerService playerService;
     private final PlayerGooseStatsService playerGooseStatsService;
+    private final GooseBoardService gooseBoardService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
     private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
     private static final Integer INDEX_OF_LOBBY = 0;
 
     @Autowired
-    public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService, PlayerGooseStatsService playerGooseStatsService){
+    public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService, PlayerGooseStatsService playerGooseStatsService, GooseBoardService gooseBoardService){
         this.gooseMatchService = gooseMatchService;
         this.playerService = playerService;
         this.playerGooseStatsService = playerGooseStatsService;
+        this.gooseBoardService = gooseBoardService;
     }
 
     @GetMapping("/gooseMatches/new")
@@ -126,10 +130,14 @@ public class GooseMatchController {
 
 
     @GetMapping(value = "/gooseMatches/{matchId}")
-    public String showMatch(@PathVariable("matchId") Integer matchId){
+    public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model){
         String view = "matches/gooseMatch";
         GooseMatch match = gooseMatchService.findGooseMatchById(matchId);
+        model.put("stats", match.getStats());
         match.setStartDate(new Date());
+        GooseBoard board = new GooseBoard();
+        GooseBoard savedBoard = gooseBoardService.save(board, match.getStats().size());
+        match.setBoard(savedBoard);
         gooseMatchService.save(match);
         return view;
     }

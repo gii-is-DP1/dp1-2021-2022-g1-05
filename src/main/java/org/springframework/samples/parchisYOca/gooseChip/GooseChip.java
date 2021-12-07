@@ -18,10 +18,13 @@ import javax.persistence.ManyToOne;
 public class GooseChip extends BaseEntity {
 
     @Range(min=1, max=63)
-	private Integer position;
+	private Integer position = 1;
 
-    //TODO
-    private Integer playerId;
+    private Integer isInGoal = 0;
+
+    private Integer inGameId;
+
+    //TODO we have to put playerId in ludo
 
     @ManyToOne
     GooseBoard board;
