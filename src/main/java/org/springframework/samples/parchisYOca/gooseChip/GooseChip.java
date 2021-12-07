@@ -18,8 +18,8 @@ import javax.persistence.ManyToOne;
 public class GooseChip extends BaseEntity {
 
 
-    @Range(min=1, max=63)
-	  private Integer position = 1;
+    @Range(min=0, max=63)
+	  private Integer position = 0;
 
     private Integer isInGoal = 0;
 
