@@ -102,6 +102,11 @@ public class LudoMatchController {
 
     @GetMapping(value = "/ludoMatches/lobby/{matchCode}")
     public String initCreationLobby(@PathVariable("matchCode") String matchCode, ModelMap modelMap, HttpServletResponse response) {
+        //If the game started
+        if(ludoMatchService.findludoMatchByMatchCode(matchCode).get().getStartDate() != null){
+            return "redirect:/ludoMatches/"+ludoMatchService.findludoMatchByMatchCode(matchCode).get().getId();
+        }
+
         response.addHeader("Refresh", "5");
 
         LudoMatch ludoMatch = ludoMatchService.findludoMatchByMatchCode(matchCode).get();

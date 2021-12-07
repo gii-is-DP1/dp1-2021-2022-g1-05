@@ -3,6 +3,8 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoardService;
+import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
+import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
@@ -35,17 +37,21 @@ public class GooseMatchController {
     private final PlayerService playerService;
     private final PlayerGooseStatsService playerGooseStatsService;
     private final GooseBoardService gooseBoardService;
+    private final GooseChipService gooseChipService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
     private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
     private static final Integer INDEX_OF_LOBBY = 0;
 
     @Autowired
-    public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService, PlayerGooseStatsService playerGooseStatsService, GooseBoardService gooseBoardService){
+    public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService,
+                                PlayerGooseStatsService playerGooseStatsService,
+                                GooseBoardService gooseBoardService, GooseChipService gooseChipService){
         this.gooseMatchService = gooseMatchService;
         this.playerService = playerService;
         this.playerGooseStatsService = playerGooseStatsService;
         this.gooseBoardService = gooseBoardService;
+        this.gooseChipService = gooseChipService;
     }
 
     @GetMapping("/gooseMatches/new")
@@ -111,12 +117,17 @@ public class GooseMatchController {
 
     @GetMapping(value = "/gooseMatches/lobby/{matchCode}")
     public String initCreationLobby(@PathVariable("matchCode") String matchCode, ModelMap modelMap, HttpServletResponse response) {
+        //If the game started
+        if(gooseMatchService.findGooseMatchByMatchCode(matchCode).get().getStartDate() != null){
+            return "redirect:/gooseMatches/"+gooseMatchService.findGooseMatchByMatchCode(matchCode).get().getId();
+        }
+
         response.addHeader("Refresh", "5");
+
+        GooseMatch gooseMatch = gooseMatchService.findGooseMatchByMatchCode(matchCode).get();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-
-        GooseMatch gooseMatch = gooseMatchService.findGooseMatchByMatchCode(matchCode).get();
 
         modelMap.addAttribute("numberOfPlayers", gooseMatch.getStats().size());
         modelMap.addAttribute("isOwner", playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), gooseMatch.getId()).getIsOwner());
@@ -134,11 +145,16 @@ public class GooseMatchController {
         String view = "matches/gooseMatch";
         GooseMatch match = gooseMatchService.findGooseMatchById(matchId);
         model.put("stats", match.getStats());
-        match.setStartDate(new Date());
-        GooseBoard board = new GooseBoard();
-        GooseBoard savedBoard = gooseBoardService.save(board, match.getStats().size());
-        match.setBoard(savedBoard);
+
+        //If the match is a new one, sets the start date and creates the board with its chips
+        if (match.getStartDate() == null){
+            match.setStartDate(new Date());
+            GooseBoard board = new GooseBoard();
+            GooseBoard savedBoard = gooseBoardService.save(board, match.getStats().size());
+            match.setBoard(savedBoard);
+        }
         gooseMatchService.save(match);
+        model.put("chips",gooseChipService.findChipsByMatchId(matchId));
         return view;
     }
 
