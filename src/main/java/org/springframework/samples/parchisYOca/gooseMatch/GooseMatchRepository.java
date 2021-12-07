@@ -9,9 +9,10 @@ import java.util.Optional;
 
 public interface GooseMatchRepository extends CrudRepository<GooseMatch, Integer> {
 
-    @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch WHERE gooseMatch.matchCode = :matchCode AND gooseMatch.startDate IS null")
+    @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch WHERE gooseMatch.matchCode = :matchCode")
     Optional<GooseMatch> findMatchByMatchCode(String matchCode);
 
-    @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch JOIN FETCH gooseMatch.stats stats WHERE gooseMatch.startDate IS null AND stats.player.user.username = :username")
+    @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch JOIN FETCH gooseMatch.stats stats WHERE stats.player.user.username = :username")
     Collection<GooseMatch> findLobbyByUsername(String username);
+
 }

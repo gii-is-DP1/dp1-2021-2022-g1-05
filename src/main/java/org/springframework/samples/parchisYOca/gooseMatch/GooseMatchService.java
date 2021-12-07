@@ -72,7 +72,6 @@ public class GooseMatchService {
             playerStats.setInGameId(playersInGame+1);
         }
 
-
         if(isOwner){
             playerStats.setIsOwner(1);
             playerStats.setHasTurn(1);
