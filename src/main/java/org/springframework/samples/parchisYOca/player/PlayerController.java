@@ -44,9 +44,25 @@ public class PlayerController {
         dataBinder.setDisallowedFields("id");
     }
 
+    @GetMapping("/players/ownProfile")
+    public String redirectToProfile(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication.getPrincipal().toString() != "anonymousUser") {
+            if (authentication.isAuthenticated()) {
+                User currentUser = (User) authentication.getPrincipal();
+                Player player = playerService.findPlayerByUsername(currentUser.getUsername()).get();
+                Integer playerId = player.getId();
+                return "redirect:/players/"+playerId;
+            }
+        }
+        return "redirect:/";
+
+    }
+
 
     @GetMapping("/players/{playerId}")
     public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
+        System.out.println("hola");
         ModelAndView mav = new ModelAndView("players/playerDetails");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

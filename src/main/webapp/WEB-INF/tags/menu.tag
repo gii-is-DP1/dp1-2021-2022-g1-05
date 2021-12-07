@@ -83,10 +83,7 @@
 										<div class="col-lg-8" style="margin-left:15%;  margin-right: 15%">
 											<p class="text-left">
 												<strong><sec:authentication property="name" /></strong>
-                                                <spring:url value="/players/{playerId}" var="playerUrl">
-                                                    <spring:param name="playerId" value="${playerId}"/>
-                                                </spring:url>
-                                                <a href="${fn:escapeXml(playerUrl)}" class="btn btn-primary btn-block btn-sm">My profile</a>
+                                                <a href="<c:url value="/players/ownProfile"/>" class="btn btn-primary btn-block btn-sm">My profile</a>
 											</p>
                                             <p class="text-left">
                                                 <a href="<c:url value="/logout" />"
