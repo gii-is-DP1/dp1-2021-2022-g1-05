@@ -26,8 +26,4 @@ public class GooseChip extends BaseEntity {
     @ManyToOne
     GooseBoard board;
 
-
-
-
-
 }

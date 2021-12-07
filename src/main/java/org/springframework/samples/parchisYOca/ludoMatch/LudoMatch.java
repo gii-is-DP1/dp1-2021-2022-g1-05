@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
@@ -35,4 +36,7 @@ public class LudoMatch extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ludoMatch")
     @Size(min=1, max=4)
     private Set<PlayerLudoStats> stats;
+
+    @OneToOne
+    private LudoBoard board;
 }
