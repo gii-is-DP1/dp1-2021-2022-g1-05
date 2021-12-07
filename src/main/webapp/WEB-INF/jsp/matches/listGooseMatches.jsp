@@ -12,9 +12,9 @@
         <thead>
         <tr>
             <th style="width: 150px;">Match code</th>
-            <th style="width: 200px;">Start date</th>
-            <th style="width: 200px;">End date</th>
-
+            <th style="width: 220px;">Start date</th>
+            <th style="width: 220px;">End date</th>
+            <th style="width:150px;">Status</th>
             <th>Actions</th>
 
         </tr>
@@ -31,12 +31,30 @@
             <td>
                 <c:out value="${match.endDate}"/>
             </td>
-            <td>
-                <spring:url value="/gooseMatches/close/{matchId}" var="matchUrl">
-                    <spring:param name="matchId" value="${match.id}"/>
-                </spring:url>
-                <a href="${fn:escapeXml(matchUrl)}">Close match</a>
-            </td>
+            <c:choose>
+                <c:when test="${match.startDate == null}">
+                    <td>Lobby</td>
+                    <td>
+                        None
+                        <!--Aquí se puede añadir que el admin cierre lobby pero xD -->
+                    </td>
+                </c:when>
+                <c:when test="${match.endDate == null}">
+                    <td>
+                        In progress
+                    </td>
+                    <td>
+                        <spring:url value="/gooseMatches/close/{matchId}" var="matchUrl">
+                            <spring:param name="matchId" value="${match.id}"/>
+                        </spring:url>
+                        <a href="${fn:escapeXml(matchUrl)}">Close match</a>
+                    </td>
+                </c:when>
+                <c:otherwise>
+                    <td>Finished</td>
+                    <td>None</td>
+                </c:otherwise>
+            </c:choose>
 
             </c:forEach>
         </tbody>

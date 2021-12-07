@@ -12,7 +12,8 @@ public interface GooseMatchRepository extends CrudRepository<GooseMatch, Integer
     @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch WHERE gooseMatch.matchCode = :matchCode")
     Optional<GooseMatch> findMatchByMatchCode(String matchCode);
 
-    @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch JOIN FETCH gooseMatch.stats stats WHERE stats.player.user.username = :username")
+    @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch JOIN FETCH gooseMatch.stats stats WHERE stats.player.user.username = :username  AND gooseMatch.endDate is null")
     Collection<GooseMatch> findLobbyByUsername(String username);
+
 
 }

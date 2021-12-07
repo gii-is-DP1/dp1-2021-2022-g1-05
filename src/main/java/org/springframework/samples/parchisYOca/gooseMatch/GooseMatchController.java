@@ -143,10 +143,16 @@ public class GooseMatchController {
 
     @GetMapping(value = "/gooseMatches/{matchId}")
 
-    
+
 
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
-                            HttpServletRequest request, HttpSession session){
+                            HttpServletRequest request, HttpSession session, HttpServletResponse response){
+        response.addHeader("Refresh", "2");
+         //TODO esta version no muestra el mensaje pero hace bien el redirect
+        if(gooseMatchService.findGooseMatchById(matchId).getEndDate() != null){
+            model.addAttribute("message","Your match has been closed");
+            return "redirect:/";
+        }
 
         //To be able to redirect back when rolling the dice
         request.getSession().setAttribute("REDIRECT_URL", "/gooseMatches/"+matchId);
@@ -173,6 +179,7 @@ public class GooseMatchController {
         Integer hasTurn = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId).getHasTurn();
         model.put("hasTurn", hasTurn);
 
+
         return view;
     }
 
@@ -182,6 +189,18 @@ public class GooseMatchController {
         Iterable<GooseMatch> gooseMatches = gooseMatchService.findAll();
         modelMap.addAttribute("gooseMatches",gooseMatches);
         return vista;
+    }
+
+    @GetMapping(value="/gooseMatches/close/{matchId}")
+    public String closeMatch(@PathVariable("matchId") Integer matchId,ModelMap modelMap){
+        GooseMatch gooseMatchDb=gooseMatchService.findGooseMatchById(matchId);
+
+        gooseMatchDb.setEndDate(new Date());
+        gooseMatchService.save(gooseMatchDb);
+        //TODO que cambie la url a gooseMatches
+        modelMap.addAttribute("message","The match has been closed");
+        return listadoPartidas(modelMap);
+
     }
 
 }

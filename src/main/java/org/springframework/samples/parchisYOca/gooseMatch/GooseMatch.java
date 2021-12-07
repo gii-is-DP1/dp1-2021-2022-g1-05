@@ -2,7 +2,7 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Singular;
+
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
