@@ -62,7 +62,6 @@ public class PlayerController {
 
     @GetMapping("/players/{playerId}")
     public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
-        System.out.println("hola");
         ModelAndView mav = new ModelAndView("players/playerDetails");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

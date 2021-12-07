@@ -148,9 +148,10 @@ public class GooseMatchController {
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response){
         response.addHeader("Refresh", "2");
-         //TODO esta version no muestra el mensaje pero hace bien el redirect
+
+        //To show the other players if their game has been closed
         if(gooseMatchService.findGooseMatchById(matchId).getEndDate() != null){
-            model.addAttribute("message","Your match has been closed");
+            session.setAttribute("matchClosed", 1);
             return "redirect:/";
         }
 
@@ -192,14 +193,13 @@ public class GooseMatchController {
     }
 
     @GetMapping(value="/gooseMatches/close/{matchId}")
-    public String closeMatch(@PathVariable("matchId") Integer matchId,ModelMap modelMap){
+    public ModelAndView closeMatch(@PathVariable("matchId") Integer matchId){
+        ModelAndView mav = new ModelAndView("/matches/listGooseMatches");
         GooseMatch gooseMatchDb=gooseMatchService.findGooseMatchById(matchId);
-
         gooseMatchDb.setEndDate(new Date());
         gooseMatchService.save(gooseMatchDb);
-        //TODO que cambie la url a gooseMatches
-        modelMap.addAttribute("message","The match has been closed");
-        return listadoPartidas(modelMap);
+        mav.addObject("message","The match has been closed");
+        return mav;
 
     }
 
