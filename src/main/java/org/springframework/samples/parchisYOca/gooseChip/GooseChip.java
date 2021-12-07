@@ -19,13 +19,13 @@ public class GooseChip extends BaseEntity {
 
 
     @Range(min=0, max=63)
-	  private Integer position = 0;
+    private Integer position = 0;
 
     private Integer isInGoal = 0;
 
     private Integer inGameId;
 
-    //TODO we have to put playerId in ludo
+    //TODO tenemos que poner playerId en ludo
 
     @ManyToOne
     GooseBoard board;

@@ -33,7 +33,7 @@ public class LudoMatchService {
         return ludoMatchRepository.findMatchByMatchCode(matchCode);
     }
 
-    @Transactional(readOnly = true) //TODO manu arregla esto, que devuelva optional pa tenerlo todo igual
+    @Transactional(readOnly = true)
     public LudoMatch findludoMatchById(int id) throws DataAccessException {
         return ludoMatchRepository.findById(id).get();
     }

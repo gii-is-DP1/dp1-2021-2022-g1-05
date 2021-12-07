@@ -30,6 +30,8 @@ public class WelcomeController {
     private final GooseMatchService gooseMatchService;
     private final LudoMatchService ludoMatchService;
 
+    private final Integer EMPTY = 0;
+
     @Autowired
     public WelcomeController(PlayerService playerService, GooseMatchService gooseMatchService, LudoMatchService ludoMatchService) {
         this.playerService = playerService;
@@ -39,7 +41,7 @@ public class WelcomeController {
 
 
 	  @GetMapping({"/","/welcome"})
-	  public String welcome(ModelMap model) {
+	  public String welcome(ModelMap model, HttpSession session) {
           //Used to load the logged user to the model
           Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
           if(authentication.getPrincipal().toString() != "anonymousUser"){
@@ -49,13 +51,17 @@ public class WelcomeController {
                   model.put("playerId", player.getId());
 
                   List<GooseMatch> playerInGooseMatches = new ArrayList<>(gooseMatchService.findLobbyByUsername(currentUser.getUsername()));
-                  if(playerInGooseMatches.size() != 0){
+                  if(playerInGooseMatches.size() != EMPTY){
                       model.addAttribute("inGooseMatch", 1);
                   }
 
                   List<LudoMatch> playerInLudoMatches = new ArrayList<>(ludoMatchService.findLobbyByUsername(currentUser.getUsername()));
-                  if(playerInLudoMatches.size() != 0){
+                  if(playerInLudoMatches.size() != EMPTY){
                       model.addAttribute("inLudoMatch", 1);
+                  }
+
+                  if(session.getAttribute("matchClosed") != null){
+                      model.addAttribute("message", "Your game has been closed by an admin");
                   }
 
               }
