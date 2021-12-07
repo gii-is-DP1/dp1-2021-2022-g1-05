@@ -7,6 +7,7 @@ import org.springframework.samples.parchisYOca.gooseBoard.GooseBoardRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -22,6 +23,11 @@ public class GooseChipService {
     @Transactional(readOnly = true)
     public Optional<GooseChip> findById(Integer id) throws DataAccessException {
         return gooseChipRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<GooseChip> findChipsByMatchId(Integer matchId) throws DataAccessException {
+        return gooseChipRepository.findChipsByMatchId(matchId);
     }
 
     @Transactional
