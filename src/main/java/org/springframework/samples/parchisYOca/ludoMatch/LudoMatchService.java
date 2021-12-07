@@ -74,6 +74,7 @@ public class LudoMatchService {
 
         if(isOwner){
             playerStats.setIsOwner(1);
+            playerStats.setHasTurn(1);
         }
         PlayerLudoStats addedStats = playerLudoStatsRepository.save(playerStats);
 

@@ -8,4 +8,11 @@
 <ParchisYOca:layout pageName="gooseMatch">
     <h2>Goose game match!</h2>
 
+    <h3>Joined players:</h3>
+    <ol>
+        <c:forEach items="${stats}" var="stat">
+            <li><p><c:out value="${stat.player.user.username}"/></p></li>
+        </c:forEach>
+    </ol>
+
 </ParchisYOca:layout>
