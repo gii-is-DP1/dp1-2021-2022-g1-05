@@ -27,6 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
 import java.util.*;
 
@@ -141,7 +142,12 @@ public class GooseMatchController {
 
 
     @GetMapping(value = "/gooseMatches/{matchId}")
-    public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model){
+    public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
+                            HttpServletRequest request, HttpSession session){
+
+        //To be able to redirect back when rolling the dice
+        request.getSession().setAttribute("REDIRECT_URL", "/gooseMatches/"+matchId);
+
         String view = "matches/gooseMatch";
         GooseMatch match = gooseMatchService.findGooseMatchById(matchId);
         model.put("stats", match.getStats());
@@ -155,6 +161,12 @@ public class GooseMatchController {
         }
         gooseMatchService.save(match);
         model.put("chips",gooseChipService.findChipsByMatchId(matchId));
+        model.put("dices", session.getAttribute("dices"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+        Integer hasTurn = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId).getHasTurn();
+        model.put("hasTurn", hasTurn);
         return view;
     }
 

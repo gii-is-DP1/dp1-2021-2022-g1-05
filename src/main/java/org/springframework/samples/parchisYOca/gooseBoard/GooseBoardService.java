@@ -40,7 +40,6 @@ public class GooseBoardService {
             gooseChipRepository.save(gooseChip);
         }
 
-
         return gooseBoardDB;
     }
 }
