@@ -92,4 +92,24 @@ public class GooseMatchService {
         return gooseMatchDB;
 
     }
+
+    /* MÉTODO ANTERIOR, PARA COMENTAR EL TEMA DE LAS PRUEBAS
+    @Transactional
+    public GooseMatch saveGooseMatchWithPlayer(GooseMatch gooseMatch, Player player, Boolean isOwner) throws DataAccessException {
+        //        //Saves the match
+        GooseMatch gooseMatchDB = gooseMatchRepository.save(gooseMatch);
+
+        //Saves the relation between player and match
+        PlayerGooseStats playerStats = new PlayerGooseStats();
+        playerStats.setPlayer(player);
+        playerStats.setGooseMatch(gooseMatchDB);
+        if(isOwner){
+            playerStats.setIsOwner(1);
+        }
+        playerGooseStatsRepository.save(playerStats);
+
+        return gooseMatchDB;
+
+    }
+     */
 }
