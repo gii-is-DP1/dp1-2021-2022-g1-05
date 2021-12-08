@@ -3,8 +3,12 @@ package org.springframework.samples.parchisYOca.ludoChip;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.data.util.Pair;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -24,5 +28,16 @@ public class LudoChip  extends BaseEntity {
 
     @ManyToOne
     LudoBoard board;
-
+    
+    public Map<Integer, Pair<Integer, Integer>> posToPixelMap() {
+    	Map<Integer, Pair<Integer, Integer>> pixelBoard = 
+    			new HashMap<Integer, Pair<Integer, Integer>>();
+    	/*aqui se construiría el mapa en base a la imagen,
+    	 pero como no hay imagen definitiva no lo voy a hacer ahora*/
+    	return pixelBoard;
+    }
+    public Pair<Integer, Integer> getBoardPosition(Integer position) { 
+    	Map<Integer, Pair<Integer, Integer>> pixelBoard = posToPixelMap();
+    	return pixelBoard.get(position);
+    }
 }
