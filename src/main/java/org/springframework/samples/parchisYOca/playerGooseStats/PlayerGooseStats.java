@@ -26,6 +26,7 @@ public class PlayerGooseStats extends BaseEntity {
     private Integer landedJails = 0;
     private Integer landedSpecials = 0;
     private Integer isOwner = 0;
+    private Integer hasWon = 0;
     private Integer inGameId = 0;
     private Integer hasTurn = 0;
 

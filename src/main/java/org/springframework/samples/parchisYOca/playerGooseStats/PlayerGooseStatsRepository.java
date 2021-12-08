@@ -11,4 +11,7 @@ public interface PlayerGooseStatsRepository extends CrudRepository<PlayerGooseSt
 
     @Query(value = "SELECT DISTINCT playerGooseStats FROM PlayerGooseStats playerGooseStats WHERE playerGooseStats.player.user.username = :username AND playerGooseStats.gooseMatch.id = :matchId")
     public Optional<PlayerGooseStats> findPlayerGooseStatsByUsernamedAndMatchId(String username, Integer matchId);
+
+    @Query(value = "SELECT DISTINCT playerGooseStats FROM PlayerGooseStats playerGooseStats WHERE playerGooseStats.inGameId = :inGameId AND playerGooseStats.gooseMatch.id = :matchId")
+    public Optional<PlayerGooseStats> findPlayerGooseStatsByInGameIdAndMatchId(Integer inGameId, Integer matchId);
 }
