@@ -33,7 +33,7 @@ public class GooseBoardService {
 
         GooseBoard gooseBoardDB = gooseBoardRepository.save(gooseBoard);
 
-        for (Integer i = 1; i <= numberOfPlayers; i++){
+        for (Integer i = 0; i < numberOfPlayers; i++){
             GooseChip gooseChip = new GooseChip();
             gooseChip.setInGameId(i);
             gooseChip.setBoard(gooseBoardDB);

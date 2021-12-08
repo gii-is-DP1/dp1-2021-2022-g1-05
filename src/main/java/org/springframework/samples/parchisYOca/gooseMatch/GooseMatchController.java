@@ -148,15 +148,12 @@ public class GooseMatchController {
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response){
         response.addHeader("Refresh", "2");
-
-        //To show the other players if their game has been closed
-        if(gooseMatchService.findGooseMatchById(matchId).getEndDate() != null){
-            session.setAttribute("matchClosed", 1);
-            return "redirect:/";
-        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
         //To be able to redirect back when rolling the dice
-        request.getSession().setAttribute("REDIRECT_URL", "/gooseMatches/"+matchId);
+        request.getSession().setAttribute("fromGoose", true);
+        request.getSession().setAttribute("matchId", matchId);
 
 
         String view = "matches/gooseMatch";
@@ -173,14 +170,26 @@ public class GooseMatchController {
         gooseMatchService.save(match);
         model.put("chips",gooseChipService.findChipsByMatchId(matchId));
 
-        model.put("dices", session.getAttribute("dices"));
+        int[] dices = (int[])session.getAttribute("dices");
+        model.put("firstDice", dices[0]);
+        model.put("secondDice", dices[1]);
+        model.put("sumDice", dices[2]);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Integer hasTurn = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId).getHasTurn();
-        model.put("hasTurn", hasTurn);
+        PlayerGooseStats stats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId);
 
+        //To show the other players if their game has been closed or has ended
+        if(gooseMatchService.findGooseMatchById(matchId).getEndDate() != null){
+            model.addAttribute("message", "The game has ended!");
+        }else{
+            if(stats.getHasTurn() < 0){
+                stats.setHasTurn(stats.getHasTurn()+1);
+                model.addAttribute("message", "You cant roll the dice this turn!");
+            } else{
+                Integer hasTurn = stats.getHasTurn();
+                model.put("hasTurn", hasTurn);
+            }
 
+        }
         return view;
     }
 
@@ -193,13 +202,12 @@ public class GooseMatchController {
     }
 
     @GetMapping(value="/gooseMatches/close/{matchId}")
-    public ModelAndView closeMatch(@PathVariable("matchId") Integer matchId){
-        ModelAndView mav = new ModelAndView("/matches/listGooseMatches");
+    public String closeMatch(@PathVariable("matchId") Integer matchId){
+        //TODO preguntar con modelandview
         GooseMatch gooseMatchDb=gooseMatchService.findGooseMatchById(matchId);
         gooseMatchDb.setEndDate(new Date());
         gooseMatchService.save(gooseMatchDb);
-        mav.addObject("message","The match has been closed");
-        return mav;
+        return "redirect:/gooseMatches";
 
     }
 

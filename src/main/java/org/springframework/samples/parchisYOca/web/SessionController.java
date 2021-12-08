@@ -26,9 +26,14 @@ public class SessionController {
         dices[NUM_DICES] = Arrays.stream(dices).sum();
         session.setAttribute("dices", dices);
 
-        //Redirects the user to the previous url
-        Object referer = request.getSession().getAttribute("REDIRECT_URL");
-        return "redirect:"+ referer.toString();
+        //Redirects the user to the goose controller
+        Object refererGoose = request.getSession().getAttribute("fromGoose");
+        if(refererGoose != null){
+            return "redirect:/gooseInGame/dicesRolled";
+        }
+
+        return "redirect:/";
+
     }
 
 

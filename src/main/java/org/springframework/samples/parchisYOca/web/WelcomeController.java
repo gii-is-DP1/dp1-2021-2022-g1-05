@@ -60,10 +60,6 @@ public class WelcomeController {
                       model.addAttribute("inLudoMatch", 1);
                   }
 
-                  if(session.getAttribute("matchClosed") != null){
-                      model.addAttribute("message", "Your game has been closed by an admin");
-                  }
-
               }
 
           }

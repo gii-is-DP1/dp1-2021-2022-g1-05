@@ -22,25 +22,25 @@ import javax.persistence.ManyToOne;
 public class GooseChip extends BaseEntity {
 
 
-    @Range(min=0, max=63)
     private Integer position = 0;
 
     private Integer isInGoal = 0;
 
-    private Integer inGameId;
+    private Integer inGameId = 0;
 
     //TODO tenemos que poner playerId en ludo
 
     @ManyToOne
     GooseBoard board;
+
     public Map<Integer, Pair<Integer, Integer>> posToPixelMap() {
-    	Map<Integer, Pair<Integer, Integer>> pixelBoard = 
+    	Map<Integer, Pair<Integer, Integer>> pixelBoard =
     			new HashMap<Integer, Pair<Integer, Integer>>();
     	/*aqui se construiría el mapa en base a la imagen,
     	 pero como no hay imagen definitiva no lo voy a hacer ahora*/
     	return pixelBoard;
     }
-    public Pair<Integer, Integer> getBoardPosition(Integer position) { 
+    public Pair<Integer, Integer> getBoardPosition(Integer position) {
     	Map<Integer, Pair<Integer, Integer>> pixelBoard = posToPixelMap();
     	return pixelBoard.get(position);
     }

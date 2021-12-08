@@ -8,14 +8,11 @@
 <ParchisYOca:layout pageName="gooseMatch">
     <h2>Goose game match!</h2>
 
-
-    
-
     <div class="container">
         <div class="row">
         <div class="col-md-2">
         <h3>Joined players:</h3>
-        <ol>
+        <ul>
             <c:forEach items="${stats}" var="stat">
                 <c:forEach items="${chips}" var="chip">
                     <c:if test="${stat.inGameId eq chip.inGameId}">
@@ -23,13 +20,21 @@
                     </c:if>
                 </c:forEach>
             </c:forEach>
-        </ol>
+        </ul>
+            <br>
             <c:if test="${hasTurn eq 1}">
+                <p style="color: #5390D9">Is your turn!</p>
                 <a href="/session/rolldices"><button class="btn btn-default">Roll the dice</button></a>
             </c:if>
-            <c:forEach items="${dices}" var="dice">
-                <p><c:out value="${dice}"></c:out></p>
-            </c:forEach>
+
+            <br>
+            <br>
+            <c:if test="${firstDice eq secondDice}">
+                <p style="color: #5390D9">You got a double roll!!!!!!</p>
+            </c:if>
+            <p><c:out value="The first dice: ${firstDice}"/></p>
+            <p><c:out value="The second dice: ${secondDice}"/></p>
+            <p><c:out value="The sum of both: ${sumDice}"/></p>
         </div>
         <!-- TODO SUPER PROVISIONAL -->
         <div class="col-md-2">

@@ -66,10 +66,9 @@ public class GooseMatchService {
 
         //To assign the in game id
         if(gooseMatchDB.getStats()==null){
-            playerStats.setInGameId(1);
         }else{
             Integer playersInGame = gooseMatchDB.getStats().size();
-            playerStats.setInGameId(playersInGame+1);
+            playerStats.setInGameId(playersInGame);
         }
 
         if(isOwner){
