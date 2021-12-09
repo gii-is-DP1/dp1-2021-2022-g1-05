@@ -2,6 +2,7 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
@@ -125,9 +126,13 @@ public class LudoMatchController {
     }
 
     @GetMapping(value = "/ludoMatches/{matchId}")
-    public String showMatch(@PathVariable("matchId") Integer matchId){
+    public String showMatch(@PathVariable("matchId") Integer matchId,HttpServletResponse response,ModelMap model){
         String view = "matches/ludoMatch";
+        response.addHeader("Refresh", "2");
         LudoMatch match = ludoMatchService.findludoMatchById(matchId);
+        if(ludoMatchService.findludoMatchById(matchId).getEndDate() != null){
+            model.addAttribute("message", "The game has ended!");
+        }
         match.setStartDate(new Date());
         ludoMatchService.save(match);
         return view;
@@ -139,5 +144,13 @@ public class LudoMatchController {
         Iterable<LudoMatch> ludoMatches = ludoMatchService.findAll();
         modelMap.addAttribute("ludoMatches",ludoMatches);
         return vista;
+    }
+    @GetMapping(value="/ludoMatches/close/{matchId}")
+    public String closeMatch(@PathVariable("matchId") Integer matchId){
+        LudoMatch ludoMatchDb=ludoMatchService.findludoMatchById(matchId);
+        ludoMatchDb.setEndDate(new Date());
+        ludoMatchService.save(ludoMatchDb);
+        return "redirect:/ludoMatches";
+
     }
 }
