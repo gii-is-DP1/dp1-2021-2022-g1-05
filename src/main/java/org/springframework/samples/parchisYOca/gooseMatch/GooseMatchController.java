@@ -170,10 +170,14 @@ public class GooseMatchController {
         gooseMatchService.save(match);
         model.put("chips",gooseChipService.findChipsByMatchId(matchId));
 
-        int[] dices = (int[])session.getAttribute("dices");
-        model.put("firstDice", dices[0]);
-        model.put("secondDice", dices[1]);
-        model.put("sumDice", dices[2]);
+
+        if (session.getAttribute("dices") != null){
+            int[] dices = (int[])session.getAttribute("dices");
+            model.put("firstDice", dices[0]);
+            model.put("secondDice", dices[1]);
+            model.put("sumDice", dices[2]);
+        }
+
 
         PlayerGooseStats stats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId);
 
