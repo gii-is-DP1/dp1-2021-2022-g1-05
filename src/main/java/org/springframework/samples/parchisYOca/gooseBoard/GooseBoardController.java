@@ -65,7 +65,6 @@ public class GooseBoardController {
                     Integer nextInGameId = (inGameId+1)%numberOfPlayers;
                     PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId);
 
-                    //TODO provisional, cuando cae en dobles, oca, etc, cuenta como turno perdido
                     if(nextInGameStats.getHasTurn() < 0){
                         nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
                     }else{
