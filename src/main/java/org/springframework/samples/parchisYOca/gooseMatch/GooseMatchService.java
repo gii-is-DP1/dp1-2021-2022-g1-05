@@ -32,10 +32,10 @@ public class GooseMatchService {
     public Optional<GooseMatch> findGooseMatchByMatchCode(String matchCode) throws DataAccessException{
         return gooseMatchRepository.findMatchByMatchCode(matchCode);
     }
-    //TODO quitar el .get() y cambiar las menciones a este método
+
     @Transactional(readOnly = true)
-    public GooseMatch findGooseMatchById(int id) throws DataAccessException {
-        return gooseMatchRepository.findById(id).get();
+    public Optional<GooseMatch> findGooseMatchById(int id) throws DataAccessException {
+        return gooseMatchRepository.findById(id);
     }
 
     @Transactional(readOnly = true)

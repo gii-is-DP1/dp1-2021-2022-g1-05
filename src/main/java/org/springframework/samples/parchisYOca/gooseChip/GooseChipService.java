@@ -3,14 +3,10 @@ package org.springframework.samples.parchisYOca.gooseChip;
 import org.hibernate.envers.internal.tools.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
-import org.springframework.samples.parchisYOca.gooseBoard.GooseBoardRepository;
-import org.springframework.samples.parchisYOca.gooseBoard.SquareTypes;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchRepository;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsRepository;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -72,42 +68,29 @@ public class GooseChipService {
         if(ESPECIALES.contains(nuevaPosicion)){
             if(OCAS.contains(nuevaPosicion)){
                 return gooseHandler(nuevaPosicion,stats);
-            }
-            else if(PUENTES.contains(nuevaPosicion)){
+            } else if(PUENTES.contains(nuevaPosicion)){
                 return bridgeHandler(nuevaPosicion,stats);
-            }
-            else if(DADOS.contains(nuevaPosicion)){
+            } else if(DADOS.contains(nuevaPosicion)){
                 return diceHandler(nuevaPosicion,stats);
-            }
-            else if(POSADA==nuevaPosicion){
+            } else if(POSADA==nuevaPosicion){
                 return innHandler(nuevaPosicion,stats);
-            }
-            else if(CARCEL==nuevaPosicion){
+            } else if(CARCEL==nuevaPosicion){
                 return jailHandler(nuevaPosicion,stats);
-            }
-            else if(LABERINTO==nuevaPosicion){
+            } else if(LABERINTO==nuevaPosicion){
                 return mazeHandler(stats);
-            }
-            else if(CASILLA_FINAL == nuevaPosicion || ULTIMA_OCA == nuevaPosicion){
+            } else if(CASILLA_FINAL == nuevaPosicion || ULTIMA_OCA == nuevaPosicion){
                 return lastPositionHandler(matchId,stats);
-            }
-            else if(CALAVERA == nuevaPosicion){
+            } else{
                 return deathHandler(stats);
-            }else{
-                return null;
             }
-        }
-        else{ //Si no es especial se tiene en cuenta si es una tirada doble o no, tambien comprueba si ha habido rebote
+        } else{ //Si no es especial se tiene en cuenta si es una tirada doble o no, tambien comprueba si ha habido rebote
             if(nuevaPosicion > CASILLA_FINAL){
                 Integer diff = nuevaPosicion - CASILLA_FINAL;
                 nuevaPosicion = CASILLA_FINAL - diff;
-            }
-            if(flagDobles==true){
+            }if(flagDobles==true){
                 Triple<Integer,Integer, String> posicionYTurno=new Triple<>(nuevaPosicion,1,"Double roll");
                 return posicionYTurno;
-            }
-            else {
-
+            } else {
                 Triple<Integer, Integer, String> posicionYTurno = new Triple<>(nuevaPosicion, 0, "NoDobles");
                 return posicionYTurno;
             }
