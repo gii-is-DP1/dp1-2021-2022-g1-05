@@ -142,9 +142,6 @@ public class GooseMatchController {
 
 
     @GetMapping(value = "/gooseMatches/{matchId}")
-
-
-
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response){
         response.addHeader("Refresh", "1");
@@ -189,7 +186,7 @@ public class GooseMatchController {
                 model.addAttribute("message", "You cant roll the dice this turn!");
             }else if(stats.getHasTurn() <0){
                 model.addAttribute("message", "You cant roll the dice this turn, you have to wait");
-
+                return "redirect:/gooseInGame/turnLost";
             }else{
                 Integer hasTurn = stats.getHasTurn();
                 model.put("hasTurn", hasTurn);

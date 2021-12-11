@@ -45,6 +45,31 @@ public class GooseBoardController {
         this.gooseChipService = gooseChipService;
     }
 
+    @GetMapping(value = "/gooseInGame/turnLost")
+    public String gooseTurnLost(HttpSession session) {
+        Integer matchId = (Integer) session.getAttribute("matchId");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+
+        PlayerGooseStats inGamePlayerStats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(
+            authenticatedUser.getUsername(), matchId);
+        Set<GooseChip> gooseChips = new HashSet<>(gooseChipService.findChipsByMatchId(matchId));
+        Integer numberOfPlayers = gooseChips.size();
+
+        for(GooseChip gc : gooseChips) {
+            Integer inGameId = inGamePlayerStats.getInGameId();
+            if (gc.getInGameId() == inGameId) {
+                inGamePlayerStats.setHasTurn(inGamePlayerStats.getHasTurn()+1);
+                //Estadisticas del siguiente jugador
+                Integer nextInGameId = (inGameId + 1) % numberOfPlayers;
+                PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId);
+
+                nextInGameStats.setHasTurn(nextInGameStats.getHasTurn() + 1);
+                playerGooseStatsService.saveStats(nextInGameStats);
+            }
+        }
+        return "redirect:/gooseMatches/"+matchId;
+    }
 
     @GetMapping(value = "/gooseInGame/dicesRolled")
     public String gooseDicesRolled(HttpSession session){
