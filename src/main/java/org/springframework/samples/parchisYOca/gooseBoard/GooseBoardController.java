@@ -60,7 +60,7 @@ public class GooseBoardController {
                 loggedPlayerChip.setPosition(loggedPlayerChip.getPosition() + rolledDices[2]);
 
                  //Para ver dobles
-                if(rolledDices[0] != rolledDices[1]){
+               /* if(rolledDices[0] != rolledDices[1]){
                     inGamePlayerStats.setHasTurn(0);
                     Integer nextInGameId = (inGameId+1)%numberOfPlayers;
                     PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId);
@@ -75,7 +75,9 @@ public class GooseBoardController {
                     inGamePlayerStats.setDoubleRolls(inGamePlayerStats.getDoubleRolls() + 1);
 
                 }
-                gooseChipService.save(loggedPlayerChip);
+                */
+
+                gooseChipService.getEspeciales(loggedPlayerChip);
                 playerGooseStatsService.saveStats(inGamePlayerStats);
 
             }
