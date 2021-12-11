@@ -1,5 +1,6 @@
 package org.springframework.samples.parchisYOca.gooseBoard;
 
+import org.hibernate.envers.internal.tools.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
@@ -16,11 +17,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 @Controller
 public class GooseBoardController {
+
+    public static final int INDICE_PRIMER_DADO = 0;
+    public static final int INDICE_SEGUNDO_DADO = 1;
+    public static final int INDICE_SUMA_DADOS = 2;
 
     private final GooseMatchService gooseMatchService;
     private final PlayerService playerService;
@@ -41,7 +47,7 @@ public class GooseBoardController {
 
 
     @GetMapping(value = "/gooseInGame/dicesRolled")
-    public String gooseDicesRolled(Map<String, Object> model, HttpSession session){
+    public String gooseDicesRolled(HttpSession session){
         Integer matchId = (Integer) session.getAttribute("matchId");
         int[] rolledDices = (int[])session.getAttribute("dices");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -51,35 +57,48 @@ public class GooseBoardController {
             authenticatedUser.getUsername(), matchId);
         Set<GooseChip> gooseChips = new HashSet<>(gooseChipService.findChipsByMatchId(matchId));
         Integer numberOfPlayers = gooseChips.size();
-        GooseChip loggedPlayerChip;
 
         for(GooseChip gc : gooseChips){
             Integer inGameId = inGamePlayerStats.getInGameId();
             if(gc.getInGameId() == inGameId){
-                loggedPlayerChip = gc;
-                loggedPlayerChip.setPosition(loggedPlayerChip.getPosition() + rolledDices[2]);
+                GooseChip loggedPlayerChip = gc;
+                boolean flagDobles = rolledDices[INDICE_PRIMER_DADO] == rolledDices[INDICE_SEGUNDO_DADO];
+                Triple<Integer,Integer,String> resultadoTirada = gooseChipService.checkSpecials(
+                    loggedPlayerChip, rolledDices[INDICE_SUMA_DADOS], flagDobles);
+                inGamePlayerStats.setHasTurn(resultadoTirada.getSecond());
 
-                 //Para ver dobles
-               /* if(rolledDices[0] != rolledDices[1]){
-                    inGamePlayerStats.setHasTurn(0);
+                //Comprobación del turno
+                if(resultadoTirada.getSecond() <= 0){
+
+                    //Estadisticas del siguiente jugador
                     Integer nextInGameId = (inGameId+1)%numberOfPlayers;
                     PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId);
 
-                    if(nextInGameStats.getHasTurn() < 0){
-                        nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
-                    }else{
-                        nextInGameStats.setHasTurn(1);
-                    }
+                    nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
                     playerGooseStatsService.saveStats(nextInGameStats);
-                }else{
-                    inGamePlayerStats.setDoubleRolls(inGamePlayerStats.getDoubleRolls() + 1);
-
                 }
-                */
 
-                gooseChipService.getEspeciales(loggedPlayerChip);
+                //Comprobación de casilla especial
+                if (resultadoTirada.getThird() == "Bridge" || resultadoTirada.getThird() == "Goose"
+                ||resultadoTirada.getThird() == "Dice"){
+                    session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ "\n"
+                    +"you have been moved from square " + loggedPlayerChip.getPosition()+rolledDices[INDICE_SUMA_DADOS] + " to the square "+resultadoTirada.getFirst()
+                    +" you have an extra turn!");
+
+                } else if(resultadoTirada.getThird() == "Jail" || resultadoTirada.getThird() == "Inn"){
+                    session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ "\n"
+                        +"you loose " + Math.abs(resultadoTirada.getSecond()) + " turns :(");
+                } else if(resultadoTirada.getThird() == "Maze" || resultadoTirada.getThird() == "Death"){
+                    session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ "\n"
+                        + "you have been moved to the square "+resultadoTirada.getFirst()+ " today it's not your lucky day ¯\\_(ツ)_/¯");
+                } else if(resultadoTirada.getThird() == "Double roll"){
+                    session.setAttribute("especial","You got a double roll!! You can roll the dice again");
+                }
+
+
+                loggedPlayerChip.setPosition(resultadoTirada.getFirst());
+                gooseChipService.save(loggedPlayerChip);
                 playerGooseStatsService.saveStats(inGamePlayerStats);
-
             }
         }
 
