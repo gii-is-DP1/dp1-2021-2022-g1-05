@@ -64,7 +64,12 @@ public class GooseBoardController {
                 Integer nextInGameId = (inGameId + 1) % numberOfPlayers;
                 PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId);
 
-                nextInGameStats.setHasTurn(nextInGameStats.getHasTurn() + 1);
+                if(nextInGameStats.getHasTurn() == 0){
+                    nextInGameStats.setHasTurn(1);
+                } else{
+                    nextInGameStats.setHasTurn(nextInGameStats.getHasTurn() + 1);
+                }
+
                 playerGooseStatsService.saveStats(nextInGameStats);
             }
         }
@@ -107,7 +112,7 @@ public class GooseBoardController {
                 if (resultadoTirada.getThird() == "Bridge" || resultadoTirada.getThird() == "Goose"
                 ||resultadoTirada.getThird() == "Dice"){
                     session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ "\n"
-                    +"you have been moved from square " + loggedPlayerChip.getPosition()+rolledDices[INDICE_SUMA_DADOS] + " to the square "+resultadoTirada.getFirst()
+                    +"you have been moved from square " + String.valueOf(loggedPlayerChip.getPosition()+rolledDices[INDICE_SUMA_DADOS]) + " to the square "+resultadoTirada.getFirst()
                     +" you have an extra turn!");
 
                 } else if(resultadoTirada.getThird() == "Jail" || resultadoTirada.getThird() == "Inn"){
@@ -115,7 +120,7 @@ public class GooseBoardController {
                         +"you loose " + Math.abs(resultadoTirada.getSecond()) + " turns :(");
                 } else if(resultadoTirada.getThird() == "Maze" || resultadoTirada.getThird() == "Death"){
                     session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ "\n"
-                        + "you have been moved to the square "+resultadoTirada.getFirst()+ " today it's not your lucky day ¯\\_(ツ)_/¯");
+                        + "you have been moved to the square "+resultadoTirada.getFirst()+ " today it's not your lucky day ¯\\('-')_/¯");
                 } else if(resultadoTirada.getThird() == "Double roll"){
                     session.setAttribute("especial","You got a double roll!! You can roll the dice again");
                 }
