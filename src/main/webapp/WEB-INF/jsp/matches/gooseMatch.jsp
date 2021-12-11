@@ -29,8 +29,8 @@
 
             <br>
             <br>
-            <c:if test="${especial ne null}">
-                <p style="color: #5390D9"><c:out value="${especial}"></c:out></p>
+            <c:if test="${hola ne null}">
+                <p style="color: #5390D9"><c:out value="${hola}"></c:out></p>
             </c:if>
             <p><c:out value="The first dice: ${firstDice}"/></p>
             <p><c:out value="The second dice: ${secondDice}"/></p>

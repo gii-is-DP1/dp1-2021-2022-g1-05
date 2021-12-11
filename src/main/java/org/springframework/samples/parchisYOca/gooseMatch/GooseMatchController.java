@@ -178,13 +178,14 @@ public class GooseMatchController {
 
         PlayerGooseStats stats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId);
 
+        model.put("hola", stats.getHasTurn());
         //To show the other players if their game has been closed or has ended
         if(gooseMatchService.findGooseMatchById(matchId).getEndDate() != null){
             model.addAttribute("message", "The game has ended!");
         }else{
             if(stats.getHasTurn() == 0){
                 model.addAttribute("message", "You cant roll the dice this turn!");
-            }else if(stats.getHasTurn() <0){
+            }else if(stats.getHasTurn() < 0){
                 model.addAttribute("message", "You cant roll the dice this turn, you have to wait");
                 return "redirect:/gooseInGame/turnLost";
             }else{
@@ -194,9 +195,10 @@ public class GooseMatchController {
 
         }
 
-        //To show if he landed on a special square
+        //To show if they landed on a special square
         if (session.getAttribute("especial") != null){
-            model.put("especial", session.getAttribute("especial"));
+            String mensaje = session.getAttribute("especial").toString();
+            model.put("message", mensaje);
         }
         return view;
     }

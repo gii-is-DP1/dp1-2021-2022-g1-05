@@ -89,10 +89,12 @@ public class GooseChipService {
                 return mazeHandler(stats);
             }
             else if(CASILLA_FINAL == nuevaPosicion || ULTIMA_OCA == nuevaPosicion){
-                return lastPositionHandler(stats);
+                return lastPositionHandler(matchId,stats);
             }
-            else{
+            else if(CALAVERA == nuevaPosicion){
                 return deathHandler(stats);
+            }else{
+                return null;
             }
         }
         else{ //Si no es especial se tiene en cuenta si es una tirada doble o no, tambien comprueba si ha habido rebote
@@ -183,11 +185,14 @@ public class GooseChipService {
     }
 
     @Transactional
-    public Triple<Integer, Integer, String> lastPositionHandler(PlayerGooseStats stats) throws DataAccessException{
-        Triple<Integer,Integer,String> posicionYTurno = new Triple<>(CASILLA_INICIAL, 0, "Final");
+    public Triple<Integer, Integer, String> lastPositionHandler(Integer matchId, PlayerGooseStats stats) throws DataAccessException{
+        Triple<Integer,Integer,String> posicionYTurno = new Triple<>(CASILLA_FINAL, 0, "Final");
         stats.setLandedGeese(stats.getLandedGeese()+1);
         stats.setHasWon(1);
+        GooseMatch gooseMatch = gooseMatchRepository.findById(matchId).get();
+        gooseMatch.setEndDate(new Date());
         playerGooseStatsRepository.save(stats);
+        gooseMatchRepository.save(gooseMatch);
         return posicionYTurno;
     }
 
