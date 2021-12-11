@@ -76,9 +76,16 @@ public class GooseBoardController {
 
                     if(nextInGameStats.getHasTurn() == 0){
                         nextInGameStats.setHasTurn(1);
-                    } else if(nextInGameStats.getHasTurn() < 0){
-                        inGamePlayerStats.setHasTurn(1);
+                        //tiene que esperar
+                    }
+                    //TODO Arreglar el tema de la comprobacion de turno cuando al otro no le toca tirar dados
+                    else if(nextInGameStats.getHasTurn() < 0){
+                        //inGamePlayerStats.setHasTurn(1);
+                        //le quitas turno al actual
+                        inGamePlayerStats.setHasTurn(0);
+                        //le sumas 1 al siguiente
                         nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
+
                     }
                     playerGooseStatsService.saveStats(nextInGameStats);
                 }
