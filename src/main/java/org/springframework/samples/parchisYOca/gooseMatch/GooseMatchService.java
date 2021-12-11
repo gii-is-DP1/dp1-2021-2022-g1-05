@@ -50,8 +50,7 @@ public class GooseMatchService {
 
     @Transactional
     public GooseMatch save(GooseMatch gooseMatch) throws DataAccessException {
-        gooseMatchRepository.save(gooseMatch);
-        return gooseMatch;
+        return gooseMatchRepository.save(gooseMatch);
     }
 
     @Transactional

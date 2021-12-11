@@ -147,7 +147,7 @@ public class GooseMatchController {
 
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response){
-        response.addHeader("Refresh", "2");
+        response.addHeader("Refresh", "1");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
@@ -185,14 +185,21 @@ public class GooseMatchController {
         if(gooseMatchService.findGooseMatchById(matchId).getEndDate() != null){
             model.addAttribute("message", "The game has ended!");
         }else{
-            if(stats.getHasTurn() < 0){
-                stats.setHasTurn(stats.getHasTurn()+1);
+            if(stats.getHasTurn() == 0){
                 model.addAttribute("message", "You cant roll the dice this turn!");
-            } else{
+            }else if(stats.getHasTurn() <0){
+                model.addAttribute("message", "You cant roll the dice this turn, you have to wait");
+
+            }else{
                 Integer hasTurn = stats.getHasTurn();
                 model.put("hasTurn", hasTurn);
             }
 
+        }
+
+        //To show if he landed on a special square
+        if (session.getAttribute("especial") != null){
+            model.put("especial", session.getAttribute("especial"));
         }
         return view;
     }

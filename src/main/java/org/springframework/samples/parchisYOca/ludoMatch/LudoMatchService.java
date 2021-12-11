@@ -50,8 +50,7 @@ public class LudoMatchService {
 
     @Transactional
     public LudoMatch save(LudoMatch ludoMatch) throws DataAccessException {
-        ludoMatchRepository.save(ludoMatch);
-        return ludoMatch;
+        return ludoMatchRepository.save(ludoMatch);
     }
 
     @Transactional

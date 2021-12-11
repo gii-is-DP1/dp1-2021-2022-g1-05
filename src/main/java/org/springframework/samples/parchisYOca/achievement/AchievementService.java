@@ -30,8 +30,7 @@ public class AchievementService {
 
     @Transactional
     public Achievement save(Achievement achievement) throws DataAccessException{
-        achievementRepository.save(achievement);
-        return achievement;
+        return achievementRepository.save(achievement);
     }
 
 
