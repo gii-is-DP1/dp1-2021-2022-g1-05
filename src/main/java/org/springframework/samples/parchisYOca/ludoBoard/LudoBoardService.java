@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LudoBoardService {
     private LudoBoardRepository ludoBoardRepository;
     private LudoChipRepository ludoChipRepository;
+
     //TODO Esto de aqui abajo revisarlo
     @Autowired
     public LudoBoardService(LudoBoardRepository ludoBoardRepository,LudoChipRepository ludoChipRepository){

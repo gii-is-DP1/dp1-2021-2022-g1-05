@@ -22,16 +22,18 @@
             </c:forEach>
         </ul>
             <br>
-            <c:if test="${hasTurn eq 1}">
-                <p style="color: #5390D9">Is your turn!</p>
-                <a href="/session/rolldices"><button class="btn btn-default">Roll the dice</button></a>
-            </c:if>
+            <c:choose>
+                <c:when test="${hasTurn eq 1}">
+                    <p style="color: #5390D9">Is your turn!</p>
+                    <a href="/session/rolldices"><button class="btn btn-default">Roll the dice</button></a>
+                </c:when>
+                <c:otherwise>
+                    <p style="color: darkred">You have to wait until its your turn!</p>
+                </c:otherwise>
+            </c:choose>
 
             <br>
             <br>
-            <c:if test="${hola ne null}">
-                <p style="color: #5390D9"><c:out value="${hola}"></c:out></p>
-            </c:if>
             <p><c:out value="The first dice: ${firstDice}"/></p>
             <p><c:out value="The second dice: ${secondDice}"/></p>
             <p><c:out value="The sum of both: ${sumDice}"/></p>

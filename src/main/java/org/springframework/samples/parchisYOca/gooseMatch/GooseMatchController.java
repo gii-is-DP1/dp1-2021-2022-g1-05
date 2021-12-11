@@ -154,7 +154,7 @@ public class GooseMatchController {
 
 
         String view = "matches/gooseMatch";
-        GooseMatch match = gooseMatchService.findGooseMatchById(matchId);
+        GooseMatch match = gooseMatchService.findGooseMatchById(matchId).get();
         model.put("stats", match.getStats());
 
         //If the match is a new one, sets the start date and creates the board with its chips
@@ -178,28 +178,22 @@ public class GooseMatchController {
 
         PlayerGooseStats stats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId);
 
-        model.put("hola", stats.getHasTurn());
         //To show the other players if their game has been closed or has ended
-        if(gooseMatchService.findGooseMatchById(matchId).getEndDate() != null){
+        if(gooseMatchService.findGooseMatchById(matchId).get().getEndDate() != null){
             model.addAttribute("message", "The game has ended!");
         }else{
-            if(stats.getHasTurn() == 0){
-                model.addAttribute("message", "You cant roll the dice this turn!");
-            }else if(stats.getHasTurn() < 0){
-                model.addAttribute("message", "You cant roll the dice this turn, you have to wait");
-                return "redirect:/gooseInGame/turnLost";
-            }else{
+            //To show if they landed on a special square
+            if (session.getAttribute("especial") != null){
+                String mensaje = session.getAttribute("especial").toString();
+                model.put("message", mensaje);
+            }
+            if(!(stats.getHasTurn() < 0)){
                 Integer hasTurn = stats.getHasTurn();
                 model.put("hasTurn", hasTurn);
             }
-
         }
 
-        //To show if they landed on a special square
-        if (session.getAttribute("especial") != null){
-            String mensaje = session.getAttribute("especial").toString();
-            model.put("message", mensaje);
-        }
+
         return view;
     }
 
@@ -213,8 +207,7 @@ public class GooseMatchController {
 
     @GetMapping(value="/gooseMatches/close/{matchId}")
     public String closeMatch(@PathVariable("matchId") Integer matchId){
-        //TODO preguntar con modelandview
-        GooseMatch gooseMatchDb=gooseMatchService.findGooseMatchById(matchId);
+        GooseMatch gooseMatchDb=gooseMatchService.findGooseMatchById(matchId).get();
         gooseMatchDb.setEndDate(new Date());
         gooseMatchService.save(gooseMatchDb);
         return "redirect:/gooseMatches";

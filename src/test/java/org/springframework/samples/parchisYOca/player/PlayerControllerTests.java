@@ -105,7 +105,7 @@ public class PlayerControllerTests {
     }
 
 
-    /*@WithMockUser(value = "ManuK") TODO I dont know why its not working
+    /*@WithMockUser(value = "ManuK") TODO No sé por qué no funcionan
     @Test
     void testProcessCreationWithRepeatedUsername() throws Exception {
         mockMvc.perform(post("/users/new").param("email", "manutest@gmail.com").param("user.password", "1234567")
