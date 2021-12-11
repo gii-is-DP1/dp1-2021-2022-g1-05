@@ -77,7 +77,7 @@ public class GooseBoardController {
                     if(nextInGameStats.getHasTurn() == 0){
                         nextInGameStats.setHasTurn(1);
                     } else if(nextInGameStats.getHasTurn() < 0){
-                        inGamePlayerStats.setHasTurn(inGamePlayerStats.getHasTurn()+1);
+                        inGamePlayerStats.setHasTurn(1);
                         nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
                     }
                     playerGooseStatsService.saveStats(nextInGameStats);
