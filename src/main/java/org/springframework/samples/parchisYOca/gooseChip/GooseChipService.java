@@ -29,7 +29,7 @@ public class GooseChipService {
     public static final List<Integer> OCAS = List.of(5,9,14,18,23,27,32,36,41,45,50,54);
     public static final List<Integer> DADOS = List.of(26,53);
     public static final List<Integer> PUENTES = List.of(6,12);
-    public static final List<Integer> ESPECIALES = List.of(63,59,19,42,30,56,58,5,9,14,18,23,27,32,36,41,45,50,54,26,53,6,12);
+    public static final List<Integer> ESPECIALES = List.of(63,59,19,42,56,58,5,9,14,18,23,27,32,36,41,45,50,54,26,53,6,12);
 
     private GooseChipRepository gooseChipRepository;
     private PlayerGooseStatsRepository playerGooseStatsRepository;
