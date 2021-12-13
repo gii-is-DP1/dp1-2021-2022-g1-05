@@ -31,8 +31,8 @@ public class GooseBoard extends BaseEntity {
 
     public GooseBoard(){
         this.background="";
-        this.width=1000;
-        this.height=1000;
+        this.width=956;
+        this.height=684;
     }
 
     @OneToOne(mappedBy = "board")
