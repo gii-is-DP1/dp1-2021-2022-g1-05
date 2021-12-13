@@ -42,7 +42,7 @@
         <div class="col-md-2">
             <ParchisYOca:gooseBoard gooseBoard="${gooseBoard}"/>
             <c:forEach items="${gooseBoard.chips}" var="chip">
-            	<ParchisYOca:gooseChip size="100" inGameId="${chip.getInGameId}" position="${chip.getPosition}"/>
+            	<ParchisYOca:gooseChip size="10" inGameId="${chip}" position="${chip.getPosition()}"/>
             </c:forEach> 
         </div>
         </div>
