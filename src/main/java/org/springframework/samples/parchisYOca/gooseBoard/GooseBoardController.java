@@ -73,14 +73,24 @@ public class GooseBoardController {
                     //Estadisticas del siguiente jugador
                     Integer nextInGameId = (inGameId+1)%numberOfPlayers;
                     PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId);
+                    Integer nextNextInGameId = (inGameId+2)%numberOfPlayers;
+                    PlayerGooseStats nextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextInGameId, matchId);
+                    Integer nextNextNextInGameId = (inGameId+3)%numberOfPlayers;
+                    PlayerGooseStats nextNextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextNextInGameId, matchId);
 
                     if(nextInGameStats.getHasTurn() == 0){
                         nextInGameStats.setHasTurn(1);
                     } else if(nextInGameStats.getHasTurn() < 0){
-                        inGamePlayerStats.setHasTurn(inGamePlayerStats.getHasTurn()+1);
                         nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
+                        nextNextInGameStats.setHasTurn(nextNextInGameStats.getHasTurn()+1);
+                        if(nextNextInGameStats.getHasTurn() < 0){
+                            nextNextNextInGameStats.setHasTurn(nextNextNextInGameStats.getHasTurn()+1);
+                        }
                     }
+
                     playerGooseStatsService.saveStats(nextInGameStats);
+                    playerGooseStatsService.saveStats(nextNextInGameStats);
+                    playerGooseStatsService.saveStats(nextNextNextInGameStats);
                 }
 
                 //Comprobación de casilla especial
@@ -97,7 +107,7 @@ public class GooseBoardController {
                     session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ ", \n"
                         + "you have been moved to the square "+resultadoTirada.getFirst()+ ". Today it's not your lucky day ¯\\('-')_/¯");
                 } else if(resultadoTirada.getThird() == "Double roll"){
-                    session.setAttribute("especial","You got a double roll!! You can roll the dice again");
+                    session.setAttribute("especial","You have landed on the square " +resultadoTirada.getFirst() +" and you got a double roll!! You can roll the dice again");
                 } else{
                     session.setAttribute("especial", "You moved from the square "+ loggedPlayerChip.getPosition()+ " to the square " + resultadoTirada.getFirst());
                 }
