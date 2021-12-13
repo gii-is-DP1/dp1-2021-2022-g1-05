@@ -144,7 +144,7 @@ public class GooseMatchController {
     @GetMapping(value = "/gooseMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response){
-        response.addHeader("Refresh", "1");
+        response.addHeader("Refresh", "10");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
@@ -192,6 +192,7 @@ public class GooseMatchController {
                 model.put("hasTurn", hasTurn);
             }
         }
+        model.put("gooseBoard", gooseMatchService.findGooseMatchById(match.getId()).get().getBoard());
 
 
         return view;
