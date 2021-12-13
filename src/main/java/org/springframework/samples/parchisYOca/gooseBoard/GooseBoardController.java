@@ -70,6 +70,7 @@ public class GooseBoardController {
 
               //Comprobación del turno
                 if(resultadoTirada.getSecond() != 1){
+
                     //Estadisticas del siguiente jugador
                     Integer nextInGameId = (inGameId+1)%numberOfPlayers;
                     PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId);
@@ -78,16 +79,20 @@ public class GooseBoardController {
                     Integer nextNextNextInGameId = (inGameId+3)%numberOfPlayers;
                     PlayerGooseStats nextNextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextNextInGameId, matchId);
 
-                    if(nextInGameStats.getHasTurn() == 0){
+                    if(nextInGameStats.getHasTurn() == 0){  //Le da el turno al siguiente
                         nextInGameStats.setHasTurn(1);
-                    } else if(nextInGameStats.getHasTurn() < 0){
+                    } else if(nextInGameStats.getHasTurn() != 1){    //Le pasa y le da el turno al siguiente que está en la casilla de perdida de turnos
                         nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
                         nextNextInGameStats.setHasTurn(nextNextInGameStats.getHasTurn()+1);
-                        if(nextNextInGameStats.getHasTurn() < 0){
+                        if(nextNextInGameStats.getHasTurn() != 1){   //Si el siguiente al siguiente tambien esta en una casilla de este tipo, le pasa al que va a continuación
                             nextNextNextInGameStats.setHasTurn(nextNextNextInGameStats.getHasTurn()+1);
+                            if(nextNextNextInGameStats.getHasTurn() != 1){ //Si todos están perdiendo el turno, vuelve al comienzo
+                                inGamePlayerStats.setHasTurn(1);
+                            }
                         }
                     }
 
+                    playerGooseStatsService.saveStats(inGamePlayerStats);
                     playerGooseStatsService.saveStats(nextInGameStats);
                     playerGooseStatsService.saveStats(nextNextInGameStats);
                     playerGooseStatsService.saveStats(nextNextNextInGameStats);
