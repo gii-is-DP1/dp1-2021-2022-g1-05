@@ -40,8 +40,10 @@
         </div>
         <!-- TODO SUPER PROVISIONAL -->
         <div class="col-md-2">
-            <h3>Displaying static board:</h3>
-            <img STYLE="width: auto; height: 300px" src="<spring:url value="/resources/images/provisional-goose-board.png" htmlEscape="true" />">
+            <ParchisYOca:gooseBoard gooseBoard="${gooseBoard}"/>
+            <c:forEach items="${gooseBoard.chips}" var="chip">
+            	<ParchisYOca:gooseChip size="100" inGameId="${chip.getInGameId}" position="${chip.getPosition}"/>
+            </c:forEach> 
         </div>
         </div>
     </div>
