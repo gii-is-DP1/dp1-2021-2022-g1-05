@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import lombok.ToString;
+
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -19,6 +22,7 @@ import java.util.Set;
 @Setter
 @Entity
 @ToString
+@Audited
 @Table(name="gooseMatches")
 public class GooseMatch extends BaseEntity {
 
@@ -36,7 +40,7 @@ public class GooseMatch extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gooseMatch")
     @Size(min=1, max=4)
     private Set<PlayerGooseStats> stats;
-
+    @NotAudited
     @OneToOne
     private GooseBoard board;
 }
