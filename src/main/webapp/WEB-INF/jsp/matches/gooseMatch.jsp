@@ -39,11 +39,11 @@
             <p><c:out value="The sum of both: ${sumDice}"/></p>
         </div>
         <!-- TODO SUPER PROVISIONAL -->
-        <div class="col-md-2">
+        <div>
             <ParchisYOca:gooseBoard gooseBoard="${gooseBoard}"/>
-            <c:forEach items="${gooseBoard.chips}" var="chip">
-            	<ParchisYOca:gooseChip size="10" inGameId="${chip}" position="${chip.getPosition()}"/>
-            </c:forEach> 
+            <c:forEach items="${chips}" var="chip">
+            	<ParchisYOca:gooseChip size="30" chip="${chip}" position="${chip.position}"/>
+            </c:forEach>
         </div>
         </div>
     </div>

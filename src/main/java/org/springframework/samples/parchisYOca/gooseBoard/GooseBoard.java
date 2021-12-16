@@ -30,7 +30,7 @@ public class GooseBoard extends BaseEntity {
     private Integer height;
 
     public GooseBoard(){
-        this.background="resources/images/provisional-goose-board.png";
+        this.background="../resources/images/provisional-goose-board.png";
         this.width=956;
         this.height=684;
     }
