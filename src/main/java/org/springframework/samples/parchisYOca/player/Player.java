@@ -3,6 +3,8 @@ package org.springframework.samples.parchisYOca.player;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import org.hibernate.envers.Audited;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.model.Person;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -18,6 +20,7 @@ import java.util.Set;
 @Setter
 @Entity
 @ToString
+@Audited
 @Table(name="players")
 public class Player extends Person implements Serializable { //Implementing serializable to fix an issue
 
