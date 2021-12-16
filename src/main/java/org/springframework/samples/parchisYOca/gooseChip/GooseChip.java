@@ -74,11 +74,49 @@ public class GooseChip extends BaseEntity {
     	
     	return pixelBoard;
     }
-    public static Integer getPositionXInPixels(Integer position) {
-    	return posToPixelMap().get(position).getFirst();
+    public static Integer getPositionXInPixels(Integer position, Integer inGameId) {
+    	Integer xPosition =  posToPixelMap().get(position).getFirst();
+    	Integer displacement = getDisplacenmentX(position, inGameId);
+    	
+    	return xPosition + displacement;
     }
-    public static Integer getPositionYInPixels(Integer position) {
-    	return posToPixelMap().get(position).getSecond();
+    public static Integer getPositionYInPixels(Integer position, Integer inGameId) {
+    	Integer yPosition =  posToPixelMap().get(position).getSecond();
+    	Integer displacement = getDisplacenmentY(position, inGameId);
+    	
+    	return yPosition + displacement;
     }
-
+    
+    public static Integer getDisplacenmentX(Integer position, Integer inGameId) {
+    	Integer displacement = 0;
+    	switch(inGameId) {
+    	case 0:
+    		break;
+    	case 1:
+    		displacement = 20;
+    		break;
+    	case 2:
+    		break;
+    	case 3:
+    		displacement = 20;
+    		break;
+    	}
+    	return displacement;
+    }
+    public static Integer getDisplacenmentY(Integer position, Integer inGameId) {
+    	Integer displacement = 0;
+    	switch(inGameId) {
+    	case 0:
+    		break;
+    	case 1:
+    		break;
+    	case 2:
+    		displacement = 20;
+    		break;
+    	case 3:
+    		displacement = 20;
+    		break;
+    	}
+    	return displacement;
+    }
 }
