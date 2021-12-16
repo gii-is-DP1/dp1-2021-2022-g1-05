@@ -3,6 +3,9 @@ package org.springframework.samples.parchisYOca.playerGooseStats;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.user.User;
@@ -16,6 +19,7 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @Entity
 @ToString
+@Audited
 @Table(name="playerGooseStats")
 public class PlayerGooseStats extends BaseEntity {
 
@@ -34,7 +38,6 @@ public class PlayerGooseStats extends BaseEntity {
 
     @ManyToOne
     Player player;
-
     @ManyToOne
     GooseMatch gooseMatch;
 }
