@@ -2,6 +2,8 @@ package org.springframework.samples.parchisYOca.user;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import org.hibernate.envers.Audited;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
 import org.springframework.samples.parchisYOca.user.User;
 
@@ -14,6 +16,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @Entity
+@Audited
 @Table(name = "authorities")
 public class Authorities extends BaseEntity{
 

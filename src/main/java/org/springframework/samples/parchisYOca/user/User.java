@@ -3,6 +3,8 @@ package org.springframework.samples.parchisYOca.user;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
 
@@ -16,6 +18,7 @@ import java.util.Set;
 @Setter
 @Entity
 @ToString
+@Audited
 @Table(name="users")
 public class User implements Serializable { //Implementing serializable to fix an issue
 
