@@ -7,6 +7,7 @@ import org.springframework.samples.parchisYOca.model.BaseEntity;
 import org.springframework.samples.parchisYOca.model.NamedEntity;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.user.User;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Audited
 @Table(name = "achievements")
 public class Achievement extends BaseEntity {
 
