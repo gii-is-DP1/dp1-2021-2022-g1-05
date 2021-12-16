@@ -16,7 +16,7 @@
             <c:forEach items="${stats}" var="stat">
                 <c:forEach items="${chips}" var="chip">
                     <c:if test="${stat.inGameId eq chip.inGameId}">
-                        <li><p><c:out value="${stat.player.user.username}: ${chip.position}"/></p></li>
+                        <li><p><c:out value="${colores.get(chip.inGameId)}->${stat.player.user.username}: ${chip.position}"/></p></li>
                     </c:if>
                 </c:forEach>
             </c:forEach>
@@ -42,7 +42,7 @@
         <div>
             <ParchisYOca:gooseBoard gooseBoard="${gooseBoard}"/>
             <c:forEach items="${chips}" var="chip">
-            	<ParchisYOca:gooseChip size="30" chip="${chip}" position="${chip.position}"/>
+            	<ParchisYOca:gooseChip size="50" chip="${chip}" position="${chip.position}"/>
             </c:forEach>
         </div>
         </div>
