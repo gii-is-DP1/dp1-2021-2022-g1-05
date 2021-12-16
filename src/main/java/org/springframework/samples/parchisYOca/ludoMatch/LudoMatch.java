@@ -3,6 +3,9 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
@@ -19,6 +22,7 @@ import java.util.Set;
 @Setter
 @Entity
 @ToString
+@Audited
 @Table(name="ludoMatches")
 public class LudoMatch extends BaseEntity {
 
@@ -36,7 +40,7 @@ public class LudoMatch extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ludoMatch")
     @Size(min=1, max=4)
     private Set<PlayerLudoStats> stats;
-
+    @NotAudited
     @OneToOne
     private LudoBoard board;
 }
