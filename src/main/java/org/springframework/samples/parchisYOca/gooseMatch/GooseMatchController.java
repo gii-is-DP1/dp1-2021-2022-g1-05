@@ -193,7 +193,8 @@ public class GooseMatchController {
             }
         }
         model.put("gooseBoard", gooseMatchService.findGooseMatchById(match.getId()).get().getBoard());
-
+        List<String> colores = Arrays.asList("Rojo","Verde","Azul","Amarillo");
+        model.put("colores", colores);
 
         return view;
     }
