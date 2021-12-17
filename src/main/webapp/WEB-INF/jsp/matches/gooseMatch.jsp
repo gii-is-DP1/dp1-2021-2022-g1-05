@@ -42,7 +42,7 @@
         <div>
             <ParchisYOca:gooseBoard gooseBoard="${gooseBoard}"/>
             <c:forEach items="${chips}" var="chip">
-            	<ParchisYOca:gooseChip size="50" chip="${chip}" position="${chip.position}"/>
+            	<ParchisYOca:gooseChip size="60" chip="${chip}" position="${chip.position}"/>
             </c:forEach>
         </div>
         </div>
