@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.util.Pair;
+import org.springframework.samples.parchisYOca.gooseChip.Color;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
 
@@ -21,23 +22,45 @@ public class LudoChip  extends BaseEntity {
     @Range(min=1, max=105)
     private Integer position;
 
-    @Range(min=1, max=4)
+    @Range(min=0, max=3)
     private Integer playerId;
-    //Esto por si queremos guardar el color como tal o se podría asginar en el controlador sin almacenarlo
-    //private String Color;
+    //Para diferenciar las distintas fichas del mismo color
+    private Integer chipId;
+    private String color; 
+    //El juego depende mucho de en que parte del tablero se encuentra la ficha
+    //este atributo simplifcara la logica mas tarde
+    //earlyGame -> casilla de inicio -> sacar 5 para pasar al sguiente estado
+    //midGame -> juego normal del parchis
+    //endGame -> las casillas antes de llegar a la meta
+    private GameState gameState;
 
     @ManyToOne
     LudoBoard board;
     
-    public Map<Integer, Pair<Integer, Integer>> posToPixelMap() {
-    	Map<Integer, Pair<Integer, Integer>> pixelBoard = 
-    			new HashMap<Integer, Pair<Integer, Integer>>();
-    	/*aqui se construiría el mapa en base a la imagen,
-    	 pero como no hay imagen definitiva no lo voy a hacer ahora*/
-    	return pixelBoard;
+    public String getColor() { 
+    	//El set no importa mucho porque el color siempre dependera del Id del jugador
+    	Color[] colores = Color.values();
+    	String color = colores[playerId].toString();
+    	return color;
     }
-    public Pair<Integer, Integer> getBoardPosition(Integer position) { 
-    	Map<Integer, Pair<Integer, Integer>> pixelBoard = posToPixelMap();
-    	return pixelBoard.get(position);
+    public void setPosition(Integer position) {
+    	/*De esta forma podemos pasarle al seter una posicion+cantidad sin necesidad
+    	 de hacer una logica extra en el controlador ya que el tablero es circular*/
+    	switch(playerId) {
+    	//El 1 es un placeholder hasta saber que tablero usamos
+    	case 0:
+    		position = position%105+1;
+    		break;
+    	case 1:
+    		position = position%105+1;
+    		break;
+    	case 2:
+    		position = position%105+1;
+    		break;
+    	case 3:
+    		position = position%105+1;
+    		break;
+    	}
+    	
     }
 }
