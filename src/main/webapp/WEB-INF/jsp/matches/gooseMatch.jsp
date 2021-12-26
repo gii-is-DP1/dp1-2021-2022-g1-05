@@ -16,7 +16,7 @@
             <c:forEach items="${stats}" var="stat">
                 <c:forEach items="${chips}" var="chip">
                     <c:if test="${stat.inGameId eq chip.inGameId}">
-                        <li><p><c:out value="${colores.get(chip.inGameId)}->${stat.player.user.username}: ${chip.position}"/></p></li>
+                        <li><p><c:out value="${chip.getColor()}->${stat.player.user.username}: ${chip.position}"/></p></li>
                     </c:if>
                 </c:forEach>
             </c:forEach>
