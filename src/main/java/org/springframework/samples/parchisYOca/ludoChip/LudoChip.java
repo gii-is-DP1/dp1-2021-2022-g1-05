@@ -19,13 +19,13 @@ import javax.persistence.ManyToOne;
 @Entity
 public class LudoChip  extends BaseEntity {
 
-    @Range(min=1, max=105)
+    @Range(min=0, max=104)
     private Integer position;
 
     @Range(min=0, max=3)
     private Integer playerId;
     //Para diferenciar las distintas fichas del mismo color
-    private Integer chipId;
+    private Integer inGameId;
     private String color; 
     //El juego depende mucho de en que parte del tablero se encuentra la ficha
     //este atributo simplifcara la logica mas tarde
@@ -46,21 +46,7 @@ public class LudoChip  extends BaseEntity {
     public void setPosition(Integer position) {
     	/*De esta forma podemos pasarle al seter una posicion+cantidad sin necesidad
     	 de hacer una logica extra en el controlador ya que el tablero es circular*/
-    	switch(playerId) {
-    	//El 1 es un placeholder hasta saber que tablero usamos
-    	case 0:
-    		position = position%105+1;
-    		break;
-    	case 1:
-    		position = position%105+1;
-    		break;
-    	case 2:
-    		position = position%105+1;
-    		break;
-    	case 3:
-    		position = position%105+1;
-    		break;
-    	}
+    	this.position = position%105;
     	
     }
 }
