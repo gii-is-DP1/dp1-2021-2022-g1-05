@@ -19,7 +19,6 @@ import javax.persistence.ManyToOne;
 @Entity
 public class LudoChip  extends BaseEntity {
 
-    @Range(min=0, max=104)
     private Integer position;
 
     @Range(min=0, max=3)
@@ -32,7 +31,7 @@ public class LudoChip  extends BaseEntity {
     //earlyGame -> casilla de inicio -> sacar 5 para pasar al sguiente estado
     //midGame -> juego normal del parchis
     //endGame -> las casillas antes de llegar a la meta
-    private GameState gameState;
+    private GameState gameState = GameState.earlyGame;
 
     @ManyToOne
     LudoBoard board;
@@ -44,9 +43,19 @@ public class LudoChip  extends BaseEntity {
     	return color;
     }
     public void setPosition(Integer position) {
-    	/*De esta forma podemos pasarle al seter una posicion+cantidad sin necesidad
-    	 de hacer una logica extra en el controlador ya que el tablero es circular*/
-    	this.position = position%105;
+    	
+    	switch(gameState) {
+    	case earlyGame:
+    		this.position = null; //esta en la casa
+    		break;
+    	case midGame:
+    		this.position = position%68;
+    		//el tablero es circular pero cada ficha empieza desde un punto distinto
+    		break;
+    	case endGame:
+    		//ver como posicionar la ficha en esta parte del juego
+    		this.position = null;
+    	}
     	
     }
 }
