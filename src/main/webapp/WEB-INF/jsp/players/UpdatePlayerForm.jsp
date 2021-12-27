@@ -12,7 +12,7 @@
     </h2>
     <form:form modelAttribute="player" class="form-horizontal" id="modify-player-form">
         <div class="form-group has-feedback">
-            <parchisYOca:inputField label="Username" name="user.username"/>
+
             <parchisYOca:inputField label="Password" name="user.password"/>
             <parchisYOca:inputField label="Email" name="email"/>
 

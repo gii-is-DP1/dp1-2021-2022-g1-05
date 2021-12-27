@@ -12,6 +12,7 @@
     </h2>
     <form:form modelAttribute="player" class="form-horizontal" id="add-player-form">
         <div class="form-group has-feedback">
+            <div class="alert alert-warning" role="alert">Please have in mind you won't be able to change your username once created!</div>
             <parchisYOca:inputField label="Username" name="user.username"/>
             <parchisYOca:inputField label="Password" name="user.password"/>
             <parchisYOca:inputField label="Email" name="email"/>

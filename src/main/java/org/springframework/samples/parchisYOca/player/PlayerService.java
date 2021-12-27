@@ -46,12 +46,25 @@ public class PlayerService {
 
     @Transactional
     public Player savePlayer(Player player) throws DataAccessException{
-        //creating player
-        Player playerDB = playerRepository.save(player);
-        //creating user
-        userService.saveUser(player.getUser());
-        //creating authorities
-        authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+        Player playerDB;
+        //Check if player already exists (in other words, if this is and edit instead of a creation)
+        //and if so, set the username so that it matches the current one, just in case
+        if(playerRepository.findById(player.getId()).isPresent()) {
+            User userIntroduced = player.getUser();
+            userIntroduced.setUsername(playerRepository.findById(player.getId()).get().getUser().getUsername());
+            player.setUser(userIntroduced);
+
+            playerDB = playerRepository.save(player);
+            userService.saveUser(userIntroduced);
+        } else { //If player doens't exist, create it normally
+
+            //creating player
+            playerDB = playerRepository.save(player);
+            //creating user
+            userService.saveUser(player.getUser());
+            //creating authorities
+            authoritiesService.saveAuthorities(player.getUser().getUsername(), "player");
+        }
 
         return playerDB;
 
@@ -75,5 +88,10 @@ public class PlayerService {
     @Transactional
     public void enable(Player player) throws DataAccessException {
         player.getUser().setEnabled(true);
+    }
+
+    @Transactional
+    public void delete(Player player) throws DataAccessException {
+        userService.deleteUser(player.getUser());
     }
 }
