@@ -28,11 +28,10 @@ public class GooseChip extends BaseEntity {
     private Integer position = 0;
     private Integer inGameId = 0;
     private String color;
-    //TODO tenemos que poner playerId en ludo
 
     @ManyToOne
     GooseBoard board;
-    
+
     private static final Integer Displacement = 60;
     private static final Pair<List<Integer>, Integer> firstColum = Pair.of(Arrays.asList(0, 21, 22, 23, 24, 25, 26, 27), 0);
     private static final Pair<List<Integer>, Integer> secondColum = Pair.of(Arrays.asList(1, 20, 28, 43, 44, 45, 46, 47), 125);
@@ -56,8 +55,8 @@ public class GooseChip extends BaseEntity {
     	String color = colores[inGameId].toString();
     	return color;
     }
-    
-    
+
+
     public static Integer getPositionXInPixels(Integer position, Integer inGameId) {
     	Integer positionX = null;
     	if(firstColum.getFirst().contains(position)) {positionX = firstColum.getSecond();}
@@ -69,7 +68,7 @@ public class GooseChip extends BaseEntity {
     	if(seventhColum.getFirst().contains(position)) {positionX = seventhColum.getSecond();}
     	if(eigthColum.getFirst().contains(position)) {positionX = eigthColum.getSecond();}
     	Integer displacement = getDisplacenmentX(inGameId);
-    	
+
     	return positionX + displacement;
     }
     public static Integer getPositionYInPixels(Integer position, Integer inGameId) {
@@ -83,10 +82,10 @@ public class GooseChip extends BaseEntity {
     	if(seventhRow.getFirst().contains(position)) {positionY = seventhRow.getSecond();}
     	if(eigthRow.getFirst().contains(position)) {positionY = eigthRow.getSecond();}
     	Integer displacement = getDisplacenmentY(inGameId);
-    	
+
     	return positionY + displacement;
     }
-    
+
     public static Integer getDisplacenmentX(Integer inGameId) {
     	Integer displacement = 0;
     	switch(inGameId) {

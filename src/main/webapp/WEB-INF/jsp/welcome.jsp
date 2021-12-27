@@ -14,6 +14,7 @@
     <div class="row" style="margin-top: 3%">
         <div class="col-md-3"></div>
         <div class="col-md-3 text-center">
+
             <c:choose>
                 <c:when test="${inLudoMatch !=1}">
                     <a href="/ludoMatches/new"><button type="button" class="btn btn-primary btn-lg btn-block" style="margin-bottom: 3%">Create ludo game</button></a>

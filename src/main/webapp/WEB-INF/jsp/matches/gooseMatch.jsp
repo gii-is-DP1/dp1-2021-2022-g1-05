@@ -15,9 +15,14 @@
         <ul>
             <c:forEach items="${stats}" var="stat">
                 <c:forEach items="${chips}" var="chip">
-                    <c:if test="${stat.inGameId eq chip.inGameId}">
-                        <li><p><c:out value="${chip.getColor()}->${stat.player.user.username}: ${chip.position}"/></p></li>
-                    </c:if>
+                    <c:choose>
+                        <c:when test="${stat.inGameId eq chip.inGameId and stat.playerLeft eq 0}">
+                            <li><p><c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position}"/></p></li>
+                        </c:when>
+                        <c:when test="${stat.inGameId eq chip.inGameId and stat.playerLeft eq 1}">
+                            <li><p><c:out value="${chip.getColor()}-> JUGADOR INACTIVO: ${chip.position}"/></p></li>
+                        </c:when>
+                    </c:choose>
                 </c:forEach>
             </c:forEach>
         </ul>
@@ -38,7 +43,9 @@
             <p><c:out value="The second dice: ${secondDice}"/></p>
             <p><c:out value="The sum of both: ${sumDice}"/></p>
         </div>
-        <!-- TODO SUPER PROVISIONAL -->
+            <c:if test="${hasEnded != 1}">
+                <a href="/gooseMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
+            </c:if>
         <div>
             <ParchisYOca:gooseBoard gooseBoard="${gooseBoard}"/>
             <c:forEach items="${chips}" var="chip">

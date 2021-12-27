@@ -32,14 +32,17 @@ public class GooseMatch extends BaseEntity {
     @DateTimeFormat
     private Date endDate = null;
 
+    private Integer closedLobby = 0;
+
     @NotEmpty
     @Size(max=6)
     @Column(unique = true)
     private String matchCode;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gooseMatch")
-    @Size(min=1, max=4)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gooseMatch", orphanRemoval = true)
+    @Size(max=4)
     private Set<PlayerGooseStats> stats;
+
     @NotAudited
     @OneToOne
     private GooseBoard board;

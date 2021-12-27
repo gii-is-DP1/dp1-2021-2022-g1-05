@@ -55,7 +55,7 @@ public class GooseBoardController {
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
         PlayerGooseStats inGamePlayerStats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(
-            authenticatedUser.getUsername(), matchId);
+            authenticatedUser.getUsername(), matchId).get();
         Set<GooseChip> gooseChips = new HashSet<>(gooseChipService.findChipsByMatchId(matchId));
         Integer numberOfPlayers = gooseChips.size();
 
@@ -73,11 +73,11 @@ public class GooseBoardController {
 
                     //Estadisticas del siguiente jugador
                     Integer nextInGameId = (inGameId+1)%numberOfPlayers;
-                    PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId);
+                    PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
                     Integer nextNextInGameId = (inGameId+2)%numberOfPlayers;
-                    PlayerGooseStats nextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextInGameId, matchId);
+                    PlayerGooseStats nextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextInGameId, matchId).get();
                     Integer nextNextNextInGameId = (inGameId+3)%numberOfPlayers;
-                    PlayerGooseStats nextNextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextNextInGameId, matchId);
+                    PlayerGooseStats nextNextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextNextInGameId, matchId).get();
 
                     if(nextInGameStats.getHasTurn() == 0){  //Le da el turno al siguiente
                         nextInGameStats.setHasTurn(1);

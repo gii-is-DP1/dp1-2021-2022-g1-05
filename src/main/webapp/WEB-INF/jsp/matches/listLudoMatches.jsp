@@ -33,6 +33,12 @@
                 <c:out value="${match.endDate}"/>
             </td>
             <c:choose>
+            <c:when test="${match.closedLobby == 1}">
+            <td>Closed lobby</td>
+            <td>
+                None
+            </td>
+            </c:when>
             <c:when test="${match.startDate == null}">
             <td>Lobby</td>
             <td>

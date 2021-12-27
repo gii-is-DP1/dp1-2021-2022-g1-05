@@ -2,6 +2,7 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -11,10 +12,7 @@ import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class GooseMatchService {
@@ -26,6 +24,26 @@ public class GooseMatchService {
     public GooseMatchService(GooseMatchRepository gooseMatchRepository, PlayerGooseStatsRepository playerGooseStatsRepository){
         this.gooseMatchRepository = gooseMatchRepository;
         this.playerGooseStatsRepository = playerGooseStatsRepository;
+    }
+
+    public Boolean findEveryoneExceptOneLeft(GooseMatch gooseMatch){
+        Integer numberOfAfkPlayers = 0;
+        Boolean res = false;
+
+        for(PlayerGooseStats pgs : gooseMatch.getStats()){
+            if(pgs.getPlayerLeft() == 1){
+                numberOfAfkPlayers++;
+            }
+        }
+
+        if(numberOfAfkPlayers == gooseMatch.getStats().size()-1){
+            res = true;
+            if(gooseMatch.getEndDate() == null){
+                gooseMatch.setEndDate(new Date());
+            }
+        }
+
+        return res;
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +62,7 @@ public class GooseMatchService {
     }
 
     @Transactional
-    public Collection<GooseMatch> findLobbyByUsername(String username) throws DataAccessException{
+    public Optional<GooseMatch> findLobbyByUsername(String username) throws DataAccessException{
         return gooseMatchRepository.findLobbyByUsername(username);
     }
 
@@ -64,13 +82,13 @@ public class GooseMatchService {
         playerStats.setGooseMatch(gooseMatchDB);
 
         //To assign the in game id
-        if(gooseMatchDB.getStats()==null){
-        }else{
+        if (gooseMatchDB.getStats() == null) {
+        } else {
             Integer playersInGame = gooseMatchDB.getStats().size();
             playerStats.setInGameId(playersInGame);
         }
 
-        if(isOwner){
+        if (isOwner) {
             playerStats.setIsOwner(1);
             playerStats.setHasTurn(1);
         }
@@ -90,24 +108,4 @@ public class GooseMatchService {
         return gooseMatchDB;
 
     }
-
-    /* MÉTODO ANTERIOR, PARA COMENTAR EL TEMA DE LAS PRUEBAS
-    @Transactional
-    public GooseMatch saveGooseMatchWithPlayer(GooseMatch gooseMatch, Player player, Boolean isOwner) throws DataAccessException {
-        //        //Saves the match
-        GooseMatch gooseMatchDB = gooseMatchRepository.save(gooseMatch);
-
-        //Saves the relation between player and match
-        PlayerGooseStats playerStats = new PlayerGooseStats();
-        playerStats.setPlayer(player);
-        playerStats.setGooseMatch(gooseMatchDB);
-        if(isOwner){
-            playerStats.setIsOwner(1);
-        }
-        playerGooseStatsRepository.save(playerStats);
-
-        return gooseMatchDB;
-
-    }
-     */
 }

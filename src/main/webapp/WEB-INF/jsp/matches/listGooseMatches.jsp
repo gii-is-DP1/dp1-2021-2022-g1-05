@@ -6,7 +6,7 @@
 <%@ taglib prefix="parchisYOca" tagdir="/WEB-INF/tags" %>
 
 <parchisYOca:layout pageName="gooseMatches">
-    <h2>Listing all ludo matches</h2>
+    <h2>Listing all goose matches</h2>
 
     <table id="matchesTable" class="table table-striped">
         <thead>
@@ -32,11 +32,16 @@
                 <c:out value="${match.endDate}"/>
             </td>
             <c:choose>
+                <c:when test="${match.closedLobby == 1}">
+                <td>Closed lobby</td>
+                <td>
+                    None
+                </td>
+                </c:when>
                 <c:when test="${match.startDate == null}">
                     <td>Lobby</td>
                     <td>
                         None
-                        <!--Aquí se puede añadir que el admin cierre lobby pero xD -->
                     </td>
                 </c:when>
                 <c:when test="${match.endDate == null}">
