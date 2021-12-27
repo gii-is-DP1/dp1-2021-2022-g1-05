@@ -163,4 +163,20 @@ public class PlayerController {
         return view;
     }
 
+    @GetMapping(path="/players/{playerId}/delete")
+    public String deletePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
+        String view = "players/listPlayers";
+        Player player = playerService.findPlayerById(playerId);
+        if(!player.equals(null)){
+            playerService.delete(player);
+            modelMap.addAttribute("message", "Player successfully deleted!");
+            view=showAllPlayers(modelMap);
+
+        }else{
+            modelMap.addAttribute("message", "Player not found!");
+            view=showAllPlayers(modelMap);
+        }
+        return view;
+    }
+
 }

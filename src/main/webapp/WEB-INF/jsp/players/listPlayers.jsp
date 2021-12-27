@@ -45,6 +45,11 @@
                         </spring:url>
                         <a href="${fn:escapeXml(playerUrl)}">Enable</a>
                     </c:if>
+                    |
+                    <spring:url value="/players/{playerId}/delete" var="playerUrl">
+                        <spring:param name="playerId" value="${player.id}"/>
+                    </spring:url>
+                    <a href="${fn:escapeXml(playerUrl)}">Delete</a>
                 </td>
 
             </tr>
