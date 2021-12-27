@@ -21,6 +21,7 @@
     <c:if test="${isOwner eq 1 && numberOfPlayers > 1}">
     <a href="/gooseMatches/${matchId}"><button class="btn btn-default" type="submit">Start game</button></a>
     </c:if>
+    <a href="/gooseMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
 
 
 </ParchisYOca:layout>

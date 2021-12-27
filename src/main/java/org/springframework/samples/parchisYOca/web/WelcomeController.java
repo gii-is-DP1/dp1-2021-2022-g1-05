@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class WelcomeController {
@@ -50,8 +51,13 @@ public class WelcomeController {
                   Player player = playerService.findPlayerByUsername(currentUser.getUsername()).get();
                   model.put("playerId", player.getId());
 
-                  List<GooseMatch> playerInGooseMatches = new ArrayList<>(gooseMatchService.findLobbyByUsername(currentUser.getUsername()));
-                  if(playerInGooseMatches.size() != EMPTY){
+                  if(session.getAttribute("ownerLeft") != null){
+                      model.addAttribute("message", session.getAttribute("ownerLeft"));
+                      session.removeAttribute("ownerLeft");
+                  }
+
+                  Optional<GooseMatch> playerInGooseMatches = gooseMatchService.findLobbyByUsername(currentUser.getUsername());
+                  if(playerInGooseMatches.isPresent()){
                       model.addAttribute("inGooseMatch", 1);
                   }
 

@@ -37,9 +37,10 @@ public class LudoMatch extends BaseEntity {
     @Column(unique = true)
     private String matchCode;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "ludoMatch")
+    @OneToMany(mappedBy = "ludoMatch")
     @Size(min=1, max=4)
     private Set<PlayerLudoStats> stats;
+
     @NotAudited
     @OneToOne
     private LudoBoard board;

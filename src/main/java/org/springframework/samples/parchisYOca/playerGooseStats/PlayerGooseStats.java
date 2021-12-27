@@ -35,6 +35,7 @@ public class PlayerGooseStats extends BaseEntity {
     private Integer hasWon = 0;
     private Integer inGameId = 0;
     private Integer hasTurn = 0;
+    private Integer playerLeft = 0;
 
     @ManyToOne
     Player player;
