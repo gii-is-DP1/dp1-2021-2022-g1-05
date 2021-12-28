@@ -3,7 +3,9 @@ package org.springframework.samples.parchisYOca.playerGooseStats;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.samples.parchisYOca.player.Player;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface PlayerGooseStatsRepository extends CrudRepository<PlayerGooseStats, Integer> {

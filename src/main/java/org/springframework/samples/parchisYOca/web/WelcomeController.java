@@ -40,6 +40,7 @@ public class WelcomeController {
 	  public String welcome(ModelMap model, HttpSession session) {
           //Used to load the logged user to the model
           Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
           if(authentication.getPrincipal().toString() != "anonymousUser"){
               if (authentication.isAuthenticated()){
                   User currentUser = (User) authentication.getPrincipal();

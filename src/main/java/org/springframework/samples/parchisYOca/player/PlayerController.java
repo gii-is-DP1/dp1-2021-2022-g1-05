@@ -1,8 +1,9 @@
 package org.springframework.samples.parchisYOca.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.parchisYOca.user.AuthoritiesService;
-import org.springframework.samples.parchisYOca.user.UserService;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,15 +13,11 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class PlayerController {
@@ -29,10 +26,14 @@ public class PlayerController {
 
 
     private final PlayerService playerService;
+    private final PlayerLudoStatsService playerLudoStatsService;
+    private final PlayerGooseStatsService playerGooseStatsService;
 
     @Autowired
-    public PlayerController(PlayerService playerService, UserService userService, AuthoritiesService authoritiesService) {
+    public PlayerController(PlayerService playerService, PlayerGooseStatsService playerGooseStatsService, PlayerLudoStatsService playerLudoStatsService) {
         this.playerService = playerService;
+        this.playerLudoStatsService = playerLudoStatsService;
+        this.playerGooseStatsService = playerGooseStatsService;
     }
 
     @InitBinder
@@ -75,15 +76,22 @@ public class PlayerController {
                 }
             }
         }
-        mav.addObject(this.playerService.findPlayerById(playerId));
-        mav.addObject(this.playerService.findPlayerById(playerId).getUser());
+        mav.addObject(this.playerService.findPlayerById(playerId).get());
+        mav.addObject(this.playerService.findPlayerById(playerId).get().getUser());
         return mav;
     }
 
     @GetMapping(value = "/players")
     public String showAllPlayers(ModelMap modelMap) {
-        String vista = "players/listPlayers";
         Iterable<Player> players = playerService.findAll();
+        modelMap.addAttribute("players", players);
+        return "players/listPlayers";
+    }
+
+    @PostMapping(value = "/players")
+    public String filterPlayers(ModelMap modelMap, @RequestParam String Username) {
+        String vista = "players/listPlayers";
+        Iterable<Player> players = playerService.findAllFilteringByUsername(Username);
         modelMap.addAttribute("players", players);
         return vista;
     }
@@ -102,7 +110,7 @@ public class PlayerController {
 
                 if (playerId == authenticatedPlayer.getId() || authorities.get(0).toString().equals("admin")){
                     model.addAttribute("hasPermission", "true");  //To check if user has permission to see data
-                    Player player = playerService.findPlayerById(playerId);
+                    Player player = playerService.findPlayerById(playerId).get();
                     model.addAttribute(player);
                     return VIEWS_PLAYER_UPDATE_FORM;
                 }
@@ -111,11 +119,10 @@ public class PlayerController {
 
         }
         return "redirect:";
-
     }
 
     @PostMapping(value = "/players/{playerId}/edit")
-        public String processUpdatePlayerForm(@Valid Player player, BindingResult result,
+    public String processUpdatePlayerForm(@Valid Player player, BindingResult result,
                                          @PathVariable("playerId") int playerId) {
         if (result.hasErrors()) {
             return VIEWS_PLAYER_UPDATE_FORM;
@@ -125,12 +132,12 @@ public class PlayerController {
             this.playerService.savePlayer(player);
             return "redirect:/players/{playerId}";
         }
-    }
+}
 
     @GetMapping(path="/players/disable/{playerId}")
     public String disablePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
         String view = "players/listPlayers";
-        Player player = playerService.findPlayerById(playerId);
+        Player player = playerService.findPlayerById(playerId).get();
         if(!player.equals(null)){
             playerService.disable(player);
             modelMap.addAttribute("message", "Player successfully disabled!");
@@ -146,7 +153,7 @@ public class PlayerController {
     @GetMapping(path="/players/enable/{playerId}")
     public String enablePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
         String view = "players/listPlayers";
-        Player player = playerService.findPlayerById(playerId);
+        Player player = playerService.findPlayerById(playerId).get();
         if(!player.equals(null)){
             playerService.enable(player);
             modelMap.addAttribute("message", "Player successfully enabled!");
@@ -161,18 +168,16 @@ public class PlayerController {
 
     @GetMapping(path="/players/{playerId}/delete")
     public String deletePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
-        String view = "players/listPlayers";
-        Player player = playerService.findPlayerById(playerId);
-        if(!player.equals(null)){
+        Optional<Player> playerOptional = playerService.findPlayerById(playerId);
+        if(playerOptional.isPresent()){
+            Player player = playerOptional.get();
             playerService.delete(player);
             modelMap.addAttribute("message", "Player successfully deleted!");
-            view=showAllPlayers(modelMap);
 
         }else{
             modelMap.addAttribute("message", "Player not found!");
-            view=showAllPlayers(modelMap);
         }
-        return view;
+        return "redirect:/";
     }
 
 }
