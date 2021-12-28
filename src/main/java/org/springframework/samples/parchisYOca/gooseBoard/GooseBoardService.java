@@ -2,7 +2,6 @@ package org.springframework.samples.parchisYOca.gooseBoard;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipRepository;
 import org.springframework.stereotype.Service;

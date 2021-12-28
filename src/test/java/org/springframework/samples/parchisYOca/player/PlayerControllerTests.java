@@ -1,6 +1,5 @@
 package org.springframework.samples.parchisYOca.player;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,16 +8,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
-import org.springframework.samples.parchisYOca.user.*;
-import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.parchisYOca.user.AuthoritiesService;
+import org.springframework.samples.parchisYOca.user.User;
+import org.springframework.samples.parchisYOca.user.UserController;
+import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

@@ -1,8 +1,6 @@
 package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.parchisYOca.achievement.Achievement;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;

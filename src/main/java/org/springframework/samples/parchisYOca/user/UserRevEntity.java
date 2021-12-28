@@ -1,13 +1,11 @@
 package org.springframework.samples.parchisYOca.user;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import org.springframework.samples.parchisYOca.user.UserRevisionListener;
-
 import lombok.Setter;
-
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionEntity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
 @Setter
 @Entity
 @RevisionEntity(UserRevisionListener.class)

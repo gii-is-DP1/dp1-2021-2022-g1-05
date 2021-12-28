@@ -2,11 +2,8 @@ package org.springframework.samples.parchisYOca.achievement;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.URL;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
-import org.springframework.samples.parchisYOca.model.NamedEntity;
 import org.springframework.samples.parchisYOca.player.Player;
-import org.springframework.samples.parchisYOca.user.User;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;

@@ -1,20 +1,14 @@
 package org.springframework.samples.parchisYOca.gooseChip;
 
-import org.hibernate.validator.constraints.Range;
 import org.springframework.data.util.Pair;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
-import org.springframework.samples.parchisYOca.player.Player;
-import org.springframework.samples.parchisYOca.gooseChip.Color;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;

@@ -3,17 +3,14 @@ package org.springframework.samples.parchisYOca.playerGooseStats;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
-import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Getter
 @Setter

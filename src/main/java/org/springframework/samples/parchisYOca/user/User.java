@@ -3,10 +3,8 @@ package org.springframework.samples.parchisYOca.user;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.samples.parchisYOca.model.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
