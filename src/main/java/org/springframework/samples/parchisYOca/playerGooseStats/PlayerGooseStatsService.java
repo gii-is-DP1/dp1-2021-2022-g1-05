@@ -29,8 +29,8 @@ public class PlayerGooseStatsService {
         return playerGooseStatsRepository.findPlayerGooseStatsByInGameIdAndMatchId(inGameId, matchId);
     }
     @Transactional
-    public void saveStats(PlayerGooseStats playerGooseStats) throws DataAccessException {
-        playerGooseStatsRepository.save(playerGooseStats);
+    public PlayerGooseStats saveStats(PlayerGooseStats playerGooseStats) throws DataAccessException {
+        return playerGooseStatsRepository.save(playerGooseStats);
     }
 
     @Transactional

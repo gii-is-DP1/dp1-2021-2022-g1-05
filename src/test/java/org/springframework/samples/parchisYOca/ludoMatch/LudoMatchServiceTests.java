@@ -1,14 +1,16 @@
 package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class LudoMatchServiceTests {
     protected final Integer MATCH_CODE_LENGTH = 6;
     protected final Integer INVALID_CODE_LENGTH = 5;
 
+    @Autowired
+    private PlayerLudoStatsService playerLudoStatsService;
     @Autowired
     private LudoMatchService ludoMatchService;
     @Autowired
@@ -96,7 +100,6 @@ public class LudoMatchServiceTests {
         assertThat(ludoMatchService.findludoMatchByMatchCode(code2).isEmpty());
     }
 
-    @Disabled("Da stack overflow error")
     @Test
     @Transactional
     public void testFindLobbyByUserName() {
@@ -114,8 +117,41 @@ public class LudoMatchServiceTests {
         LudoMatch match = new LudoMatch();
         match.setMatchCode(code);
         LudoMatch addedMatch = ludoMatchService.saveludoMatchWithPlayer(match, addedPlayer, false);
-        assertThat(addedMatch).isEqualTo(ludoMatchService.findLobbyByUsername(user.getUsername()));
+        Assertions.assertThat(addedMatch).isEqualTo(ludoMatchService.findLobbyByUsername(user.getUsername()).get());
+    }
+    @Test
+    public void testFindEveryoneExceptOneLeft() {
+        LudoMatch newMatch = new LudoMatch();
+        String matchCode = RandomStringGenerator.getRandomString(MATCH_CODE_LENGTH);
+        newMatch.setMatchCode(matchCode);
+        newMatch.setStartDate(new Date());
+        //Player 1
+        Player player = new Player();
+        player.setEmail("carmen@domain.com");
+        User user = new User();
+        user.setUsername("Carmen");
+        user.setPassword("Carmen1111");
+        user.setEnabled(true);
+        player.setUser(user);
+        Player addedPlayer = playerService.savePlayer(player);
+        //Player2
+        Player player2 = new Player();
+        player2.setEmail("carmeeeeen@domain.com");
+        User user2 = new User();
+        user2.setUsername("Carmen12");
+        user2.setPassword("Carmen111112");
+        user2.setEnabled(true);
+        player2.setUser(user2);
+        Player addedPlayer2 = playerService.savePlayer(player2);
+        LudoMatch addedMatch = ludoMatchService.saveludoMatchWithPlayer(newMatch, addedPlayer, true);
+        LudoMatch addedMatch2=ludoMatchService.saveludoMatchWithPlayer(addedMatch, addedPlayer2, false);
 
+        List<PlayerLudoStats> aux=new ArrayList<>(addedMatch2.getStats());
+        PlayerLudoStats pgs=aux.get(0);
+        pgs.setPlayerLeft(1);
+        pgs.setHasTurn(Integer.MIN_VALUE);
+        playerLudoStatsService.saveStats(pgs);
+        Assertions.assertThat(ludoMatchService.findEveryoneExceptOneLeft(addedMatch2)).isEqualTo(true);
     }
 
 }

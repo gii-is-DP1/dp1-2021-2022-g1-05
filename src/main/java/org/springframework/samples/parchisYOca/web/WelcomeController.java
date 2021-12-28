@@ -57,8 +57,8 @@ public class WelcomeController {
                       model.addAttribute("inGooseMatch", 1);
                   }
 
-                  List<LudoMatch> playerInLudoMatches = new ArrayList<>(ludoMatchService.findLobbyByUsername(currentUser.getUsername()));
-                  if(playerInLudoMatches.size() != EMPTY){
+                  Optional<LudoMatch> playerInLudoMatches = ludoMatchService.findLobbyByUsername(currentUser.getUsername());
+                  if(playerInLudoMatches.isPresent()){
                       model.addAttribute("inLudoMatch", 1);
                   }
 

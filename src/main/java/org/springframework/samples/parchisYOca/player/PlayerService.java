@@ -61,13 +61,13 @@ public class PlayerService {
         Player playerDB;
         //Check if player already exists (in other words, if this is and edit instead of a creation)
         //and if so, set the username so that it matches the current one, just in case
-        if(playerRepository.findById(player.getId()).isPresent()) {
+        if( player.getId()!=null) {
             User userIntroduced = player.getUser();
             userIntroduced.setUsername(playerRepository.findById(player.getId()).get().getUser().getUsername());
             player.setUser(userIntroduced);
-
             playerDB = playerRepository.save(player);
             userService.saveUser(userIntroduced);
+
         } else { //If player doens't exist, create it normally
 
             //creating player

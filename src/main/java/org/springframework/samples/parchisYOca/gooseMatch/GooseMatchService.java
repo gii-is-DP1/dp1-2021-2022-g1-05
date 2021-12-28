@@ -3,8 +3,10 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.player.Player;
+import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsRepository;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +19,14 @@ import java.util.Set;
 public class GooseMatchService {
 
     private GooseMatchRepository gooseMatchRepository;
-    private PlayerGooseStatsRepository playerGooseStatsRepository;
 
     @Autowired
-    public GooseMatchService(GooseMatchRepository gooseMatchRepository, PlayerGooseStatsRepository playerGooseStatsRepository){
+    private PlayerGooseStatsService playerGooseStatsService;
+
+    @Autowired
+    public GooseMatchService(GooseMatchRepository gooseMatchRepository){
         this.gooseMatchRepository = gooseMatchRepository;
-        this.playerGooseStatsRepository = playerGooseStatsRepository;
+
     }
 
     public Boolean findEveryoneExceptOneLeft(GooseMatch gooseMatch){
@@ -60,7 +64,7 @@ public class GooseMatchService {
         return gooseMatchRepository.findAll();
     }
 
-    @Transactional
+    @Transactional(readOnly=true)
     public Optional<GooseMatch> findLobbyByUsername(String username) throws DataAccessException{
         return gooseMatchRepository.findLobbyByUsername(username);
     }
@@ -79,29 +83,23 @@ public class GooseMatchService {
         PlayerGooseStats playerStats = new PlayerGooseStats();
         playerStats.setPlayer(player);
         playerStats.setGooseMatch(gooseMatchDB);
+        Set<PlayerGooseStats> statsSet = new HashSet<>();
 
         //To assign the in game id
-        if (gooseMatchDB.getStats() == null) {
-        } else {
+        if (gooseMatchDB.getStats() != null) {
             Integer playersInGame = gooseMatchDB.getStats().size();
             playerStats.setInGameId(playersInGame);
+            statsSet = gooseMatchDB.getStats();
         }
-
         if (isOwner) {
             playerStats.setIsOwner(1);
             playerStats.setHasTurn(1);
-        }
-        PlayerGooseStats addedStats = playerGooseStatsRepository.save(playerStats);
-        Set<PlayerGooseStats> statsSet = new HashSet<>();
 
-
-        //From here its the new method
-        if (gooseMatchDB.getStats() != null) {
-            statsSet = gooseMatchDB.getStats();
         }
+        PlayerGooseStats addedStats = playerGooseStatsService.saveStats(playerStats);
+
         statsSet.add(addedStats);
         gooseMatchDB.setStats(statsSet);
-
         gooseMatchDB = gooseMatchRepository.save(gooseMatchDB);
 
         return gooseMatchDB;

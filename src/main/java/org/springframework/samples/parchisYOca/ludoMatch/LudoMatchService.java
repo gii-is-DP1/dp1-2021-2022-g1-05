@@ -3,15 +3,13 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.player.Player;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class LudoMatchService {
@@ -41,7 +39,7 @@ public class LudoMatchService {
     }
 
     @Transactional
-    public Collection<LudoMatch> findLobbyByUsername(String username) throws DataAccessException{
+    public Optional<LudoMatch> findLobbyByUsername(String username) throws DataAccessException{
         return ludoMatchRepository.findLobbyByUsername(username);
     }
 
@@ -85,5 +83,25 @@ public class LudoMatchService {
         ludoMatchDB = ludoMatchRepository.save(ludoMatchDB);
         return ludoMatchDB;
 
+    }
+
+    public boolean findEveryoneExceptOneLeft(LudoMatch ludoMatch) {
+        Integer numberOfAfkPlayers = 0;
+        Boolean res = false;
+
+        for(PlayerLudoStats pgs : ludoMatch.getStats()){
+            if(pgs.getPlayerLeft() == 1){
+                numberOfAfkPlayers++;
+            }
+        }
+
+        if(numberOfAfkPlayers == ludoMatch.getStats().size()-1){
+            res = true;
+            if(ludoMatch.getEndDate() == null){
+                ludoMatch.setEndDate(new Date());
+            }
+        }
+
+        return res;
     }
 }

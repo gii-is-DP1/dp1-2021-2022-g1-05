@@ -2,7 +2,6 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -10,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
@@ -30,6 +31,8 @@ public class GooseMatchServiceTest {
     protected GooseMatchService gooseMatchService;
     @Autowired
     protected PlayerService playerService;
+    @Autowired
+    protected PlayerGooseStatsService playerGooseStatsService;
 
     @Test
     @Transactional
@@ -53,7 +56,7 @@ public class GooseMatchServiceTest {
 
         GooseMatch addedMatch = gooseMatchService.save(newMatch);
 
-        Assertions.assertThat(addedMatch).isEqualTo(gooseMatchService.findGooseMatchById(addedMatch.getId()));
+        Assertions.assertThat(addedMatch).isEqualTo(gooseMatchService.findGooseMatchById(addedMatch.getId()).get());
     }
 
     @Test
@@ -75,7 +78,7 @@ public class GooseMatchServiceTest {
         Player addedPlayer = playerService.savePlayer(player);
 
         GooseMatch addedMatch = gooseMatchService.saveGooseMatchWithPlayer(newMatch, addedPlayer, true);;
-        Assertions.assertThat(addedMatch).isEqualTo(gooseMatchService.findGooseMatchById(addedMatch.getId()));
+        Assertions.assertThat(addedMatch).isEqualTo(gooseMatchService.findGooseMatchById(addedMatch.getId()).get());
         Assertions.assertThat(addedMatch.getStats().size()).isEqualTo(1);
         List<PlayerGooseStats> savedMatchStats = new ArrayList<>(addedMatch.getStats());
         Assertions.assertThat(savedMatchStats.get(0).getIsOwner());
@@ -96,7 +99,6 @@ public class GooseMatchServiceTest {
         Assertions.assertThat(gooseMatchService.findGooseMatchByMatchCode(code2).isEmpty());
     }
 
-    @Disabled("Da stack overflow error")
     @Test
     @Transactional
     public void testFindLobbyByUserName() {
@@ -114,48 +116,16 @@ public class GooseMatchServiceTest {
         GooseMatch match = new GooseMatch();
         match.setMatchCode(code);
         GooseMatch addedMatch = gooseMatchService.saveGooseMatchWithPlayer(match, addedPlayer, false);
-        Assertions.assertThat(addedMatch).isEqualTo(gooseMatchService.findLobbyByUsername(user.getUsername()));
-
+        Assertions.assertThat(addedMatch).isEqualTo(gooseMatchService.findLobbyByUsername(user.getUsername()).get());
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-    /*Integer idPrueba = 1;
-	Long count = 0L;
-	Integer size = 6;
-	Integer invalidSize = 5;
-
-
     @Test
-    @Transactional
-    public void testAddCorrectMatch(){
+    public void testFindEveryoneExceptOneLeft() {
         GooseMatch newMatch = new GooseMatch();
-        //newMatch.setStartDate(new Date());
-        String code = RandomStringGenerator.getRandomString(size);
-        newMatch.setMatchCode(code);
-        GooseMatch addedGooseMatch = gooseMatchService.save(newMatch);
-
-        Assertions.assertThat(addedGooseMatch).isEqualTo(gooseMatchService.findGooseMatchByMatchCode(code).get());
-    }
-
-
-    @Test
-    @Transactional
-    public void testSaveMatchWithPlayer() {
-        String code = RandomStringGenerator.getRandomString(size);
-        GooseMatch match = new GooseMatch();
-        match.setMatchCode(code);
-
+        String matchCode = RandomStringGenerator.getRandomString(MATCH_CODE_LENGTH);
+        newMatch.setMatchCode(matchCode);
+        newMatch.setStartDate(new Date());
+        //Player 1
         Player player = new Player();
         player.setEmail("carmen@domain.com");
         User user = new User();
@@ -163,105 +133,26 @@ public class GooseMatchServiceTest {
         user.setPassword("Carmen1111");
         user.setEnabled(true);
         player.setUser(user);
-        playerService.savePlayer(player);
+        Player addedPlayer = playerService.savePlayer(player);
+        //Player2
+        Player player2 = new Player();
+        player2.setEmail("carmeeeeen@domain.com");
+        User user2 = new User();
+        user2.setUsername("Carmen12");
+        user2.setPassword("Carmen111112");
+        user2.setEnabled(true);
+        player2.setUser(user2);
+        Player addedPlayer2 = playerService.savePlayer(player2);
+        GooseMatch addedMatch = gooseMatchService.saveGooseMatchWithPlayer(newMatch, addedPlayer, true);
+        GooseMatch addedMatch2=gooseMatchService.saveGooseMatchWithPlayer(addedMatch, addedPlayer2, false);
 
-
-        Player player = new Player();
-        player.setEmail("pepe@gmail.com");
-        User user = new User();
-        user.setUsername("Pepe07");
-        user.setPassword("supersecretpassword1");
-        user.setEnabled(true);
-        player.setUser(user);
-
-        Player addedplayer = playerService.savePlayer(player);
-
-        gooseMatchService.saveGooseMatchWithPlayer(match, player, true);
-        GooseMatch savedMatch = gooseMatchService.findGooseMatchByMatchCode(code).get();
-        Assertions.assertThat(match).isEqualTo(savedMatch);
-        Assertions.assertThat(savedMatch.getStats().size()).isEqualTo(1);
-        List<PlayerGooseStats> savedMatchStats = new ArrayList<>(savedMatch.getStats());
-        Assertions.assertThat(savedMatchStats.get(0).getIsOwner());
-    }/*
-
-
-	@Test
-	public void testFindByID() {
-		assertThrows(DataAccessException.class, ()->{
-			gMatchService.findGooseMatchById(idPrueba);
-		});
-	}
-
-	@Test
-	public void testFindAll() {
-		//la cantidad de partidas debe ser 0
-
-        assertEquals(StreamSupport.stream(gMatchService
-				.findAll()
-				.spliterator(),false)
-				.count(), count);
-	}
-	@Test
-	@Transactional
-	public void testSaveMatchPositivo() {
-		String code = RandomStringGenerator.getRandomString(size);
-		GooseMatch match = new GooseMatch();
-		match.setMatchCode(code);
-		assertDoesNotThrow(()->gMatchService.save(match));
-	}
-	@Test
-	@Transactional
-	public void testSaveMatchPlayerPositivo() {
-		String code = RandomStringGenerator.getRandomString(size);
-		GooseMatch match = new GooseMatch();
-		match.setMatchCode(code);
-		Player player = new Player();
-	    player.setEmail("carmen@domain.com");
-	    User user = new User();
-	    user.setUsername("Carmen");
-	    user.setPassword("Carmen1111");
-	    user.setEnabled(true);
-	    player.setUser(user);
-		assertDoesNotThrow(()->gMatchService.saveGooseMatchWithPlayer(match, player, true));
-	}
-	@Test
-	@Transactional
-	public void testFindByMatchCode() {
-		String code = RandomStringGenerator.getRandomString(size);
-		GooseMatch match = new GooseMatch();
-		match.setMatchCode(code);
-		gMatchService.save(match);
-		assertDoesNotThrow(()->gMatchService.findGooseMatchByMatchCode(code));
-	}
-	@Test
-	public void testFindByMatchCodeNegative() {
-		String code = RandomStringGenerator.getRandomString(invalidSize);
-		assertThrows(DataAccessException.class, ()-> {
-				gMatchService.findGooseMatchByMatchCode(code);
-		});
-	}
-	@Test
-	@Transactional
-	public void testFindLobbyByUserName() {
-		Player player = new Player();
-	    player.setEmail("carmen@domain.com");
-	    User user = new User();
-	    user.setUsername("Carmen");
-	    user.setPassword("Carmen1111");
-	    user.setEnabled(true);
-	    player.setUser(user);
-	    String code = RandomStringGenerator.getRandomString(size);
-		GooseMatch match = new GooseMatch();
-		match.setMatchCode(code);
-		gMatchService.save(match);
-	    gMatchService.saveGooseMatchWithPlayer(match, player, false);
-	    assertDoesNotThrow(()->gMatchService.findLobbyByUsername(user.getUsername()));
-
-	}*/
-
-
-
-
+        List<PlayerGooseStats> aux=new ArrayList<>(addedMatch2.getStats());
+        PlayerGooseStats pgs=aux.get(0);
+        pgs.setPlayerLeft(1);
+        pgs.setHasTurn(Integer.MIN_VALUE);
+        playerGooseStatsService.saveStats(pgs);
+        Assertions.assertThat(gooseMatchService.findEveryoneExceptOneLeft(addedMatch2)).isEqualTo(true);
+    }
 
 
 }

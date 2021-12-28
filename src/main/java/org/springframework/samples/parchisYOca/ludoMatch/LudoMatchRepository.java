@@ -12,5 +12,5 @@ public interface LudoMatchRepository extends CrudRepository<LudoMatch, Integer> 
     Optional<LudoMatch> findMatchByMatchCode(String matchCode);
 
     @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch JOIN FETCH ludoMatch.stats stats WHERE stats.player.user.username = :username AND ludoMatch.endDate is null")
-    Collection<LudoMatch> findLobbyByUsername(String username);
+    Optional<LudoMatch> findLobbyByUsername(String username);
 }
