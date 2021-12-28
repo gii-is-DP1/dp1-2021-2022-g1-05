@@ -1,8 +1,6 @@
 package org.springframework.samples.parchisYOca.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
-import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.core.Authentication;
@@ -23,8 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Controller
 public class PlayerController {

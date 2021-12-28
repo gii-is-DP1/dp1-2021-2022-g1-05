@@ -13,7 +13,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
-
 import java.util.Set;
 
 @Getter
@@ -26,6 +25,12 @@ public class LudoBoard extends BaseEntity {
     private Integer width;
     @Positive
     private Integer height;
+
+    public LudoBoard(){
+        this.background="";
+        this.width=1000;
+        this.height=1000;
+    }
 
     @OneToOne(mappedBy = "board")
     private LudoMatch match;

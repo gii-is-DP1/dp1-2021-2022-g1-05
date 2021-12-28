@@ -7,10 +7,6 @@ import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
-import org.springframework.samples.parchisYOca.user.AuthoritiesService;
-import org.springframework.samples.parchisYOca.user.UserService;
-import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
-import org.springframework.samples.petclinic.model.Person;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller

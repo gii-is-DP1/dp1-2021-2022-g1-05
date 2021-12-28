@@ -18,10 +18,6 @@ package org.springframework.samples.parchisYOca.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.user.Authorities;
-import org.springframework.samples.parchisYOca.user.AuthoritiesRepository;
-import org.springframework.samples.parchisYOca.user.User;
-import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -3,16 +3,11 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoardService;
-import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
-import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsRepository;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
-import org.springframework.samples.parchisYOca.user.AuthoritiesService;
-import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +23,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.websocket.server.PathParam;
 import java.util.*;
 
 @Controller

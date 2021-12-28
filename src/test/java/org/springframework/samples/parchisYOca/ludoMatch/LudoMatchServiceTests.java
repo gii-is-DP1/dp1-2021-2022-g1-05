@@ -1,17 +1,11 @@
 package org.springframework.samples.parchisYOca.ludoMatch;
 
-import ch.qos.logback.core.CoreConstants;
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
@@ -20,14 +14,11 @@ import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolationException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class LudoMatchServiceTests {

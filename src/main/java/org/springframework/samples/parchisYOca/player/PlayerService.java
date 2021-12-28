@@ -2,7 +2,6 @@ package org.springframework.samples.parchisYOca.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.user.Authorities;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.user.UserService;

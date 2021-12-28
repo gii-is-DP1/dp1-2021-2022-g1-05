@@ -17,14 +17,11 @@ package org.springframework.samples.parchisYOca.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 
 
 @Getter

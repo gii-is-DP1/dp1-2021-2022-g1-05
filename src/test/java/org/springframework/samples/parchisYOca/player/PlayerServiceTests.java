@@ -6,11 +6,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import javax.validation.ConstraintViolationException;
 

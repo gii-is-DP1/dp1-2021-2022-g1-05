@@ -1,10 +1,8 @@
 package org.springframework.samples.parchisYOca.gooseMatch;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.Collection;
 import java.util.Optional;
 
 public interface GooseMatchRepository extends CrudRepository<GooseMatch, Integer> {

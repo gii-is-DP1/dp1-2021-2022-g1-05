@@ -4,11 +4,9 @@ import java.util.*;
 
 import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
-import org.springframework.samples.parchisYOca.player.Player;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.petclinic.model.BaseEntity;
 
 import javax.persistence.CascadeType;
