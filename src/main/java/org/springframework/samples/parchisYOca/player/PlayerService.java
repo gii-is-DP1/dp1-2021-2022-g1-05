@@ -2,13 +2,18 @@ package org.springframework.samples.parchisYOca.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -23,13 +28,21 @@ public class PlayerService {
     private AuthoritiesService authoritiesService;
 
     @Autowired
+    private PlayerGooseStatsService playerGooseStatsService;
+
+    @Autowired
+    private PlayerLudoStatsService playerLudoStatsService;
+
+
+
+    @Autowired
     public PlayerService(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
     }
 
     @Transactional(readOnly = true)
-    public Player findPlayerById(int id) throws DataAccessException {
-        return playerRepository.findById(id).get();
+    public Optional<Player> findPlayerById(int id) throws DataAccessException {
+        return playerRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
@@ -74,13 +87,14 @@ public class PlayerService {
         return playerRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public Iterable<Player> findAllFilteringByUsername(String username) throws DataAccessException {
+        return playerRepository.findAllPlayersFilterByUsername(username);
+    }
+
     @Transactional
     public void disable(Player player) throws DataAccessException {
-        //for(Authorities authorities : player.getUser().getAuthorities()) {
-        //    authoritiesService.deleteAuthorities(authorities);
-        //}
         player.getUser().setEnabled(false);
-        //player.setEmail(null);
 
     }
 
@@ -91,6 +105,8 @@ public class PlayerService {
 
     @Transactional
     public void delete(Player player) throws DataAccessException {
+
+        playerRepository.delete(player);
         userService.deleteUser(player.getUser());
     }
 }

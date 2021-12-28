@@ -52,7 +52,7 @@ public class PlayerControllerTests {
         ManuK.setUser(user);
         ManuK.setId(TEST_PLAYER_ID);
         ManuK.setEmail("manu@gmail.com");
-        given(this.gameService.findPlayerById(TEST_PLAYER_ID)).willReturn(ManuK);
+        given(this.gameService.findPlayerById(TEST_PLAYER_ID).get()).willReturn(ManuK);
 
     }
 

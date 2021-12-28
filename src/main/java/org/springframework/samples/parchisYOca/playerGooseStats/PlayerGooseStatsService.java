@@ -2,9 +2,11 @@ package org.springframework.samples.parchisYOca.playerGooseStats;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -26,7 +28,6 @@ public class PlayerGooseStatsService {
     public Optional<PlayerGooseStats> findPlayerGooseStatsByInGameIdAndMatchId(Integer inGameId, Integer matchId) throws DataAccessException {
         return playerGooseStatsRepository.findPlayerGooseStatsByInGameIdAndMatchId(inGameId, matchId);
     }
-
     @Transactional
     public void saveStats(PlayerGooseStats playerGooseStats) throws DataAccessException {
         playerGooseStatsRepository.save(playerGooseStats);
@@ -41,4 +42,6 @@ public class PlayerGooseStatsService {
     public void removeAllGooseStatsFromGame(Integer gooseMatchId) throws DataAccessException {
         playerGooseStatsRepository.deleteStatsFromGame(gooseMatchId);
     }
+
+
 }

@@ -4,9 +4,27 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="ParchisYOca" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="th" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <ParchisYOca:layout pageName="players">
-    <h2>Showing all players</h2>
+    <h2>Search player by username</h2>
+
+    <form:form class="form-horizontal" id="player-id-form">
+        <div class="form-group has-feedback" style="margin-left: 2%">
+            <label for="Username" style="margin-right: 0.5%">Username:</label>
+            <input type="text" name="Username" id="Username" placeholder="Enter a userName">
+        </div>
+        <div class="form-group">
+            <div class="col-sm col-sm-10" style="margin-left: 2%">
+                <button class="btn btn-default" type="submit">Search</button>
+            </div>
+        </div>
+    </form:form>
+
+    <br>
+
+    <h2>Showing players</h2>
 
     <table id="playersTable" class="table table-striped">
         <thead>
