@@ -2,6 +2,7 @@ package org.springframework.samples.parchisYOca.gooseBoard;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipRepository;
 import org.springframework.stereotype.Service;
@@ -28,10 +29,13 @@ public class GooseBoardService {
     }
 
     @Transactional
-    public GooseBoard save(GooseBoard gooseBoard, Integer numberOfPlayers) throws DataAccessException{
+    public GooseBoard save(GooseBoard gooseBoard, Integer numberOfPlayers) throws DataAccessException, InvalidPlayerNumberException {
 
         GooseBoard gooseBoardDB = gooseBoardRepository.save(gooseBoard);
 
+        if(numberOfPlayers>4||numberOfPlayers<=1){
+            throw new InvalidPlayerNumberException();
+        }
         for (Integer i = 0; i < numberOfPlayers; i++){
             GooseChip gooseChip = new GooseChip();
             gooseChip.setInGameId(i);

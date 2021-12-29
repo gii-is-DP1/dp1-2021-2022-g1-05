@@ -4,6 +4,7 @@ import org.hibernate.envers.internal.tools.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
+import org.springframework.samples.parchisYOca.gooseChip.exceptions.InvalidChipPositionException;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -46,7 +47,7 @@ public class GooseBoardController {
 
 
     @GetMapping(value = "/gooseInGame/dicesRolled")
-    public String gooseDicesRolled(HttpSession session){
+    public String gooseDicesRolled(HttpSession session) throws InvalidChipPositionException {
         Integer matchId = (Integer) session.getAttribute("matchId");
         int[] rolledDices = (int[])session.getAttribute("dices");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -124,5 +125,5 @@ public class GooseBoardController {
 
         return "redirect:/gooseMatches/"+matchId;
     }
-    
+
 }

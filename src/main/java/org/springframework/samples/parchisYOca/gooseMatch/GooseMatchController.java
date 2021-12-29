@@ -3,6 +3,7 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoardService;
+import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
@@ -145,7 +146,7 @@ public class GooseMatchController {
 
     @GetMapping(value = "/gooseMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
-                            HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+                            HttpServletRequest request, HttpSession session, HttpServletResponse response) throws InvalidPlayerNumberException {
         response.addHeader("Refresh", "2");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player

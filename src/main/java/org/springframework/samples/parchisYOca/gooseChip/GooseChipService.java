@@ -3,6 +3,7 @@ package org.springframework.samples.parchisYOca.gooseChip;
 import org.hibernate.envers.internal.tools.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.gooseChip.exceptions.InvalidChipPositionException;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchRepository;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -25,7 +26,7 @@ public class GooseChipService {
     public static final int LABERINTO = 42;
     public static final int FINAL_LABERINTO = 30;
     public static final int CARCEL = 56;
-    public static final int CALAVERA = 58;
+    //public static final int CALAVERA = 58;
     public static final List<Integer> OCAS = List.of(5,9,14,18,23,27,32,36,41,45,50,54);
     public static final List<Integer> DADOS = List.of(26,53);
     public static final List<Integer> PUENTES = List.of(6,12);
@@ -53,7 +54,10 @@ public class GooseChipService {
     }
 
     @Transactional
-    public GooseChip save(GooseChip gooseChip) throws DataAccessException {
+    public GooseChip save(GooseChip gooseChip) throws DataAccessException, InvalidChipPositionException {
+        if(gooseChip.getPosition()<0){
+            throw new InvalidChipPositionException();
+        }
         return gooseChipRepository.save(gooseChip);
     }
 
@@ -178,68 +182,6 @@ public class GooseChipService {
         gooseMatchRepository.save(gooseMatch);
         return posicionYTurno;
     }
-
-    /*
-    @Transactional
-    public GooseChip save(GooseChip gooseChip) throws DataAccessException{
-        Integer matchId = gooseChip.getBoard().getMatch().getId();
-        GooseMatch gooseMatch = gooseMatchRepository.findById(matchId).get();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        PlayerGooseStats stats = playerGooseStatsRepository.
-            findPlayerGooseStatsByUsernamedAndMatchId(currentUser.getUsername(), matchId).get();
-
-        Integer position = gooseChip.getPosition();
-
-        //Checks if has won
-        if(position == CASILLA_FINAL || position == ULTIMA_OCA){
-            if(position == ULTIMA_OCA){
-                gooseChip.setPosition(63);
-            }
-            gooseMatch.setEndDate(new Date());
-            stats.setHasWon(1);
-            gooseMatchRepository.save(gooseMatch);
-        //Checks if bounce
-        } else if (position > CASILLA_FINAL){
-            Integer diff = position - CASILLA_FINAL;
-            gooseChip.setPosition(CASILLA_FINAL- diff);
-        //Checks if oca
-        } else if (OCAS.contains(position)){
-            Integer oca = OCAS.indexOf(position);
-            if(oca == OCAS.size()-1){
-                gooseChip.setPosition(ULTIMA_OCA);
-            }
-            gooseChip.setPosition(OCAS.get(oca+1));
-            stats.setHasTurn(1);
-        //Checks if puente
-        } else if (PUENTES.contains(position)){
-            Integer puente = PUENTES.indexOf(position);
-            gooseChip.setPosition(PUENTES.get((puente+1)%PUENTES.size()));
-            stats.setHasTurn(1);
-        //Checks if dado
-        } else if (DADOS.contains(position)){
-            Integer dado = DADOS.indexOf(position);
-            gooseChip.setPosition(DADOS.get((dado+1)%DADOS.size()));
-            stats.setHasTurn(1);
-        //Checks if posada
-        } else if (position == POSADA){
-            stats.setHasTurn(-1);
-        //Checks if carcel
-        } else if (position == CARCEL){
-            stats.setHasTurn(-2);
-        //Checks if laberinto
-        } else if (position == LABERINTO){
-            gooseChip.setPosition(FINAL_LABERINTO);
-        //Checks if calavera
-        }else if (position == CALAVERA){
-            gooseChip.setPosition(0);
-        }
-
-        playerGooseStatsRepository.save(stats);
-        gooseChipRepository.save(gooseChip);
-        return gooseChip;
-    }
-    */
 
 
 }
