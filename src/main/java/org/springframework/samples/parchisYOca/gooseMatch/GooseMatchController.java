@@ -9,6 +9,7 @@ import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
+import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +35,7 @@ public class GooseMatchController {
     private final PlayerGooseStatsService playerGooseStatsService;
     private final GooseBoardService gooseBoardService;
     private final GooseChipService gooseChipService;
+    private final UserService userService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
     private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
@@ -42,33 +44,40 @@ public class GooseMatchController {
     @Autowired
     public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService,
                                 PlayerGooseStatsService playerGooseStatsService,
-                                GooseBoardService gooseBoardService, GooseChipService gooseChipService){
+                                GooseBoardService gooseBoardService, GooseChipService gooseChipService, UserService userService){
         this.gooseMatchService = gooseMatchService;
         this.playerService = playerService;
         this.playerGooseStatsService = playerGooseStatsService;
         this.gooseBoardService = gooseBoardService;
         this.gooseChipService = gooseChipService;
+        this.userService = userService;
     }
 
     @GetMapping("/gooseMatches/new")
     public String createGooseMatch(ModelMap modelMap){
         String matchCode = RandomStringGenerator.getRandomString(MATCH_CODE_LENGTH);
         GooseMatch gooseMatch = new GooseMatch();
+        Boolean logged = userService.isAuthenticated();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+        if(logged==true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
-        Optional<GooseMatch> playerInGooseMatches = gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername());
-        if(playerInGooseMatches.isPresent()){
-            GooseMatch playerInGooseMatch = playerInGooseMatches.get();
-            modelMap.addAttribute("message", "You are already at a lobby: "+playerInGooseMatch.getMatchCode());
+            Optional<GooseMatch> playerInGooseMatches = gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername());
+            if(playerInGooseMatches.isPresent()){
+                GooseMatch playerInGooseMatch = playerInGooseMatches.get();
+                modelMap.addAttribute("message", "You are already at a lobby: "+playerInGooseMatch.getMatchCode());
+                return "redirect:/";
+            }
+
+            gooseMatch.setMatchCode(matchCode);
+            gooseMatchService.saveGooseMatchWithPlayer(gooseMatch, player, true);
+            return "redirect:/gooseMatches/lobby/"+matchCode;
+        }else{
             return "redirect:/";
         }
 
-        gooseMatch.setMatchCode(matchCode);
-        gooseMatchService.saveGooseMatchWithPlayer(gooseMatch, player, true);
-        return "redirect:/gooseMatches/lobby/"+matchCode;
     }
 
     @GetMapping(value = "/gooseMatches/join")
@@ -81,33 +90,39 @@ public class GooseMatchController {
     @PostMapping(value = "/gooseMatches/join")
     public String joinGooseMatch(@RequestParam String matchCode, ModelMap modelMap){
         Optional<GooseMatch> gooseMatch = gooseMatchService.findGooseMatchByMatchCode(matchCode);
+        Boolean logged = userService.isAuthenticated();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+        if(logged==true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
-        Optional<GooseMatch> playerInGooseMatches = gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername());
+            Optional<GooseMatch> playerInGooseMatches = gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername());
 
 
-        if(playerInGooseMatches.isPresent()){ //If player is in a match
-            if(matchCode.equals(playerInGooseMatches.get().getMatchCode())){   //If the player enters the lobby they are in
-                return "redirect:/gooseMatches/lobby/" + matchCode;
-            }else{
-                modelMap.addAttribute("message", "You are already at a lobby: "+playerInGooseMatches.get().getMatchCode());
-            }
-        } else{
-            if(gooseMatch.isPresent()) { //If the game exists
-                if(!(gooseMatch.get().getStats().size()>=MAX_NUMBER_OF_PLAYERS)) { //If the game is not full
-                    gooseMatchService.saveGooseMatchWithPlayer(gooseMatch.get(),player, false);
-                    return "redirect:/gooseMatches/lobby/"+matchCode;
+            if(playerInGooseMatches.isPresent()){ //If player is in a match
+                if(matchCode.equals(playerInGooseMatches.get().getMatchCode())){   //If the player enters the lobby they are in
+                    return "redirect:/gooseMatches/lobby/" + matchCode;
                 }else{
-                    modelMap.addAttribute("message", "The lobby is full!");
+                    modelMap.addAttribute("message", "You are already at a lobby: "+playerInGooseMatches.get().getMatchCode());
                 }
-            }else{
-                modelMap.addAttribute("message", "Lobby not found!");
+            } else{
+                if(gooseMatch.isPresent()) { //If the game exists
+                    if(!(gooseMatch.get().getStats().size()>=MAX_NUMBER_OF_PLAYERS)) { //If the game is not full
+                        gooseMatchService.saveGooseMatchWithPlayer(gooseMatch.get(),player, false);
+                        return "redirect:/gooseMatches/lobby/"+matchCode;
+                    }else{
+                        modelMap.addAttribute("message", "The lobby is full!");
+                    }
+                }else{
+                    modelMap.addAttribute("message", "Lobby not found!");
+                }
             }
+            return "matches/joinMatchForm";
+        }else{
+            return "redirect:/";
         }
-        return "matches/joinMatchForm";
+
     }
 
 
@@ -127,20 +142,25 @@ public class GooseMatchController {
         response.addHeader("Refresh", REFRESH_RATE);
 
         GooseMatch gooseMatch = gooseMatchService.findGooseMatchByMatchCode(matchCode).get();
+        Boolean logged = userService.isAuthenticated();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+        if(logged==true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
-        modelMap.addAttribute("numberOfPlayers", gooseMatch.getStats().size());
-        if(playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), gooseMatch.getId()).isPresent()){
-            modelMap.addAttribute("isOwner", playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), gooseMatch.getId()).get().getIsOwner());
+            modelMap.addAttribute("numberOfPlayers", gooseMatch.getStats().size());
+            if(playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), gooseMatch.getId()).isPresent()){
+                modelMap.addAttribute("isOwner", playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), gooseMatch.getId()).get().getIsOwner());
+            }
+            modelMap.addAttribute("stats", gooseMatch.getStats());
+            modelMap.addAttribute("matchCode", matchCode);
+            modelMap.addAttribute("match", gooseMatch);
+            modelMap.addAttribute("matchId",gooseMatch.getId());
+
+            return "matches/gooseMatchLobby";
+        }else{
+            return "redirect:/";
         }
-        modelMap.addAttribute("stats", gooseMatch.getStats());
-        modelMap.addAttribute("matchCode", matchCode);
-        modelMap.addAttribute("match", gooseMatch);
-        modelMap.addAttribute("matchId",gooseMatch.getId());
-
-        return "matches/gooseMatchLobby";
     }
 
 
@@ -148,66 +168,73 @@ public class GooseMatchController {
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response) throws InvalidPlayerNumberException {
         response.addHeader("Refresh", "2");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+        Boolean logged = userService.isAuthenticated();
 
-        //To be able to redirect back when rolling the dice
-        request.getSession().setAttribute("fromGoose", true);
-        request.getSession().setAttribute("matchId", matchId);
+        if(logged==true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
-        String view = "matches/gooseMatch";
-        GooseMatch match = gooseMatchService.findGooseMatchById(matchId).get();
-        model.put("stats", match.getStats());
+            //To be able to redirect back when rolling the dice
+            request.getSession().setAttribute("fromGoose", true);
+            request.getSession().setAttribute("matchId", matchId);
 
-        //If the match is a new one, sets the start date and creates the board with its chips
-        if (match.getStartDate() == null) {
-            match.setStartDate(new Date());
-            GooseBoard board = new GooseBoard();
-            GooseBoard savedBoard = gooseBoardService.save(board, match.getStats().size());
-            match.setBoard(savedBoard);
-        }
-        model.put("chips", gooseChipService.findChipsByMatchId(matchId));
+            String view = "matches/gooseMatch";
+            GooseMatch match = gooseMatchService.findGooseMatchById(matchId).get();
+            model.put("stats", match.getStats());
 
-        if (session.getAttribute("dices") != null) {
-            int[] dices = (int[]) session.getAttribute("dices");
-            model.put("firstDice", dices[0]);
-            model.put("secondDice", dices[1]);
-            model.put("sumDice", dices[2]);
-        }
+            //If the match is a new one, sets the start date and creates the board with its chips
+            if (match.getStartDate() == null) {
+                match.setStartDate(new Date());
+                GooseBoard board = new GooseBoard();
+                GooseBoard savedBoard = gooseBoardService.save(board, match.getStats().size());
+                match.setBoard(savedBoard);
+            }
+            model.put("chips", gooseChipService.findChipsByMatchId(matchId));
 
-        PlayerGooseStats stats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId).get();
+            if (session.getAttribute("dices") != null) {
+                int[] dices = (int[]) session.getAttribute("dices");
+                model.put("firstDice", dices[0]);
+                model.put("secondDice", dices[1]);
+                model.put("sumDice", dices[2]);
+            }
 
-        //Checks if everyone except one left
-        Boolean everyoneExceptOneLeft = gooseMatchService.findEveryoneExceptOneLeft(match);
-        System.out.println(everyoneExceptOneLeft);
-        if (stats.getPlayerLeft() == 0 && everyoneExceptOneLeft == true) {
-            stats.setHasWon(1);
-            playerGooseStatsService.saveStats(stats);
-        }
-        gooseMatchService.save(match);
+            PlayerGooseStats stats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), matchId).get();
 
-        //To show the other players if their game has been closed or has ended
-        if(gooseMatchService.findGooseMatchById(matchId).get().getEndDate() != null){
-            model.addAttribute("hasEnded", 1);
-            if(everyoneExceptOneLeft == true){
-                model.addAttribute("message", "Everyone except you left, so you won!");
+            //Checks if everyone except one left
+            Boolean everyoneExceptOneLeft = gooseMatchService.findEveryoneExceptOneLeft(match);
+            System.out.println(everyoneExceptOneLeft);
+            if (stats.getPlayerLeft() == 0 && everyoneExceptOneLeft == true) {
+                stats.setHasWon(1);
+                playerGooseStatsService.saveStats(stats);
+            }
+            gooseMatchService.save(match);
+
+            //To show the other players if their game has been closed or has ended
+            if(gooseMatchService.findGooseMatchById(matchId).get().getEndDate() != null){
+                model.addAttribute("hasEnded", 1);
+                if(everyoneExceptOneLeft == true){
+                    model.addAttribute("message", "Everyone except you left, so you won!");
+                }else{
+                    model.addAttribute("message", "The game has ended!");
+                }
             }else{
-                model.addAttribute("message", "The game has ended!");
+                //To show if they landed on a special square
+                if (session.getAttribute("especial") != null){
+                    String mensaje = session.getAttribute("especial").toString();
+                    model.put("message", mensaje);
+                }
+                if(!(stats.getHasTurn() < 0)){
+                    Integer hasTurn = stats.getHasTurn();
+                    model.put("hasTurn", hasTurn);
+                }
             }
-        }else{
-            //To show if they landed on a special square
-            if (session.getAttribute("especial") != null){
-                String mensaje = session.getAttribute("especial").toString();
-                model.put("message", mensaje);
-            }
-            if(!(stats.getHasTurn() < 0)){
-                Integer hasTurn = stats.getHasTurn();
-                model.put("hasTurn", hasTurn);
-            }
-        }
-        model.put("gooseBoard", gooseMatchService.findGooseMatchById(match.getId()).get().getBoard());
+            model.put("gooseBoard", gooseMatchService.findGooseMatchById(match.getId()).get().getBoard());
 
-        return view;
+            return view;
+        }else{
+            return "redirect:/";
+        }
+
     }
 
     @GetMapping(value="/gooseMatches")
@@ -228,28 +255,31 @@ public class GooseMatchController {
     }
 
     @GetMapping(value="/gooseMatches/matchLeft")
-    public ModelAndView leaveMatch(){
+    public ModelAndView leaveMatch() {
         ModelAndView mav = new ModelAndView("welcome");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        GooseMatch userMatch = gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()).get();
-        PlayerGooseStats pgs = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), userMatch.getId()).get();
+        Boolean logged = userService.isAuthenticated();
 
-       if(pgs.getIsOwner() == 1 && userMatch.getStartDate() == null) {
-           playerGooseStatsService.removeAllGooseStatsFromGame(userMatch.getId());
-           userMatch.setClosedLobby(1);
-           gooseMatchService.save(userMatch);
-           mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
-       }else if (userMatch.getStartDate() == null){
-           playerGooseStatsService.removeGooseStatsFromGame(pgs.getInGameId(),userMatch.getId() );
-           mav.addObject("message", "You left the game!");
-       } else {
-           pgs.setPlayerLeft(1);
-           pgs.setHasTurn(Integer.MIN_VALUE);
-           playerGooseStatsService.saveStats(pgs);
-           mav.addObject("message", "You left the game!");
-       }
+        if (logged == true) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            GooseMatch userMatch = gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()).get();
+            PlayerGooseStats pgs = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), userMatch.getId()).get();
+
+            if (pgs.getIsOwner() == 1 && userMatch.getStartDate() == null) {
+                playerGooseStatsService.removeAllGooseStatsFromGame(userMatch.getId());
+                userMatch.setClosedLobby(1);
+                gooseMatchService.save(userMatch);
+                mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
+            } else if (userMatch.getStartDate() == null) {
+                playerGooseStatsService.removeGooseStatsFromGame(pgs.getInGameId(), userMatch.getId());
+                mav.addObject("message", "You left the game!");
+            } else {
+                pgs.setPlayerLeft(1);
+                pgs.setHasTurn(Integer.MIN_VALUE);
+                playerGooseStatsService.saveStats(pgs);
+                mav.addObject("message", "You left the game!");
+            }
+        }
         return mav;
     }
-
 }

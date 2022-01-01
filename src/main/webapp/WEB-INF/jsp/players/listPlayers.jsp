@@ -32,6 +32,7 @@
             <th style="width: 150px;">Name</th>
             <th style="width: 200px;">Email</th>
             <th style="width: 150px;">Enabled</th>
+            <th style="width: 150px;">In game</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -51,6 +52,16 @@
                     <c:out value="${player.user.enabled}"/>
                 </td>
                 <td>
+                    <c:choose>
+                        <c:when test="${fn:contains(playersInGame, player.user.username)}">
+                            <p>true</p>
+                        </c:when>
+                        <c:otherwise>
+                            false
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td>
                     <c:if test="${player.user.enabled eq true}">
                         <spring:url value="/players/disable/{playerId}" var="playerUrl">
                             <spring:param name="playerId" value="${player.id}"/>
@@ -64,11 +75,19 @@
                         <a href="${fn:escapeXml(playerUrl)}">Enable</a>
                     </c:if>
                     |
-                    <spring:url value="/players/{playerId}/delete" var="playerUrl">
-                        <spring:param name="playerId" value="${player.id}"/>
-                    </spring:url>
-                    <a href="${fn:escapeXml(playerUrl)}">Delete</a>
+                    <c:choose>
+                        <c:when test="${fn:contains(playersInGame, player.user.username)}">
+                            <p style="color: darkred; display: inline-block">Can't delete this account because the player is in game</p>
+                        </c:when>
+                        <c:otherwise>
+                            <spring:url value="/players/{playerId}/delete" var="playerUrl">
+                                <spring:param name="playerId" value="${player.id}"/>
+                            </spring:url>
+                            <a href="${fn:escapeXml(playerUrl)}">Delete</a>
+                        </c:otherwise>
+                    </c:choose>
                 </td>
+
 
             </tr>
         </c:forEach>

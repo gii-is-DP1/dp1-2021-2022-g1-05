@@ -10,10 +10,7 @@ import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 
 @Service
@@ -26,12 +23,6 @@ public class PlayerService {
 
     @Autowired
     private AuthoritiesService authoritiesService;
-
-    @Autowired
-    private PlayerGooseStatsService playerGooseStatsService;
-
-    @Autowired
-    private PlayerLudoStatsService playerLudoStatsService;
 
 
 

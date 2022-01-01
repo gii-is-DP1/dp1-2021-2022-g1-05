@@ -65,27 +65,4 @@ public class UserController {
 
     }
 
-
-    //Método hecho para ver como funcionan las excepciones en formularios, comentar si no se necesita
-    /*@PostMapping(value = "/users/new")
-    public String processCreationForm(@Valid Player player, BindingResult result, Map<String, Object> model) {
-        if (!result.hasErrors()) {
-            try{
-
-                //creating player, user, and authority
-                this.playerService.savePlayer(player);
-            }catch(ConstraintViolationException ex){
-                List<String> excepciones = new ArrayList<>();
-                for(ConstraintViolation violacion : ex.getConstraintViolations()){
-                    excepciones.add(violacion.getMessage());
-                }
-                model.put("exceptions", excepciones);
-            }
-            return VIEWS_PLAYER_CREATE_FORM;
-        }
-        else {
-            return VIEWS_PLAYER_CREATE_FORM;
-
-        }
-    }*/
 }

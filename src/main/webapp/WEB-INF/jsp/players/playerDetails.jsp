@@ -15,10 +15,12 @@
                 <spring:param name="playerId" value="${player.id}"/>
             </spring:url>
             <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Edit Player</a>
-            <spring:url value="{playerId}/delete" var="editUrl">
-                <spring:param name="playerId" value="${player.id}"/>
-            </spring:url>
-            <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-danger">Delete Player</a>
+            <c:if test="${inGame != 'true'}">
+                <spring:url value="{playerId}/delete" var="editUrl">
+                    <spring:param name="playerId" value="${player.id}"/>
+                </spring:url>
+                <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-danger">Delete Player</a>
+            </c:if>
             <br>
             <br>
 

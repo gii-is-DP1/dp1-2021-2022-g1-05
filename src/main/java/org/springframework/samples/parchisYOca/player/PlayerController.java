@@ -1,9 +1,9 @@
 package org.springframework.samples.parchisYOca.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
-import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
+import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,14 +26,16 @@ public class PlayerController {
 
 
     private final PlayerService playerService;
-    private final PlayerLudoStatsService playerLudoStatsService;
-    private final PlayerGooseStatsService playerGooseStatsService;
+    private final UserService userService;
+    private final GooseMatchService gooseMatchService;
+    private final LudoMatchService ludoMatchService;
 
     @Autowired
-    public PlayerController(PlayerService playerService, PlayerGooseStatsService playerGooseStatsService, PlayerLudoStatsService playerLudoStatsService) {
+    public PlayerController(PlayerService playerService, UserService userService, GooseMatchService gooseMatchService, LudoMatchService ludoMatchService) {
         this.playerService = playerService;
-        this.playerLudoStatsService = playerLudoStatsService;
-        this.playerGooseStatsService = playerGooseStatsService;
+        this.userService = userService;
+        this.gooseMatchService = gooseMatchService;
+        this.ludoMatchService = ludoMatchService;
     }
 
     @InitBinder
@@ -43,14 +45,13 @@ public class PlayerController {
 
     @GetMapping("/players/ownProfile")
     public String redirectToProfile(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication.getPrincipal().toString() != "anonymousUser") {
-            if (authentication.isAuthenticated()) {
-                User currentUser = (User) authentication.getPrincipal();
-                Player player = playerService.findPlayerByUsername(currentUser.getUsername()).get();
-                Integer playerId = player.getId();
-                return "redirect:/players/"+playerId;
-            }
+        Boolean logged = userService.isAuthenticated();
+        if(logged==true) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = (User) authentication.getPrincipal();
+            Player player = playerService.findPlayerByUsername(currentUser.getUsername()).get();
+            Integer playerId = player.getId();
+            return "redirect:/players/"+playerId;
         }
         return "redirect:/";
 
@@ -60,21 +61,22 @@ public class PlayerController {
     @GetMapping("/players/{playerId}")
     public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
         ModelAndView mav = new ModelAndView("players/playerDetails");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Boolean logged = userService.isAuthenticated();
 
+        if(logged == true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+            List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
 
-        if(authentication.getPrincipal().toString() != "anonymousUser"){ //To check if the user is logged
-            if(authentication.isAuthenticated()){
-
-                User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-                Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
-                List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
-
-                System.out.println(authorities.get(0).toString());
-                if (playerId == player.getId() || authorities.get(0).toString().equals("admin")){
-                    mav.addObject("hasPermission", "true"); //To check if user has permission to see data
-                }
+            if (gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()).isPresent() ||
+                ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()).isPresent()){
+                mav.addObject("inGame","true"); //Not delete account when in game
             }
+            if (playerId == player.getId() || authorities.get(0).toString().equals("admin")){
+                mav.addObject("hasPermission", "true"); //To check if user has permission to see data
+            }
+
         }
         mav.addObject(this.playerService.findPlayerById(playerId).get());
         mav.addObject(this.playerService.findPlayerById(playerId).get().getUser());
@@ -84,7 +86,15 @@ public class PlayerController {
     @GetMapping(value = "/players")
     public String showAllPlayers(ModelMap modelMap) {
         Iterable<Player> players = playerService.findAll();
+        String playersInGame = "";
+        for(Player p : players){
+            if (gooseMatchService.findLobbyByUsername(p.getUser().getUsername()).isPresent() ||
+            ludoMatchService.findLobbyByUsername(p.getUser().getUsername()).isPresent()){
+                playersInGame = playersInGame + p.getUser().getUsername() + " ";
+            }
+        }
         modelMap.addAttribute("players", players);
+        modelMap.addAttribute("playersInGame", playersInGame);
         return "players/listPlayers";
     }
 
@@ -99,23 +109,21 @@ public class PlayerController {
 
     @GetMapping(value = "/players/{playerId}/edit")
     public String initUpdatePlayerForm(@PathVariable("playerId") int playerId, Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if(authentication.getPrincipal().toString() != "anonymousUser"){    //To check if the user is logged
-            if(authentication.isAuthenticated()){
+        Boolean logged = userService.isAuthenticated();
 
-                User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-                Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
-                List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
+        if(logged == true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+            List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
 
-                if (playerId == authenticatedPlayer.getId() || authorities.get(0).toString().equals("admin")){
-                    model.addAttribute("hasPermission", "true");  //To check if user has permission to see data
-                    Player player = playerService.findPlayerById(playerId).get();
-                    model.addAttribute(player);
-                    return VIEWS_PLAYER_UPDATE_FORM;
-                }
+            if (playerId == authenticatedPlayer.getId() || authorities.get(0).toString().equals("admin")){
+                model.addAttribute("hasPermission", "true");  //To check if user has permission to see data
+                Player player = playerService.findPlayerById(playerId).get();
+                model.addAttribute(player);
+                return VIEWS_PLAYER_UPDATE_FORM;
             }
-
 
         }
         return "redirect:";
@@ -169,6 +177,14 @@ public class PlayerController {
     @GetMapping(path="/players/{playerId}/delete")
     public String deletePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
         Optional<Player> playerOptional = playerService.findPlayerById(playerId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+        Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+
+        if(playerId == authenticatedPlayer.getId()){ //If auto-deletes, logs off
+            authentication.setAuthenticated(false);
+        }
+
         if(playerOptional.isPresent()){
             Player player = playerOptional.get();
             playerService.delete(player);
@@ -177,7 +193,7 @@ public class PlayerController {
         }else{
             modelMap.addAttribute("message", "Player not found!");
         }
-        return "redirect:/";
+        return "welcome";
     }
 
 }

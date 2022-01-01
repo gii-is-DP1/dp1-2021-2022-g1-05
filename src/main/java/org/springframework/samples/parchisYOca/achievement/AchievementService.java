@@ -33,25 +33,6 @@ public class AchievementService {
         return achievementRepository.save(achievement);
     }
 
-
-    /* Método save que hizo mario con florituras pero no vale pa na
-    @Transactional(rollbackFor = DuplicatedAchievementNameException.class)
-    public void save(Achievement achievement) throws DataAccessException, DuplicatedAchievementNameException{
-        Iterable<Achievement> achievements = achievementRepository.findAll();
-        boolean repeFlag = false;
-        for (Achievement achievementToTest: achievements) {
-            if(achievement.getName().equals(achievementToTest.getName())) {
-                repeFlag = true;
-                break;
-            }
-        }
-        if(repeFlag){
-            throw new DuplicatedAchievementNameException();
-        } else {
-            achievementRepository.save(achievement);
-        }
-    }*/
-
     public void delete(Achievement achievement) throws DataAccessException{
         achievementRepository.delete(achievement);
     }
