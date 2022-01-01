@@ -18,26 +18,29 @@ public class LudoChip  extends BaseEntity {
     private Integer position;
 
     @Range(min=0, max=3)
-    private Integer playerId;
+    private Integer inGamePlayerId;
     //Para diferenciar las distintas fichas del mismo color
-    private Integer inGameId;
-    private String color;
+    @Range(min=0, max=3)
+    private Integer inGameChipId;
     //El juego depende mucho de en que parte del tablero se encuentra la ficha
     //este atributo simplifcara la logica mas tarde
     //earlyGame -> casilla de inicio -> sacar 5 para pasar al sguiente estado
     //midGame -> juego normal del parchis
     //endGame -> las casillas antes de llegar a la meta
-    private GameState gameState = GameState.earlyGame;
+    //private GameState gameState = GameState.earlyGame;
 
     @ManyToOne
     LudoBoard board;
 
+    //TODO arreglar coloreh
     public String getColor() {
     	//El set no importa mucho porque el color siempre dependera del Id del jugador
     	Color[] colores = Color.values();
-    	String color = colores[playerId].toString();
+    	String color = colores[inGamePlayerId].toString();
     	return color;
     }
+
+    /*
     public void setPosition(Integer position) {
 
     	switch(gameState) {
@@ -54,4 +57,5 @@ public class LudoChip  extends BaseEntity {
     	}
 
     }
+    */
 }

@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChipRepository;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 public class LudoBoardService {
@@ -24,15 +27,18 @@ public class LudoBoardService {
         return ludoBoardRepository.findById(id).get();
     }
 
+    //TODO revisar las posiciones originales
     @Transactional(readOnly=true)
-    public LudoBoard save(LudoBoard ludoBoard,Integer playerNumber) throws DataAccessException {
+    public LudoBoard save(LudoBoard ludoBoard, Set<PlayerLudoStats> playerLudoStats) throws DataAccessException {
         LudoBoard ludoBoardDb=ludoBoardRepository.save(ludoBoard);
-        for(Integer i =1;i<=playerNumber;i++){
+        Integer playerNumber= playerLudoStats.size();
+        for(Integer i =0;i<playerNumber;i++){
             //Crear las 4 fichas para cada jugador
-            for(Integer j=1;j<=4;i++){
+            for(Integer j=0;j<=3;j++){
                 LudoChip ludoChip=new LudoChip();
-                ludoChip.setPosition(i);
-                ludoChip.setPlayerId(i);
+                ludoChip.setPosition(0);
+                ludoChip.setInGameChipId(j);
+                ludoChip.setInGamePlayerId(i);
                 ludoChip.setBoard(ludoBoardDb);
                 ludoChipRepository.save(ludoChip);
             }

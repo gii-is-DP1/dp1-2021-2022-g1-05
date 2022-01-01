@@ -29,8 +29,8 @@ public class LudoMatchService {
     }
 
     @Transactional(readOnly = true)
-    public LudoMatch findludoMatchById(int id) throws DataAccessException {
-        return ludoMatchRepository.findById(id).get();
+    public Optional<LudoMatch> findludoMatchById(int id) throws DataAccessException {
+        return ludoMatchRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
