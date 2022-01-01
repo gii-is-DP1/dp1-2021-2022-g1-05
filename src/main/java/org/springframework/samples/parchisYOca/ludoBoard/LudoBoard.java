@@ -27,7 +27,7 @@ public class LudoBoard extends BaseEntity {
     private Integer height;
 
     public LudoBoard(){
-        this.background="";
+        this.background="../resources/static/resources/images/tablero parchís gaming set 4K punjabi no virus.png";
         this.width=1000;
         this.height=1000;
     }

@@ -7,5 +7,40 @@
 
 <ParchisYOca:layout pageName="ludoMatch">
     <h2>Ludo game match!</h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h3>Joined players:</h3>
+
+                <br>
+                <c:choose>
+                    <c:when test="${hasTurn eq 1}">
+                        <p style="color: #5390D9">Is your turn!</p>
+                        <a href="/session/rolldices"><button class="btn btn-default">Roll the dice</button></a>
+                    </c:when>
+                    <c:otherwise>
+                        <p style="color: darkred">You have to wait until its your turn!</p>
+                    </c:otherwise>
+                </c:choose>
+
+                <br>
+                <br>
+                <p><c:out value="The first dice: ${firstDice}"/></p>
+                <p><c:out value="The second dice: ${secondDice}"/></p>
+                <p><c:out value="The sum of both: ${sumDice}"/></p>
+            </div>
+            <c:if test="${hasEnded != 1}">
+                <a href="/ludoMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
+            </c:if>
+            <div>
+                <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
+                <c:forEach items="${chips}" var="chip">
+                    <ParchisYOca:ludoChip size="60" chip="${chip}" position="${chip.position}"/>
+                </c:forEach>
+            </div>
+        </div>
+    </div>
+
+
 
 </ParchisYOca:layout>

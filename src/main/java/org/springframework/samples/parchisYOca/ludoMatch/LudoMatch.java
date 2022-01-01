@@ -24,11 +24,15 @@ import java.util.Set;
 @Table(name="ludoMatches")
 public class LudoMatch extends BaseEntity {
 
+
+
     @DateTimeFormat
     private Date startDate = null;
 
     @DateTimeFormat
     private Date endDate = null;
+
+    private Integer closedLobby = 0;
 
     @NotEmpty
     @Size(max=6)

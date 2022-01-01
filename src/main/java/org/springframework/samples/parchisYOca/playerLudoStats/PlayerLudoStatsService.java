@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class PlayerLudoStatsService {
@@ -19,8 +20,8 @@ public class PlayerLudoStatsService {
     }
 
     @Transactional(readOnly = true)
-    public PlayerLudoStats findPlayerLudoStatsByUsernameAndMatchId(String username, Integer matchId) throws DataAccessException {
-        return playerLudoStatsRepository.findPlayerLudoStatsByUsernameAndMatchId(username, matchId).get();
+    public Optional<PlayerLudoStats> findPlayerLudoStatsByUsernameAndMatchId(String username, Integer matchId) throws DataAccessException {
+        return playerLudoStatsRepository.findPlayerLudoStatsByUsernameAndMatchId(username, matchId);
     }
 
     @Transactional
