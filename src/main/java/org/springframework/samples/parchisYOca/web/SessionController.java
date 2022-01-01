@@ -26,8 +26,12 @@ public class SessionController {
 
         //Redirects the user to the goose controller
         Object refererGoose = request.getSession().getAttribute("fromGoose");
+        Object refererLudo = request.getSession().getAttribute("fromLudo");
         if(refererGoose != null){
             return "redirect:/gooseInGame/dicesRolled";
+        }
+        if(refererLudo != null){
+            return "redirect:/ludoInGame/dicesRolled";
         }
 
         return "redirect:/";

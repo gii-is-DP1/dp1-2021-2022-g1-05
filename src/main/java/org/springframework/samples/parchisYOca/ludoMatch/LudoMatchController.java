@@ -36,6 +36,7 @@ public class LudoMatchController {
     private final LudoBoardService ludoBoardService;
     private final PlayerService playerService;
     private final PlayerLudoStatsService playerLudoStatsService;
+    private final UserService userService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
     private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
@@ -49,27 +50,33 @@ public class LudoMatchController {
         this.playerLudoStatsService = playerLudoStatsService;
         this.ludoChipService = ludoChipService;
         this.ludoBoardService = ludoBoardService;
+        this.userService = userService;
     }
 
     @GetMapping("/ludoMatches/new")
     public String createMatch(ModelMap modelMap){
         String matchCode = RandomStringGenerator.getRandomString(MATCH_CODE_LENGTH);
         LudoMatch ludoMatch = new LudoMatch();
+        Boolean logged = userService.isAuthenticated();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+        if(logged == true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
-        Optional<LudoMatch> playerInLudoMatches =ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername());
-        if(playerInLudoMatches.isPresent()){
-            LudoMatch playerInLudoMatch = playerInLudoMatches.get();
-            modelMap.addAttribute("message", "You are already at a lobby: "+playerInLudoMatch.getMatchCode());
+            Optional<LudoMatch> playerInLudoMatches =ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername());
+            if(playerInLudoMatches.isPresent()){
+                LudoMatch playerInLudoMatch = playerInLudoMatches.get();
+                modelMap.addAttribute("message", "You are already at a lobby: "+playerInLudoMatch.getMatchCode());
+                return "redirect:/";
+            }
+
+            ludoMatch.setMatchCode(matchCode);
+            ludoMatchService.saveludoMatchWithPlayer(ludoMatch, player, true);
+            return "redirect:/ludoMatches/lobby/"+matchCode;
+        }else{
             return "redirect:/";
         }
-
-        ludoMatch.setMatchCode(matchCode);
-        ludoMatchService.saveludoMatchWithPlayer(ludoMatch, player, true);
-        return "redirect:/ludoMatches/lobby/"+matchCode;
     }
 
     @GetMapping(value = "/ludoMatches/join")
@@ -82,33 +89,39 @@ public class LudoMatchController {
     @PostMapping(value = "/ludoMatches/join")
     public String joinLudoMatch(@RequestParam String matchCode, ModelMap modelMap){
         Optional<LudoMatch> ludoMatch = ludoMatchService.findludoMatchByMatchCode(matchCode);
+        Boolean logged = userService.isAuthenticated();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+        if(logged==true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
 
-        Optional<LudoMatch> playerInLudoMatches =ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername());
+            Optional<LudoMatch> playerInLudoMatches =ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername());
 
 
-        if(playerInLudoMatches.isPresent()){ //If player is in a match
-            if(matchCode.equals(playerInLudoMatches.get().getMatchCode())){   //If the player enters the lobby they are in
-                return "redirect:/ludoMatches/lobby/" + matchCode;
-            }else{
-                modelMap.addAttribute("message", "You are already at a lobby: "+playerInLudoMatches.get().getMatchCode());
-            }
-        } else{
-            if(ludoMatch.isPresent()) { //If the game exists
-                if(!(ludoMatch.get().getStats().size()>=MAX_NUMBER_OF_PLAYERS)) { //If the game is not full
-                    ludoMatchService.saveludoMatchWithPlayer(ludoMatch.get(),player, false);
-                    return "redirect:/ludoMatches/lobby/"+matchCode;
+            if(playerInLudoMatches.isPresent()){ //If player is in a match
+                if(matchCode.equals(playerInLudoMatches.get().getMatchCode())){   //If the player enters the lobby they are in
+                    return "redirect:/ludoMatches/lobby/" + matchCode;
                 }else{
-                    modelMap.addAttribute("message", "The lobby is full!");
+                    modelMap.addAttribute("message", "You are already at a lobby: "+playerInLudoMatches.get().getMatchCode());
                 }
-            }else{
-                modelMap.addAttribute("message", "Lobby not found!");
+            } else{
+                if(ludoMatch.isPresent()) { //If the game exists
+                    if(!(ludoMatch.get().getStats().size()>=MAX_NUMBER_OF_PLAYERS)) { //If the game is not full
+                        ludoMatchService.saveludoMatchWithPlayer(ludoMatch.get(),player, false);
+                        return "redirect:/ludoMatches/lobby/"+matchCode;
+                    }else{
+                        modelMap.addAttribute("message", "The lobby is full!");
+                    }
+                }else{
+                    modelMap.addAttribute("message", "Lobby not found!");
+                }
             }
+            return "matches/joinMatchForm";
+        }else{
+            return "redirect:/";
         }
-        return "matches/joinMatchForm";
+
     }
 
 
@@ -122,74 +135,82 @@ public class LudoMatchController {
         response.addHeader("Refresh", REFRESH_RATE_LOBBY);
 
         LudoMatch ludoMatch = ludoMatchService.findludoMatchByMatchCode(matchCode).get();
+        Boolean logged = userService.isAuthenticated();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+        if(logged==true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
-        modelMap.addAttribute("numberOfPlayers", ludoMatch.getStats().size());
-        modelMap.addAttribute("isOwner", playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), ludoMatch.getId()).get().getIsOwner());
-        modelMap.addAttribute("stats", ludoMatch.getStats());
-        modelMap.addAttribute("matchCode", matchCode);
-        modelMap.addAttribute("match", ludoMatch);
-        modelMap.addAttribute("matchId",ludoMatch.getId());
+            modelMap.addAttribute("numberOfPlayers", ludoMatch.getStats().size());
+            modelMap.addAttribute("isOwner", playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), ludoMatch.getId()).get().getIsOwner());
+            modelMap.addAttribute("stats", ludoMatch.getStats());
+            modelMap.addAttribute("matchCode", matchCode);
+            modelMap.addAttribute("match", ludoMatch);
+            modelMap.addAttribute("matchId",ludoMatch.getId());
 
-        return "matches/ludoMatchLobby";
+            return "matches/ludoMatchLobby";
+        }else{
+            return "redirect:/";
+        }
+
     }
 
     @GetMapping(value = "/ludoMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response) {
         response.addHeader("Refresh", REFRESH_RATE_MATCH);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+        Boolean logged = userService.isAuthenticated();
 
-        //To be able to redirect back when rolling the dice
-        //TODO cambiar ese nombre
-        request.getSession().setAttribute("fromGoose", true);
-        request.getSession().setAttribute("matchId", matchId);
+        if(logged==true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
-        String view = "matches/ludoMatch";
-        LudoMatch match = ludoMatchService.findludoMatchById(matchId).get();
-        model.put("stats", match.getStats());
+            //To be able to redirect back when rolling the dice
+            request.getSession().setAttribute("fromLudo", true);
+            request.getSession().setAttribute("matchId", matchId);
 
-        //If the match is a new one, sets the start date and creates the board with its chips
-        if (match.getStartDate() == null) {
-            match.setStartDate(new Date());
-            LudoBoard board = new LudoBoard();
+            String view = "matches/ludoMatch";
+            LudoMatch match = ludoMatchService.findludoMatchById(matchId).get();
+            model.put("stats", match.getStats());
 
-            LudoBoard savedBoard = ludoBoardService.save(board, match.getStats());
-            match.setBoard(savedBoard);
+            //If the match is a new one, sets the start date and creates the board with its chips
+            if (match.getStartDate() == null) {
+                match.setStartDate(new Date());
+                LudoBoard board = new LudoBoard();
 
-        }
-        model.put("chips", ludoChipService.findChipsByMatchId(matchId));
+                LudoBoard savedBoard = ludoBoardService.save(board, match.getStats());
+                match.setBoard(savedBoard);
 
-        if (session.getAttribute("dices") != null) {
-            int[] dices = (int[]) session.getAttribute("dices");
-            model.put("firstDice", dices[0]);
-            model.put("secondDice", dices[1]);
-            model.put("sumDice", dices[2]);
-        }
-
-        PlayerLudoStats stats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), matchId).get();
-
-        //Checks if everyone except one left
-        Boolean everyoneExceptOneLeft = ludoMatchService.findEveryoneExceptOneLeft(match);
-        System.out.println(everyoneExceptOneLeft);
-        if (stats.getPlayerLeft() == 0 && everyoneExceptOneLeft == true) {
-            stats.setHasWon(1);
-            playerLudoStatsService.saveStats(stats);
-        }
-        ludoMatchService.save(match);
-
-        //To show the other players if their game has been closed or has ended
-        if(ludoMatchService.findludoMatchById(matchId).get().getEndDate() != null){
-            model.addAttribute("hasEnded", 1);
-            if(everyoneExceptOneLeft == true){
-                model.addAttribute("message", "Everyone except you left, so you won!");
-            }else{
-                model.addAttribute("message", "The game has ended!");
             }
-        }
+            model.put("chips", ludoChipService.findChipsByMatchId(matchId));
+
+            if (session.getAttribute("dices") != null) {
+                int[] dices = (int[]) session.getAttribute("dices");
+                model.put("firstDice", dices[0]);
+                model.put("secondDice", dices[1]);
+                model.put("sumDice", dices[2]);
+            }
+
+            PlayerLudoStats stats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), matchId).get();
+
+            //Checks if everyone except one left
+            Boolean everyoneExceptOneLeft = ludoMatchService.findEveryoneExceptOneLeft(match);
+            System.out.println(everyoneExceptOneLeft);
+            if (stats.getPlayerLeft() == 0 && everyoneExceptOneLeft == true) {
+                stats.setHasWon(1);
+                playerLudoStatsService.saveStats(stats);
+            }
+            ludoMatchService.save(match);
+
+            //To show the other players if their game has been closed or has ended
+            if(ludoMatchService.findludoMatchById(matchId).get().getEndDate() != null){
+                model.addAttribute("hasEnded", 1);
+                if(everyoneExceptOneLeft == true){
+                    model.addAttribute("message", "Everyone except you left, so you won!");
+                }else{
+                    model.addAttribute("message", "The game has ended!");
+                }
+            }
         /*else{
             //To show if they landed on a special square
             if (session.getAttribute("especial") != null){
@@ -203,10 +224,15 @@ public class LudoMatchController {
         }
 
          */
-        model.put("ludoBoard", ludoMatchService.findludoMatchById(match.getId()).get().getBoard());
+            model.put("ludoBoard", ludoMatchService.findludoMatchById(match.getId()).get().getBoard());
 
-        return view;
+            return view;
+        }else{
+            return "redirect:/";
+        }
+
     }
+
     @GetMapping(value="/ludoMatches")
     public String listadoPartidas(ModelMap modelMap){
         String vista = "matches/listLudoMatches";
@@ -214,6 +240,7 @@ public class LudoMatchController {
         modelMap.addAttribute("ludoMatches",ludoMatches);
         return vista;
     }
+
     @GetMapping(value="/ludoMatches/close/{matchId}")
     public String closeMatch(@PathVariable("matchId") Integer matchId){
         LudoMatch ludoMatchDb=ludoMatchService.findludoMatchById(matchId).get();

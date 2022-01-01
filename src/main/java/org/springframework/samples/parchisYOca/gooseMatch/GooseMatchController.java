@@ -39,7 +39,8 @@ public class GooseMatchController {
 
     private static final Integer MATCH_CODE_LENGTH = 6;
     private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
-    private static final String REFRESH_RATE = "2";
+    private static final String REFRESH_RATE_MATCH = "2";
+    private static final String REFRESH_RATE_LOBBY = "3";
 
     @Autowired
     public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService,
@@ -139,7 +140,7 @@ public class GooseMatchController {
             return "redirect:/gooseMatches/"+gooseMatchService.findGooseMatchByMatchCode(matchCode).get().getId();
         }
 
-        response.addHeader("Refresh", REFRESH_RATE);
+        response.addHeader("Refresh", REFRESH_RATE_LOBBY);
 
         GooseMatch gooseMatch = gooseMatchService.findGooseMatchByMatchCode(matchCode).get();
         Boolean logged = userService.isAuthenticated();
@@ -167,7 +168,7 @@ public class GooseMatchController {
     @GetMapping(value = "/gooseMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response) throws InvalidPlayerNumberException {
-        response.addHeader("Refresh", "2");
+        response.addHeader("Refresh", REFRESH_RATE_MATCH);
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true){
