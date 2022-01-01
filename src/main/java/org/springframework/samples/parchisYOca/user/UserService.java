@@ -2,6 +2,8 @@ package org.springframework.samples.parchisYOca.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,22 @@ public class UserService {
     @Transactional
     public void deleteUser(User user) throws DataAccessException {
         userRepository.delete(user);
+    }
+
+    @Transactional
+    public Boolean isAuthenticated() throws DataAccessException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Boolean ac = false;
+
+        if(authentication.getPrincipal().toString() != "anonymousUser"){
+            org.springframework.security.core.userdetails.User user =  (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+            if (authentication.isAuthenticated() && findUserByUsername(user.getUsername()).isPresent()){
+                ac = true;
+            } else{
+                authentication.setAuthenticated(false);
+            }
+        }
+        return ac;
     }
 
 }

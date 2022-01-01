@@ -8,6 +8,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.user.UserController;
@@ -38,6 +40,10 @@ public class PlayerControllerTests {
     private UserService userService;
     @MockBean
     private AuthoritiesService authoritiesService;
+    @MockBean
+    private GooseMatchService gooseMatchService;
+    @MockBean
+    private LudoMatchService ludoMatchService;
     @Autowired
     private MockMvc mockMvc;
 
