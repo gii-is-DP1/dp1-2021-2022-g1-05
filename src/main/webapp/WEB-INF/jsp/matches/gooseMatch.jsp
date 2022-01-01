@@ -10,43 +10,44 @@
 
     <div class="container">
         <div class="row">
-        <div class="col-md-4">
-        <h3>Joined players:</h3>
-        <ul>
-            <c:forEach items="${stats}" var="stat">
-                <c:forEach items="${chips}" var="chip">
-                    <c:choose>
-                        <c:when test="${stat.inGameId eq chip.inGameId and stat.playerLeft eq 0}">
-                            <li><p><c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position}"/></p></li>
-                        </c:when>
-                        <c:when test="${stat.inGameId eq chip.inGameId and stat.playerLeft eq 1}">
-                            <li><p><c:out value="${chip.getColor()}-> JUGADOR INACTIVO: ${chip.position}"/></p></li>
-                        </c:when>
-                    </c:choose>
+        <div class="col-md-3">
+            <h3>Joined players:</h3>
+            <ul>
+                <c:forEach items="${stats}" var="stat">
+                    <c:forEach items="${chips}" var="chip">
+                        <c:choose>
+                            <c:when test="${stat.inGameId eq chip.inGameId and stat.playerLeft eq 0}">
+                                <li><p><c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position}"/></p></li>
+                            </c:when>
+                            <c:when test="${stat.inGameId eq chip.inGameId and stat.playerLeft eq 1}">
+                                <li><p><c:out value="${chip.getColor()}-> JUGADOR INACTIVO: ${chip.position}"/></p></li>
+                            </c:when>
+                        </c:choose>
+                    </c:forEach>
                 </c:forEach>
-            </c:forEach>
-        </ul>
-            <br>
+            </ul>
+        </div>
+        <div class="col-md-2">
             <c:choose>
                 <c:when test="${hasTurn eq 1}">
-                    <p style="color: #5390D9">Is your turn!</p>
+                    <p style="color: #5390D9">It's your turn!</p>
                     <a href="/session/rolldices"><button class="btn btn-default">Roll the dice</button></a>
                 </c:when>
                 <c:otherwise>
-                    <p style="color: darkred">You have to wait until its your turn!</p>
+                    <p style="color: darkred">You have to wait until it's your turn!</p>
                 </c:otherwise>
             </c:choose>
-
-            <br>
-            <br>
-            <p><c:out value="The first dice: ${firstDice}"/></p>
-            <p><c:out value="The second dice: ${secondDice}"/></p>
+        </div>
+        <div class="col-md-5">
+            <p><c:out value="First dice: ${firstDice}"/></p>
+            <p><c:out value="Second dice: ${secondDice}"/></p>
             <p><c:out value="The sum of both: ${sumDice}"/></p>
         </div>
-            <c:if test="${hasEnded != 1}">
-                <a href="/gooseMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
-            </c:if>
-        <div>
+        <c:if test="${hasEnded != 1}">
+            <a href="/gooseMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
+        </c:if>
+
+        <div class="tablero">
             <ParchisYOca:gooseBoard gooseBoard="${gooseBoard}"/>
             <c:forEach items="${chips}" var="chip">
             	<ParchisYOca:gooseChip size="60" chip="${chip}" position="${chip.position}"/>
