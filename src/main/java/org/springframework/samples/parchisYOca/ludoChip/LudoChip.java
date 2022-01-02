@@ -45,7 +45,6 @@ public class LudoChip  extends BaseEntity {
         this.color = colores[inGamePlayerId].toString();
     }
 
-    /*
     public void setPosition(Integer position) {
 
     	switch(gameState) {
@@ -62,5 +61,4 @@ public class LudoChip  extends BaseEntity {
     	}
 
     }
-    */
 }
