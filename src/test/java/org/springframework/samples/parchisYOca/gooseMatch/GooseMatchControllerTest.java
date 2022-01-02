@@ -91,7 +91,7 @@ class gooseMatchControllerTest {
 		Paco.setEmail("Paco@domain.com");
 		Paco.setId(PACO_ID);
 		pacoStats = new PlayerGooseStats();
-		pacoStats.setPlayer(Jaime);
+		pacoStats.setPlayer(Paco);
 		pacoStats.setIsOwner(IS_OWNER);
 		Set<PlayerGooseStats> players = new HashSet<PlayerGooseStats>();
 		players.add(jaimeStats);
