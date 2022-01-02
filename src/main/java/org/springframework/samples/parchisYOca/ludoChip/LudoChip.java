@@ -16,7 +16,7 @@ import javax.persistence.ManyToOne;
 public class LudoChip  extends BaseEntity {
 
     private Integer position;
-
+    private String color;
     @Range(min=0, max=3)
     private Integer inGamePlayerId;
     //Para diferenciar las distintas fichas del mismo color
@@ -27,17 +27,22 @@ public class LudoChip  extends BaseEntity {
     //earlyGame -> casilla de inicio -> sacar 5 para pasar al sguiente estado
     //midGame -> juego normal del parchis
     //endGame -> las casillas antes de llegar a la meta
-    //private GameState gameState = GameState.earlyGame;
+    private GameState gameState = GameState.earlyGame;
 
     @ManyToOne
     LudoBoard board;
 
     //TODO arreglar coloreh
     public String getColor() {
-    	//El set no importa mucho porque el color siempre dependera del Id del jugador
-    	Color[] colores = Color.values();
-    	String color = colores[inGamePlayerId].toString();
-    	return color;
+        if(this.getColor()==null){
+            setColor();
+        }
+    	return this.getColor();
+
+    }
+    public void setColor(){
+        Color[] colores = Color.values();
+        this.color = colores[inGamePlayerId].toString();
     }
 
     /*

@@ -36,7 +36,7 @@ public class LudoBoardService {
             //Crear las 4 fichas para cada jugador
             for(Integer j=0;j<=3;j++){
                 LudoChip ludoChip=new LudoChip();
-                ludoChip.setPosition(0);
+                ludoChip.setPosition(i);
                 ludoChip.setInGameChipId(j);
                 ludoChip.setInGamePlayerId(i);
                 ludoChip.setBoard(ludoBoardDb);
