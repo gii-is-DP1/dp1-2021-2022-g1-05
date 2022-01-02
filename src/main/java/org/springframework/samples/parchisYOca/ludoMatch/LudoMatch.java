@@ -46,4 +46,7 @@ public class LudoMatch extends BaseEntity {
     @NotAudited
     @OneToOne
     private LudoBoard board;
+
+
+
 }
