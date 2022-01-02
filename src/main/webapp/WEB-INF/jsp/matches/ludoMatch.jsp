@@ -34,9 +34,7 @@
             </c:if>
             <div>
                 <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
-                <c:forEach items="${chips}" var="chip">
-                    <ParchisYOca:ludoChip size="60" chip="${chip}" position="${chip.position}"/>
-                </c:forEach>
+               
             </div>
         </div>
     </div>
