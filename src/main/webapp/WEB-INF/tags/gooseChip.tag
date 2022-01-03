@@ -7,6 +7,6 @@
  <script>
  var canvas = document.getElementById("canvas");
  var ctx = canvas.getContext("2d");
- var image = document.getElementById('${chip.inGameId}');
+ var image = document.getElementById('${chip.getColor()}');
  ctx.drawImage(image,${chip.getPositionXInPixels(position, chip.inGameId)},${chip.getPositionYInPixels(position, chip.inGameId)},${size},${size});
  </script>

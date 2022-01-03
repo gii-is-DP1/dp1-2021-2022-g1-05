@@ -34,10 +34,10 @@ public class LudoChip  extends BaseEntity {
 
     //TODO arreglar coloreh
     public String getColor() {
-        if(this.getColor()==null){
+        if(this.color==null){
             setColor();
         }
-    	return this.getColor();
+    	return this.color;
 
     }
     public void setColor(){

@@ -45,9 +45,15 @@ public class GooseChip extends BaseEntity {
     private static final Pair<List<Integer>, Integer> eigthRow = Pair.of(Arrays.asList(14, 15, 16, 17, 18, 19, 20, 21), 875);
 
     public String getColor() {
-    	Color[] colores = Color.values();
-    	String color = colores[inGameId].toString();
-    	return color;
+        if(this.color==null){
+            setColor();
+        }
+    	return this.color;
+
+    }
+    public void setColor(){
+        Color[] colores = Color.values();
+        this.color = colores[inGameId].toString();
     }
 
 
