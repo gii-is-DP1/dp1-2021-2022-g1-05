@@ -5,10 +5,10 @@ INSERT INTO achievements(id, name, description) VALUES(3, 'NombreAchievement3', 
 INSERT INTO users(username, password, enabled) VALUES('ManuK', 1234567, 'true');
 INSERT INTO users(username, password, enabled) VALUES('marioespiro', 'admin121', 'true');
 INSERT INTO users(username, password, enabled) VALUES('pedro', 'pedro121', 'true');
-INSERT INTO users(username, password, enabled) VALUES('jaime', 'jaime', 'true');
-INSERT INTO users(username, password, enabled) VALUES('jose', 'jose', 'true');
-INSERT INTO users(username, password, enabled) VALUES('antonio', 'antonio', 'true');
-INSERT INTO users(username, password, enabled) VALUES('paco', 'paco', 'true');
+INSERT INTO users(username, password, enabled) VALUES('jaime', 'jaime1', 'true');
+INSERT INTO users(username, password, enabled) VALUES('jose', 'jose1', 'true');
+INSERT INTO users(username, password, enabled) VALUES('antonio', 'antonio1', 'true');
+INSERT INTO users(username, password, enabled) VALUES('paco', 'paco1', 'true');
 
 INSERT INTO players(id, email, username) VALUES(1, 'manu@gmail.com', 'ManuK');
 INSERT INTO players(id, email, username) VALUES(2, 'mario@testmail.com', 'marioespiro');
@@ -25,8 +25,6 @@ INSERT INTO authorities(id, authority, username) VALUES(4, 'player', 'jaime');
 INSERT INTO authorities(id, authority, username) VALUES(5, 'player', 'jose');
 INSERT INTO authorities(id, authority, username) VALUES(6, 'player', 'antonio');
 INSERT INTO authorities(id, authority, username) VALUES(7, 'player', 'paco');
-
---INSERT INTO goose_board(id, background, height, width) VALUES (1, '', 1000, 1000);
 
 --INSERT INTO ludo_Matches(id, match_Code) VALUES(1, '111111');
 --INSERT INTO goose_Matches(id, match_Code, board_id) VALUES(1, '111111', 1);

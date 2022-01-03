@@ -297,7 +297,7 @@ public class GooseMatchController {
                 mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
             } else if (userMatch.getStartDate() == null) {
                 playerGooseStatsService.removeGooseStatsFromGame(pgs.getInGameId(), userMatch.getId());
-                mav.addObject("message", "You left the game!");
+                mav.addObject("message", "You left the lobby");
             } else {
                 pgs.setPlayerLeft(1);
                 pgs.setHasTurn(Integer.MIN_VALUE);
