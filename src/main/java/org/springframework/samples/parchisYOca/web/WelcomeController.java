@@ -62,6 +62,9 @@ public class WelcomeController {
               if(playerInLudoMatches.isPresent()){
                   model.addAttribute("inLudoMatch", 1);
               }
+
+              session.setAttribute("fromLudo", null);
+              session.setAttribute("fromGoose", null);
           }
 	    return "welcome";
 	  }

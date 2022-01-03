@@ -82,8 +82,8 @@ public class LudoBoardController {
         }
     }
 
-    @GetMapping(value = "/ludoInGame/sumDices/{diceIndex}")
-    public String ludoSumDices(@PathVariable("diceIndex") Integer diceIndex, ModelMap model,
+    @GetMapping(value = "/ludoInGame/sumDice/{diceIndex}")
+    public String ludoSumDice(@PathVariable("diceIndex") Integer diceIndex, ModelMap model,
                                HttpServletRequest request, HttpSession session) {
         Boolean logged = userService.isAuthenticated();
 

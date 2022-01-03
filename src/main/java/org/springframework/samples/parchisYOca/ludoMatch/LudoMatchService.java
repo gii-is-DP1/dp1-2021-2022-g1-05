@@ -2,11 +2,9 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
-import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsRepository;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +14,12 @@ import java.util.*;
 public class LudoMatchService {
 
     private LudoMatchRepository ludoMatchRepository;
-    private PlayerLudoStatsRepository playerLudoStatsRepository;
+    private PlayerLudoStatsService playerLudoStatsService;
 
     @Autowired
-    public LudoMatchService(LudoMatchRepository ludoMatchRepository, PlayerLudoStatsRepository playerLudoStatsRepository){
+    public LudoMatchService(LudoMatchRepository ludoMatchRepository, PlayerLudoStatsService playerLudoStatsService){
         this.ludoMatchRepository = ludoMatchRepository;
-        this.playerLudoStatsRepository = playerLudoStatsRepository;
+        this.playerLudoStatsService = playerLudoStatsService;
     }
 
 
@@ -75,29 +73,23 @@ public class LudoMatchService {
         PlayerLudoStats playerStats = new PlayerLudoStats();
         playerStats.setPlayer(player);
         playerStats.setLudoMatch(ludoMatchDB);
+        Set<PlayerLudoStats> statsSet = new HashSet<>();
 
         //To assign the in game id
-        if(ludoMatchDB.getStats()==null){
-            playerStats.setInGameId(1);
-        }else{
+        if(ludoMatchDB.getStats() != null) {
             Integer playersInGame = ludoMatchDB.getStats().size();
-            playerStats.setInGameId(playersInGame+1);
+            playerStats.setInGameId(playersInGame);
+            statsSet = ludoMatchDB.getStats();
         }
 
         if(isOwner){
             playerStats.setIsOwner(1);
             playerStats.setHasTurn(1);
         }
-        PlayerLudoStats addedStats = playerLudoStatsRepository.save(playerStats);
+        PlayerLudoStats addedStats = playerLudoStatsService.saveStats(playerStats);
 
-        //From here its the new method
-        Set<PlayerLudoStats> statsSet = new HashSet<>();
-        if (ludoMatchDB.getStats() != null) {
-            statsSet = ludoMatchDB.getStats();
-        }
         statsSet.add(addedStats);
         ludoMatchDB.setStats(statsSet);
-
         ludoMatchDB = ludoMatchRepository.save(ludoMatchDB);
         return ludoMatchDB;
 

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -127,7 +128,13 @@ public class LudoMatchController {
 
 
     @GetMapping(value = "/ludoMatches/lobby/{matchCode}")
-    public String initCreationLobby(@PathVariable("matchCode") String matchCode, ModelMap modelMap, HttpServletResponse response) {
+    public String initCreationLobby(@PathVariable("matchCode") String matchCode, ModelMap modelMap, HttpServletResponse response, HttpSession session) {
+        //If the owner left
+        if(ludoMatchService.findludoMatchByMatchCode(matchCode).get().getClosedLobby() == 1){
+            session.setAttribute("ownerLeft", "The owner of the lobby left, so it was closed");
+            return "redirect:/";
+        }
+
         //If the game started
         if(ludoMatchService.findludoMatchByMatchCode(matchCode).get().getStartDate() != null){
             return "redirect:/ludoMatches/"+ludoMatchService.findludoMatchByMatchCode(matchCode).get().getId();
@@ -143,7 +150,9 @@ public class LudoMatchController {
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
             modelMap.addAttribute("numberOfPlayers", ludoMatch.getStats().size());
-            modelMap.addAttribute("isOwner", playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), ludoMatch.getId()).get().getIsOwner());
+            if(playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), ludoMatch.getId()).isPresent()) {
+                modelMap.addAttribute("isOwner", playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), ludoMatch.getId()).get().getIsOwner());
+            }
             modelMap.addAttribute("stats", ludoMatch.getStats());
             modelMap.addAttribute("matchCode", matchCode);
             modelMap.addAttribute("match", ludoMatch);
@@ -178,10 +187,8 @@ public class LudoMatchController {
             if (match.getStartDate() == null) {
                 match.setStartDate(new Date());
                 LudoBoard board = new LudoBoard();
-
                 LudoBoard savedBoard = ludoBoardService.save(board, match.getStats());
                 match.setBoard(savedBoard);
-
             }
             model.put("chips", ludoChipService.findChipsByMatchId(matchId));
 
@@ -211,20 +218,17 @@ public class LudoMatchController {
                 }else{
                     model.addAttribute("message", "The game has ended!");
                 }
+            } else {
+                //To show if they landed on a special square
+                if (session.getAttribute("especial") != null) {
+                    String mensaje = session.getAttribute("especial").toString();
+                    model.put("message", mensaje);
+                }
+                if (!(stats.getHasTurn() < 0)) {
+                    Integer hasTurn = stats.getHasTurn();
+                    model.put("hasTurn", hasTurn);
+                }
             }
-        /*else{
-            //To show if they landed on a special square
-            if (session.getAttribute("especial") != null){
-                String mensaje = session.getAttribute("especial").toString();
-                model.put("message", mensaje);
-            }
-            if(!(stats.getHasTurn() < 0)){
-                Integer hasTurn = stats.getHasTurn();
-                model.put("hasTurn", hasTurn);
-            }
-        }
-
-         */
             model.put("ludoBoard", ludoMatchService.findludoMatchById(match.getId()).get().getBoard());
 
             return view;
@@ -272,5 +276,34 @@ public class LudoMatchController {
         ludoMatchService.save(ludoMatchDb);
         return "redirect:/ludoMatches";
 
+    }
+
+    @GetMapping(value = "/ludoMatches/matchLeft")
+    public ModelAndView leaveMatch() {
+        ModelAndView mav = new ModelAndView("welcome");
+        Boolean logged = userService.isAuthenticated();
+
+        if(logged == true) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            LudoMatch userMatch = ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()).get();
+            PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), userMatch.getId()).get();
+
+            if(pls.getIsOwner() == 1 && userMatch.getStartDate() == null) {
+                playerLudoStatsService.removeAllLudoStatsFromGame(userMatch.getId());
+                userMatch.setClosedLobby(1);
+                ludoMatchService.save(userMatch);
+                mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
+            } else if (userMatch.getStartDate() == null) {
+                playerLudoStatsService.removeLudoStatsFromGame(pls.getInGameId(), userMatch.getId());
+                mav.addObject("message", "You left the lobby");
+            } else {
+                pls.setPlayerLeft(1);
+                pls.setHasTurn(Integer.MIN_VALUE);
+                playerLudoStatsService.saveStats(pls);
+                mav.addObject("message", "You left the game!");
+            }
+        }
+        return mav;
     }
 }
