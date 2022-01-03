@@ -2,7 +2,6 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 
 import java.util.Collection;
 import java.util.Date;
@@ -24,4 +23,5 @@ public interface LudoMatchRepository extends CrudRepository<LudoMatch, Integer> 
 
     @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch WHERE ludoMatch.endDate > :date")
     Collection<LudoMatch> findLudoMatchByEndDate(Date date);
+
 }

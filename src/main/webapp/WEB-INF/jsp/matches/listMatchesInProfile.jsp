@@ -14,7 +14,7 @@
             <th style="width: 150px;">Match code</th>
             <th style="width: 220px;">Start date</th>
             <th style="width: 220px;">End date</th>
-            <th style="width:150px;">Status</th>
+            <th style="width:150px;">Winner</th>
 
         </tr>
         </thead>
@@ -22,28 +22,17 @@
         <c:forEach items="${matches}" var="match">
         <tr>
             <td>
-                <c:out value="${match.matchCode}"/>
+                <c:out value="${match.key.matchCode}"/>
             </td>
             <td>
-                <c:out value="${match.startDate}"/>
+                <c:out value="${match.key.startDate}"/>
             </td>
             <td>
-                <c:out value="${match.endDate}"/>
+                <c:out value="${match.key.endDate}"/>
             </td>
-            <c:choose>
-                <c:when test="${match.closedLobby == 1}">
-                <td>Closed lobby</td>
-                </c:when>
-                <c:when test="${match.startDate == null}">
-                    <td>Lobby</td>
-                </c:when>
-                <c:when test="${match.endDate == null}">
-                    <td>In progress</td>
-                </c:when>
-                <c:otherwise>
-                    <td>Finished</td>
-                </c:otherwise>
-            </c:choose>
+            <td>
+                <c:out value="${match.value}"/>
+            </td>
 
             </c:forEach>
         </tbody>
