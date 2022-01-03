@@ -3,7 +3,7 @@ package org.springframework.samples.parchisYOca.ludoChip;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
-import org.springframework.samples.parchisYOca.gooseChip.Color;
+import org.springframework.samples.parchisYOca.util.Color;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
 
