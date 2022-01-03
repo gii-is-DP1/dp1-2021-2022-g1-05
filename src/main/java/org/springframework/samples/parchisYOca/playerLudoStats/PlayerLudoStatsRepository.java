@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface PlayerLudoStatsRepository extends CrudRepository<PlayerLudoStats, Integer> {
 
     @Query(value = "SELECT DISTINCT playerLudoStats FROM PlayerLudoStats playerLudoStats WHERE playerLudoStats.player.user.username = :username AND playerLudoStats.ludoMatch.id = :matchId")
-    public Optional<PlayerLudoStats> findPlayerLudoStatsByUsernameAndMatchId(String username, Integer matchId);
+    Optional<PlayerLudoStats> findPlayerLudoStatsByUsernameAndMatchId(String username, Integer matchId);
 
     @Query(value = "SELECT DISTINCT playerLudoStats FROM PlayerLudoStats playerLudoStats WHERE playerLudoStats.inGameId = :inGameId AND playerLudoStats.ludoMatch.id = :matchId")
     Optional<PlayerLudoStats> findPlayerLudoStatsByInGameIdAndMatchId(Integer inGameId, Integer matchId);

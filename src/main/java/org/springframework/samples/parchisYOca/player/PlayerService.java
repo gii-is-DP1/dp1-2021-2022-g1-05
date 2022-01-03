@@ -24,8 +24,6 @@ public class PlayerService {
     @Autowired
     private AuthoritiesService authoritiesService;
 
-
-
     @Autowired
     public PlayerService(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
@@ -44,6 +42,16 @@ public class PlayerService {
     @Transactional(readOnly = true)
     public Optional<Player> findPlayerByEmail(String email) throws DataAccessException {
         return playerRepository.findPlayerByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Player> findWinnerByGooseMatchCode(String matchCode) throws DataAccessException {
+        return playerRepository.findWinnerByGooseMatchCode(matchCode);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Player> findWinnerByLudoMatchCode(String matchCode) throws DataAccessException {
+        return playerRepository.findWinnerByLudoMatchCode(matchCode);
     }
 
 

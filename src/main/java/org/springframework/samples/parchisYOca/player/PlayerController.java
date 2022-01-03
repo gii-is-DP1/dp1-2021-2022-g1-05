@@ -5,6 +5,7 @@ import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -208,7 +209,17 @@ public class PlayerController {
         Optional<Player> playerOptional = playerService.findPlayerById(playerId);
         ModelAndView mav = new ModelAndView("matches/listMatchesInProfile");
         Collection<LudoMatch> matches = ludoMatchService.findMatchesByUsername(playerOptional.get().getUser().getUsername());
-        mav.addObject("matches", matches);
+        Map<LudoMatch,String> matchesAndWinners = new HashMap<>();
+        for(LudoMatch ludoMatch : matches){
+            if(playerService.findWinnerByLudoMatchCode(ludoMatch.getMatchCode()).isPresent()){
+                String winner = playerService.findWinnerByLudoMatchCode(ludoMatch.getMatchCode()).get().getUser().getUsername();
+                matchesAndWinners.put(ludoMatch, winner);
+            }else{
+                String winner = "No winner";
+                matchesAndWinners.put(ludoMatch, winner);
+            }
+        }
+        mav.addObject("matches", matchesAndWinners);
         return mav;
     }
 
@@ -217,7 +228,17 @@ public class PlayerController {
         Optional<Player> playerOptional = playerService.findPlayerById(playerId);
         ModelAndView mav = new ModelAndView("matches/listMatchesInProfile");
         Collection<GooseMatch> matches = gooseMatchService.findMatchesByUsername(playerOptional.get().getUser().getUsername());
-        mav.addObject("matches", matches);
+        Map<GooseMatch,String> matchesAndWinners = new HashMap<>();
+        for(GooseMatch gooseMatch : matches){
+            if(playerService.findWinnerByGooseMatchCode(gooseMatch.getMatchCode()).isPresent()){
+                String winner = playerService.findWinnerByGooseMatchCode(gooseMatch.getMatchCode()).get().getUser().getUsername();
+                matchesAndWinners.put(gooseMatch, winner);
+            }else{
+                String winner = "No winner";
+                matchesAndWinners.put(gooseMatch, winner);
+            }
+        }
+        mav.addObject("matches", matchesAndWinners);
         return mav;
     }
 
