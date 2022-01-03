@@ -14,8 +14,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -38,6 +42,7 @@ public class LudoBoardController {
         this.playerLudoStatsService = playerLudoStatsService;
         this.ludoChipService = ludoChipService;
     }
+
     @GetMapping(value="/ludoInGame/dicesRolled")
     public String ludoDicesRolled(HttpSession session, Map<String, Object> model){
         Integer matchId = (Integer) session.getAttribute("matchId");
@@ -68,80 +73,6 @@ public class LudoBoardController {
                     }
 
 
-                    //TODO FORMULARIO PARA ELEGIR QUE DADOS SE JUEGAN PARA QUE FICHA Y EL ORDEN, ¿CREAR CLASE NUEVA PARA GUARDAR LAS ELECCIONES DEL FORMULARIO?
-                    List<Integer> listaAux=new ArrayList<>();
-                    model.put("respuesta",listaAux );
-                    return "matches/ludoDiceForm";
-
-
-
-
-
-
-
-
-
-
-
-
-                    /*
-                    inGamePlayerStats.setHasTurn(resultadoTirada.getSecond());
-
-                    //Comprobación del turno
-                    if(resultadoTirada.getSecond() != 1){
-
-                        //Estadisticas del siguiente jugador
-                        Integer nextInGameId = (inGameId+1)%numberOfPlayers;
-                        PlayerGooseStats nextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
-                        Integer nextNextInGameId = (inGameId+2)%numberOfPlayers;
-                        PlayerGooseStats nextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextInGameId, matchId).get();
-                        Integer nextNextNextInGameId = (inGameId+3)%numberOfPlayers;
-                        PlayerGooseStats nextNextNextInGameStats = playerGooseStatsService.findPlayerGooseStatsByInGameIdAndMatchId(nextNextNextInGameId, matchId).get();
-
-                        if(nextInGameStats.getHasTurn() == 0){  //Le da el turno al siguiente
-                            nextInGameStats.setHasTurn(1);
-                        } else if(nextInGameStats.getHasTurn() != 1){    //Le pasa y le da el turno al siguiente que está en la casilla de perdida de turnos
-                            nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
-                            nextNextInGameStats.setHasTurn(nextNextInGameStats.getHasTurn()+1);
-                            if(nextNextInGameStats.getHasTurn() != 1){   //Si el siguiente al siguiente tambien esta en una casilla de este tipo, le pasa al que va a continuación
-                                nextNextNextInGameStats.setHasTurn(nextNextNextInGameStats.getHasTurn()+1);
-                                if(nextNextNextInGameStats.getHasTurn() != 1){ //Si todos están perdiendo el turno, vuelve al comienzo
-                                    inGamePlayerStats.setHasTurn(1);
-                                }
-                            }
-                        }
-
-                        playerGooseStatsService.saveStats(inGamePlayerStats);
-                        playerGooseStatsService.saveStats(nextInGameStats);
-                        playerGooseStatsService.saveStats(nextNextInGameStats);
-                        playerGooseStatsService.saveStats(nextNextNextInGameStats);
-                    }
-
-                    //Comprobación de casilla especial
-                    if (resultadoTirada.getThird() == "Bridge" || resultadoTirada.getThird() == "Goose"
-                        ||resultadoTirada.getThird() == "Dice"){
-                        session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ ", \n"
-                            +"you have been moved from square " + String.valueOf(loggedPlayerChip.getPosition()+rolledDices[INDICE_SUMA_DADOS]) + " to the square "+resultadoTirada.getFirst()
-                            +". You have an extra turn!");
-
-                    } else if(resultadoTirada.getThird() == "Jail" || resultadoTirada.getThird() == "Inn"){
-                        session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ ", \n"
-                            +"you loose " + Math.abs(resultadoTirada.getSecond()) + " turns :(");
-                    } else if(resultadoTirada.getThird() == "Maze" || resultadoTirada.getThird() == "Death"){
-                        session.setAttribute("especial", "You have landed on the special square " + resultadoTirada.getThird().toLowerCase(Locale.ROOT)+ ", \n"
-                            + "you have been moved to the square "+resultadoTirada.getFirst()+ ". Today it's not your lucky day ¯\\('-')_/¯");
-                    } else if(resultadoTirada.getThird() == "Double roll"){
-                        session.setAttribute("especial","You have landed on the square " +resultadoTirada.getFirst() +" and you got a double roll!! You can roll the dice again");
-                    } else{
-                        session.setAttribute("especial", "You moved from the square "+ loggedPlayerChip.getPosition()+ " to the square " + resultadoTirada.getFirst());
-                    }
-
-
-                    loggedPlayerChip.setPosition(resultadoTirada.getFirst());
-                    gooseChipService.save(loggedPlayerChip);
-                    playerGooseStatsService.saveStats(inGamePlayerStats);
-                    /*
-                     */
                 }
             }
 
@@ -149,6 +80,20 @@ public class LudoBoardController {
         }else{
             return "redirect:/";
         }
+    }
+
+    @GetMapping(value = "/ludoInGame/sumDices/{diceIndex}")
+    public String ludoSumDices(@PathVariable("diceIndex") Integer diceIndex, ModelMap model,
+                               HttpServletRequest request, HttpSession session) {
+        Boolean logged = userService.isAuthenticated();
+
+        if(logged==true){
+
+            return "matches/ludoSumDice";
+        } else {
+            return "redirect:/";
+        }
+
     }
 
 
