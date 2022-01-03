@@ -3,6 +3,7 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoardService;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChipService;
@@ -238,6 +239,29 @@ public class LudoMatchController {
         String vista = "matches/listLudoMatches";
         Iterable<LudoMatch> ludoMatches = ludoMatchService.findAll();
         modelMap.addAttribute("ludoMatches",ludoMatches);
+        return vista;
+    }
+
+    @PostMapping(value = "/ludoMatches")
+    public String filterLudoMatches(ModelMap modelMap, @RequestParam String filterBy, @RequestParam String date) {
+        String vista = "matches/listLudoMatches";
+        String[] dateValues = date.split("-");
+        if(dateValues.length == 3){
+            Calendar correctDate = Calendar.getInstance();
+            correctDate.set(Integer.parseInt(dateValues[0]),Integer.parseInt(dateValues[1])-1,Integer.parseInt(dateValues[2]));
+            correctDate.set(Calendar.HOUR_OF_DAY,0);
+            Date correctDateRepresentation = correctDate.getTime();
+            if(filterBy.equals("startDate")){
+                Collection<LudoMatch> matches = ludoMatchService.findMatchesByStartDate(correctDateRepresentation);
+                modelMap.addAttribute("ludoMatches",matches);
+            } else{
+                Collection<LudoMatch> matches = ludoMatchService.findMatchesByEndDate(correctDateRepresentation);
+                modelMap.addAttribute("ludoMatches",matches);
+            }
+        }else{
+            Iterable<LudoMatch> ludoMatches = ludoMatchService.findAll();
+            modelMap.addAttribute("ludoMatches",ludoMatches);
+        }
         return vista;
     }
 

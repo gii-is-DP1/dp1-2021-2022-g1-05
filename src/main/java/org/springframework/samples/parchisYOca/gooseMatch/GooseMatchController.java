@@ -25,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -243,6 +244,29 @@ public class GooseMatchController {
         String vista = "matches/listGooseMatches";
         Iterable<GooseMatch> gooseMatches = gooseMatchService.findAll();
         modelMap.addAttribute("gooseMatches",gooseMatches);
+        return vista;
+    }
+
+    @PostMapping(value = "/gooseMatches")
+    public String filterGooseMatches(ModelMap modelMap, @RequestParam String filterBy, @RequestParam String date) {
+        String vista = "matches/listGooseMatches";
+        String[] dateValues = date.split("-");
+        if(dateValues.length == 3){
+            Calendar correctDate = Calendar.getInstance();
+            correctDate.set(Integer.parseInt(dateValues[0]),Integer.parseInt(dateValues[1])-1,Integer.parseInt(dateValues[2]));
+            correctDate.set(Calendar.HOUR_OF_DAY,0);
+            Date correctDateRepresentation = correctDate.getTime();
+            if(filterBy.equals("startDate")){
+                Collection<GooseMatch> matches = gooseMatchService.findMatchesByStartDate(correctDateRepresentation);
+                modelMap.addAttribute("gooseMatches",matches);
+            } else{
+                Collection<GooseMatch> matches = gooseMatchService.findMatchesByEndDate(correctDateRepresentation);
+                modelMap.addAttribute("gooseMatches",matches);
+            }
+        }else{
+            Iterable<GooseMatch> gooseMatches = gooseMatchService.findAll();
+            modelMap.addAttribute("gooseMatches",gooseMatches);
+        }
         return vista;
     }
 

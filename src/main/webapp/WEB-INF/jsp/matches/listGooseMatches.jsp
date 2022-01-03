@@ -4,9 +4,30 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="parchisYOca" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <parchisYOca:layout pageName="gooseMatches">
-    <h2>Listing all goose matches</h2>
+
+    <h2>Filter goose matches</h2>
+    <p>It will show the matches starting from the specified date</p>
+    <br>
+    <form:form class="form-horizontal" id="date-filter-goose-form">
+        <div class="form-group has-feedback" style="margin-left: 2%">
+            <label for="filterBy">Filter by:</label>
+            <select name="filterBy" id="filterBy">
+                <option value="startDate">Start date</option>
+                <option value="endDate">End date</option>
+            </select>
+            <label for="date" style="margin-left: 0.5%">Select date:</label>
+            <input type="date" name="date" id="date">
+        </div>
+        <div class="form-group">
+            <div class="col-sm col-sm-10" style="margin-left: 2%">
+                <button class="btn btn-default" type="submit">Search</button>
+            </div>
+        </div>
+    </form:form>
+    <h2>Listing goose matches</h2>
 
     <table id="matchesTable" class="table table-striped">
         <thead>
