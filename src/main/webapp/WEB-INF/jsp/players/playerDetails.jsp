@@ -65,6 +65,17 @@
                     </c:forEach>
                 </tbody>
             </table>
+
+            <h3>Played matches</h3>
+
+            <spring:url value="{playerId}/ludoMatchesPlayed" var="editUrl">
+                <spring:param name="playerId" value="${player.id}"/>
+            </spring:url>
+            <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Ludo matches</a>
+            <spring:url value="{playerId}/gooseMatchesPlayed" var="editUrl">
+                <spring:param name="playerId" value="${player.id}"/>
+            </spring:url>
+            <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Goose matches</a>
         </c:when>
         <c:otherwise>
             <h1>You dont have permission to visualize this data</h1>

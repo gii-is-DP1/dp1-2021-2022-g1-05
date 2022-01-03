@@ -10,10 +10,7 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class GooseMatchService {
@@ -67,6 +64,21 @@ public class GooseMatchService {
     @Transactional(readOnly=true)
     public Optional<GooseMatch> findLobbyByUsername(String username) throws DataAccessException{
         return gooseMatchRepository.findLobbyByUsername(username);
+    }
+
+    @Transactional(readOnly=true)
+    public Collection<GooseMatch> findMatchesByUsername(String username) throws DataAccessException{
+        return gooseMatchRepository.findMatchesByUsername(username);
+    }
+
+    @Transactional(readOnly=true)
+    public Collection<GooseMatch> findMatchesByStartDate(Date date) throws DataAccessException{
+        return gooseMatchRepository.findGooseMatchByStartDate(date);
+    }
+
+    @Transactional(readOnly=true)
+    public Collection<GooseMatch> findMatchesByEndDate(Date date) throws DataAccessException{
+        return gooseMatchRepository.findGooseMatchByEndDate(date);
     }
 
     @Transactional

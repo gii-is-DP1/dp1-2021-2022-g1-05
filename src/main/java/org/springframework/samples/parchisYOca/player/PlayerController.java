@@ -1,7 +1,9 @@
 package org.springframework.samples.parchisYOca.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.core.Authentication;
@@ -177,23 +179,46 @@ public class PlayerController {
     @GetMapping(path="/players/{playerId}/delete")
     public String deletePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
         Optional<Player> playerOptional = playerService.findPlayerById(playerId);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-        Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+        Boolean logged = userService.isAuthenticated();
 
-        if(playerId == authenticatedPlayer.getId()){ //If auto-deletes, logs off
-            authentication.setAuthenticated(false);
+        if(logged == true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            Player authenticatedPlayer = this.playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
+
+            if(playerId == authenticatedPlayer.getId()){ //If auto-deletes, logs off
+                authentication.setAuthenticated(false);
+            }
+
+            if(playerOptional.isPresent()){
+                Player player = playerOptional.get();
+                playerService.delete(player);
+                modelMap.addAttribute("message", "Player successfully deleted!");
+
+            }else{
+                modelMap.addAttribute("message", "Player not found!");
+            }
         }
 
-        if(playerOptional.isPresent()){
-            Player player = playerOptional.get();
-            playerService.delete(player);
-            modelMap.addAttribute("message", "Player successfully deleted!");
-
-        }else{
-            modelMap.addAttribute("message", "Player not found!");
-        }
         return "welcome";
+    }
+
+    @GetMapping(path="/players/{playerId}/ludoMatchesPlayed")
+    public ModelAndView ludoMatchesOfPlayer(@PathVariable("playerId") int playerId){
+        Optional<Player> playerOptional = playerService.findPlayerById(playerId);
+        ModelAndView mav = new ModelAndView("matches/listMatchesInProfile");
+        Collection<LudoMatch> matches = ludoMatchService.findMatchesByUsername(playerOptional.get().getUser().getUsername());
+        mav.addObject("matches", matches);
+        return mav;
+    }
+
+    @GetMapping(path="/players/{playerId}/gooseMatchesPlayed")
+    public ModelAndView gooseMatchesOfPlayer(@PathVariable("playerId") int playerId){
+        Optional<Player> playerOptional = playerService.findPlayerById(playerId);
+        ModelAndView mav = new ModelAndView("matches/listMatchesInProfile");
+        Collection<GooseMatch> matches = gooseMatchService.findMatchesByUsername(playerOptional.get().getUser().getUsername());
+        mav.addObject("matches", matches);
+        return mav;
     }
 
 }
