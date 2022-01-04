@@ -27,15 +27,17 @@
                 </ul>
             </div>
             <div class="col-md-2">
-                <c:choose>
-                    <c:when test="${hasTurn eq 1}">
-                        <p style="color: #5390D9">It's your turn!</p>
-                        <a href="/session/rolldices"><button class="btn btn-default">Roll the dice</button></a>
-                    </c:when>
-                    <c:otherwise>
-                        <p style="color: darkred">You have to wait until it's your turn!</p>
-                    </c:otherwise>
-                </c:choose>
+                <c:if test="${hasTurn ne null}">
+                    <c:choose>
+                        <c:when test="${hasTurn eq 1}">
+                            <p style="color: #5390D9">It's your turn!</p>
+                            <a href="/session/rolldices"><button class="btn btn-default">Roll the dice</button></a>
+                        </c:when>
+                        <c:otherwise>
+                            <p style="color: darkred">You have to wait until it's your turn!</p>
+                        </c:otherwise>
+                    </c:choose>
+                </c:if>
             </div>
             <div class="col-md-2">
                 <p><c:out value="First dice: ${firstDice}"/></p>
@@ -44,7 +46,7 @@
             </div>
 
             <div class="col-md-3">
-                <c:if test="${hasTurn eq 1}">
+                <c:if test="${dicesRolled ne null}">
                     <p><c:out value="Which dice will you sum first?"/></p>
                     <a href="/ludoInGame/sumDice/1">
                         <img src="../resources/images/dado1.png" width="100px">

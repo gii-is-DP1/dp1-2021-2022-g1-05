@@ -66,7 +66,7 @@ public class SessionController {
                     return "redirect:/gooseInGame/dicesRolled";
                 }
                 if(refererLudo != null){
-                    return "redirect:/ludoMatches/"+matchId;
+                    return "redirect:/ludoInGame/dicesRolled";
                 }
 
             }
