@@ -5,7 +5,10 @@ import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,13 +35,19 @@ public class PlayerController {
     private final UserService userService;
     private final GooseMatchService gooseMatchService;
     private final LudoMatchService ludoMatchService;
+    private final PlayerGooseStatsService playerGooseStatsService;
+    private final PlayerLudoStatsService playerLudoStatsService;
 
     @Autowired
-    public PlayerController(PlayerService playerService, UserService userService, GooseMatchService gooseMatchService, LudoMatchService ludoMatchService) {
+    public PlayerController(PlayerService playerService, UserService userService,
+                            GooseMatchService gooseMatchService, LudoMatchService ludoMatchService,
+                            PlayerGooseStatsService playerGooseStatsService, PlayerLudoStatsService playerLudoStatsService) {
         this.playerService = playerService;
         this.userService = userService;
         this.gooseMatchService = gooseMatchService;
         this.ludoMatchService = ludoMatchService;
+        this.playerLudoStatsService = playerLudoStatsService;
+        this.playerGooseStatsService = playerGooseStatsService;
     }
 
     @InitBinder
@@ -80,7 +89,18 @@ public class PlayerController {
                 mav.addObject("hasPermission", "true"); //To check if user has permission to see data
             }
 
+            //To show user stats
+            PlayerGooseStats pgs = playerGooseStatsService.sumStats(
+                playerGooseStatsService.findPlayerGooseStatsByUsername(authenticatedUser.getUsername()));
+            PlayerLudoStats pls = playerLudoStatsService.sumStats(
+                playerLudoStatsService.findPlayerLudoStatsByUsername(authenticatedUser.getUsername()));
+            mav.addObject("gooseStats", pgs);
+            mav.addObject("ludoStats", pls);
+
         }
+
+
+
         mav.addObject(this.playerService.findPlayerById(playerId).get());
         mav.addObject(this.playerService.findPlayerById(playerId).get().getUser());
         return mav;
@@ -219,6 +239,7 @@ public class PlayerController {
                 matchesAndWinners.put(ludoMatch, winner);
             }
         }
+        mav.addObject("playerId", playerId);
         mav.addObject("matches", matchesAndWinners);
         return mav;
     }
@@ -238,8 +259,30 @@ public class PlayerController {
                 matchesAndWinners.put(gooseMatch, winner);
             }
         }
+        mav.addObject("playerId", playerId);
         mav.addObject("matches", matchesAndWinners);
         return mav;
     }
+
+    @GetMapping(path="/players/{playerId}/matchStats/{matchCode}")
+    public ModelAndView gooseMatchesOfPlayer(@PathVariable("playerId") int playerId,
+                                             @PathVariable("matchCode") String matchCode){
+        ModelAndView mav = new ModelAndView("stats/userStatsInAMatch");
+        Optional<Player> playerOptional = playerService.findPlayerById(playerId);
+        String username = playerOptional.get().getUser().getUsername();
+
+        if(gooseMatchService.findGooseMatchByMatchCode(matchCode).isPresent()){
+            GooseMatch match = gooseMatchService.findGooseMatchByMatchCode(matchCode).get();
+            PlayerGooseStats stats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(username,match.getId()).get();
+            mav.addObject("gooseStats", stats);
+        }else{
+            LudoMatch match = ludoMatchService.findludoMatchByMatchCode(matchCode).get();
+            PlayerLudoStats stats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(username,match.getId()).get();
+            mav.addObject("ludoStats", stats);
+        }
+        return mav;
+    }
+
+
 
 }

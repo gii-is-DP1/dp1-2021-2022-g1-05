@@ -40,12 +40,12 @@
                     <flippingboards:menuItem active="${name eq 'ludoMatches'}" url="/ludoMatches"
                          title="find ludo matches">
                         <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                        <span>Ludo matches</span>
+                        <span>Ludo</span>
                     </flippingboards:menuItem>
                     <flippingboards:menuItem active="${name eq 'gooseMatches'}" url="/gooseMatches"
                                              title="find goose matches">
                         <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                        <span>Goose matches</span>
+                        <span>Goose</span>
                     </flippingboards:menuItem>
 
                     <flippingboards:menuItem active="${name eq 'achievements'}" url="/achievements"
