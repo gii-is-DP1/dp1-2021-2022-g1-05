@@ -17,6 +17,9 @@ public interface PlayerLudoStatsRepository extends CrudRepository<PlayerLudoStat
     @Query(value = "SELECT DISTINCT playerLudoStats FROM PlayerLudoStats playerLudoStats WHERE playerLudoStats.inGameId = :inGameId AND playerLudoStats.ludoMatch.id = :matchId")
     Optional<PlayerLudoStats> findPlayerLudoStatsByInGameIdAndMatchId(Integer inGameId, Integer matchId);
 
+    @Query(value = "SELECT DISTINCT playerLudoStats FROM PlayerLudoStats playerLudoStats WHERE playerLudoStats.player.user.username = :username")
+    Collection<PlayerLudoStats> findPlayerLudoStatsByUsername(String username);
+
     @Modifying
     @Query(value = "DELETE FROM PlayerLudoStats playerLudoStats WHERE playerLudoStats.ludoMatch.id = :matchId And playerLudoStats.inGameId = :statsId")
     void deletePlayerFromGame(Integer statsId, Integer matchId);

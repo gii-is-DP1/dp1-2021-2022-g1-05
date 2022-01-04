@@ -15,6 +15,7 @@
             <th style="width: 220px;">Start date</th>
             <th style="width: 220px;">End date</th>
             <th style="width:150px;">Winner</th>
+            <th style="width:150px;">My stats</th>
 
         </tr>
         </thead>
@@ -32,6 +33,13 @@
             </td>
             <td>
                 <c:out value="${match.value}"/>
+            </td>
+            <td>
+                <spring:url value="/players/{playerId}/matchStats/{matchCode}" var="url">
+                    <spring:param name="playerId" value="${playerId}"/>
+                    <spring:param name="matchCode" value="${match.key.matchCode}"/>
+                </spring:url>
+                <a href="${fn:escapeXml(url)}">Stats</a>
             </td>
 
             </c:forEach>

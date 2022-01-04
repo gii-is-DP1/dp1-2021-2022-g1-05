@@ -2,9 +2,13 @@ package org.springframework.samples.parchisYOca.playerGooseStats;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.player.Player;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -17,6 +21,23 @@ public class PlayerGooseStatsService {
         this.playerGooseStatsRepository = playerGooseStatsRepository;
     }
 
+    //Used to show stats in profile
+    public PlayerGooseStats sumStats(Collection<PlayerGooseStats> statsList){
+        PlayerGooseStats stats = new PlayerGooseStats();
+        for(PlayerGooseStats pgs : statsList){
+            stats.setDoubleRolls(pgs.getDoubleRolls() + stats.getDoubleRolls());
+            stats.setLandedGeese(pgs.getLandedGeese() + stats.getLandedGeese());
+            stats.setLandedBridges(pgs.getLandedBridges() + stats.getLandedBridges());
+            stats.setLandedDeath(pgs.getLandedDeath() + stats.getLandedDeath());
+            stats.setLandedDice(pgs.getLandedDice() + stats.getLandedDice());
+            stats.setLandedMaze(pgs.getLandedMaze() + stats.getLandedMaze());
+            stats.setLandedInn(pgs.getLandedInn() + stats.getLandedInn());
+            stats.setLandedJails(pgs.getLandedJails() + stats.getLandedJails());
+            stats.setHasWon(pgs.getHasWon() + stats.getHasWon());
+        }
+        return stats;
+    }
+
     @Transactional(readOnly = true)
     public Optional<PlayerGooseStats> findGooseStatsByUsernamedAndMatchId(String username, Integer matchId) throws DataAccessException {
         return playerGooseStatsRepository.findPlayerGooseStatsByUsernamedAndMatchId(username, matchId);
@@ -26,6 +47,13 @@ public class PlayerGooseStatsService {
     public Optional<PlayerGooseStats> findPlayerGooseStatsByInGameIdAndMatchId(Integer inGameId, Integer matchId) throws DataAccessException {
         return playerGooseStatsRepository.findPlayerGooseStatsByInGameIdAndMatchId(inGameId, matchId);
     }
+
+    @Transactional(readOnly = true)
+    public Collection<PlayerGooseStats> findPlayerGooseStatsByUsername(String username) throws DataAccessException {
+        return playerGooseStatsRepository.findPlayerGooseStatsByUsername(username);
+    }
+
+
     @Transactional
     public PlayerGooseStats saveStats(PlayerGooseStats playerGooseStats) throws DataAccessException {
         return playerGooseStatsRepository.save(playerGooseStats);

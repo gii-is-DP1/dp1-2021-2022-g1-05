@@ -2,7 +2,7 @@ INSERT INTO achievements(id, name, description) VALUES(1, 'NombreAchievement1', 
 INSERT INTO achievements(id, name, description) VALUES(2, 'NombreAchievement2', 'Descripción achievement 2');
 INSERT INTO achievements(id, name, description) VALUES(3, 'NombreAchievement3', 'Descripción achievement 3');
 
-INSERT INTO users(username, password, enabled) VALUES('ManuK', 1234567, 'true');
+INSERT INTO users(username, password, enabled) VALUES('ManuK', '1234567', 'true');
 INSERT INTO users(username, password, enabled) VALUES('marioespiro', 'admin121', 'true');
 INSERT INTO users(username, password, enabled) VALUES('pedro', 'pedro121', 'true');
 INSERT INTO users(username, password, enabled) VALUES('jaime', 'jaime1', 'true');
