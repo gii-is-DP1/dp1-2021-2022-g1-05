@@ -22,7 +22,7 @@ public class GooseChip extends BaseEntity {
 
     private Integer position = 0;
     private Integer inGameId = 0;
-    private String color;
+    private Color color;
 
     @ManyToOne
     GooseBoard board;
@@ -45,7 +45,7 @@ public class GooseChip extends BaseEntity {
     private static final Pair<List<Integer>, Integer> seventhRow = Pair.of(Arrays.asList(13, 22, 38, 39, 40, 41, 42, 43), 750);
     private static final Pair<List<Integer>, Integer> eigthRow = Pair.of(Arrays.asList(14, 15, 16, 17, 18, 19, 20, 21), 875);
 
-    public String getColor() {
+    public Color getColor() {
         if(this.color==null){
             setColor();
         }
@@ -54,7 +54,7 @@ public class GooseChip extends BaseEntity {
     }
     public void setColor(){
         Color[] colores = Color.values();
-        this.color = colores[inGameId].toString();
+        this.color = colores[inGameId];
     }
 
 
