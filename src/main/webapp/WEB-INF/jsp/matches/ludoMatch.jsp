@@ -16,7 +16,16 @@
                         <c:forEach items="${chips}" var="chip">
                             <c:choose>
                                 <c:when test="${stat.inGameId eq chip.inGamePlayerId and stat.playerLeft eq 0}">
-                                    <li><p><c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position}"/></p></li>
+                                    <li><p>
+                                        <c:choose>
+                                            <c:when test="${chip.position eq null}">
+                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: EN CASA"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position}"/>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </p></li>
                                 </c:when>
                                 <c:when test="${stat.inGameId eq chip.inGamePlayerId and stat.playerLeft eq 1}">
                                     <li><p><c:out value="${chip.getColor()}-> JUGADOR INACTIVO: ${chip.position}"/></p></li>
@@ -48,12 +57,28 @@
             <div class="col-md-3">
                 <c:if test="${dicesRolled ne null}">
                     <p><c:out value="Which dice will you sum first?"/></p>
-                    <a href="/ludoInGame/sumDice/1">
-                        <img src="../resources/images/dado1.png" width="100px">
-                    </a>
-                    <a href="/ludoInGame/sumDice/2">
-                        <img src="../resources/images/dado2.png" width="100px">
-                    </a>
+                    <c:choose>
+                        <c:when test="${diceCode eq 0}">
+                            <img src="../resources/images/dado1.png" width="100px" style="opacity: 0.4">
+                            <a href="/ludoInGame/sumDice/2">
+                                <img src="../resources/images/dado2.png" width="100px">
+                            </a>
+                        </c:when>
+                        <c:when test="${diceCode eq 1}">
+                            <a href="/ludoInGame/sumDice/1">
+                                <img src="../resources/images/dado1.png" width="100px">
+                            </a>
+                            <img src="../resources/images/dado2.png" width="100px" style="opacity: 0.4">
+                        </c:when>
+                        <c:otherwise>
+                            <a href="/ludoInGame/sumDice/1">
+                                <img src="../resources/images/dado1.png" width="100px">
+                            </a>
+                            <a href="/ludoInGame/sumDice/2">
+                                <img src="../resources/images/dado2.png" width="100px">
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
                 </c:if>
             </div>
 

@@ -17,8 +17,8 @@ import java.util.*;
 
 @Service
 public class LudoChipService {
-	private static final Integer RED_LAST_TILE = 33; //uno menos que en el tablero porque
-	private static final Integer YELLOW_LAST_TILE = 67;//internamente vamos de 0-67
+	private static final Integer RED_LAST_TILE = 33; //uno menos que en el tablero porque internamente vamos de 0-67
+	private static final Integer YELLOW_LAST_TILE = 67;
 	private static final Integer GREEN_LAST_TILE = 50;
 	private static final Integer BLUE_LAST_TILE = 16;
 	private static final List<Integer> SAVE_TILES = Arrays.asList(4,11,16,21,28,33,38,45,50,55,62,67);
@@ -78,7 +78,6 @@ public class LudoChipService {
                     chipToModify.setPosition(FIRST_TILES.get(color));
                     save(chipToModify);
                     manageFives(inGameId, matchId, 0, secondDice);
-                    result = 2;
                 }
                 return result;
             }
@@ -96,7 +95,7 @@ public class LudoChipService {
         } else if(firstDice == FIVE && secondDice == FIVE) {
             return 3;
         }
-        return null;
+        return -1;
     }
 
     @Transactional

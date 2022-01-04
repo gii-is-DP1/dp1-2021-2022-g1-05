@@ -22,8 +22,8 @@ public class LudoChip  extends BaseEntity {
     //Para diferenciar las distintas fichas del mismo color
     @Range(min=0, max=3)
     private Integer inGameChipId;
+
     //El juego depende mucho de en que parte del tablero se encuentra la ficha
-    //este atributo simplifcara la logica mas tarde
     //earlyGame -> casilla de inicio -> sacar 5 para pasar al sguiente estado
     //midGame -> juego normal del parchis
     //endGame -> las casillas antes de llegar a la meta
@@ -48,7 +48,7 @@ public class LudoChip  extends BaseEntity {
 
     	switch(gameState) {
     	case earlyGame:
-    		this.position = null; //esta en la casa
+    		this.position = null; //Está en casa, la posición es irrelevante
     		break;
     	case midGame:
     		this.position = position%68;

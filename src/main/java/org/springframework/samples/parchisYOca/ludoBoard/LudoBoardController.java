@@ -83,24 +83,29 @@ public class LudoBoardController {
                     //Comprobar si ha sacado 5 y tiene fichas en base
                     if(rolledDices[INDICE_PRIMER_DADO] == 5 || rolledDices[INDICE_SEGUNDO_DADO] == 5 ||
                         rolledDices[INDICE_SUMA_DADOS] == 5) {
-                        Integer resultadoServicio = ludoChipService.manageFives(inGameId,matchId, rolledDices[INDICE_PRIMER_DADO], rolledDices[INDICE_SEGUNDO_DADO]);
-
-                        if(resultadoServicio==0){
+                        Integer diceCode = ludoChipService.manageFives(inGameId,matchId, rolledDices[INDICE_PRIMER_DADO], rolledDices[INDICE_SEGUNDO_DADO]);
+                        model.put("diceCode", diceCode);
+                        if(diceCode==0){
                             rolledDices[INDICE_PRIMER_DADO]=0;
                             rolledDices[INDICE_SUMA_DADOS]=rolledDices[INDICE_SUMA_DADOS]-rolledDices[INDICE_PRIMER_DADO];
                         }
-                        else if(resultadoServicio==1){
+                        else if(diceCode==1){
                             rolledDices[INDICE_SEGUNDO_DADO]=0;
                             rolledDices[INDICE_SUMA_DADOS]=rolledDices[INDICE_SUMA_DADOS]-rolledDices[INDICE_SEGUNDO_DADO];
                         }
-                        else if(resultadoServicio==2){
+                        else if(diceCode==2){
                             rolledDices[INDICE_PRIMER_DADO]=0;
                             rolledDices[INDICE_SEGUNDO_DADO]=0;
+                            rolledDices[INDICE_SUMA_DADOS]=0;
+
+                        } else if(diceCode == 3){
+                            //TODO cuando saque dos cincos tiene que no dejarte tener el turno y tirar de nuevo los dados
+                            rolledDices[INDICE_PRIMER_DADO]=0;
                             rolledDices[INDICE_SEGUNDO_DADO]=0;
+                            rolledDices[INDICE_SUMA_DADOS]=0;
+                            return "redirect:/ludoMatches/" + matchId;
                         }
                     }
-
-
                 }
             }
 
