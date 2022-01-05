@@ -9,6 +9,7 @@ import org.springframework.samples.parchisYOca.ludoBoard.LudoBoardService;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChipService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
@@ -276,6 +277,15 @@ public class LudoMatchController {
         ludoMatchService.save(ludoMatchDb);
         return "redirect:/ludoMatches";
 
+    }
+
+    @GetMapping(value="/ludoMatches/stats/{matchId}")
+    public ModelAndView showStats(@PathVariable("matchId") Integer matchId){
+        LudoMatch ludoMatchDb=ludoMatchService.findludoMatchById(matchId).get();
+        Collection<PlayerLudoStats> pls = ludoMatchDb.getStats();
+        ModelAndView mav = new ModelAndView("stats/adminMatchStats");
+        mav.addObject("ludoStats", pls);
+        return mav;
     }
 
     @GetMapping(value = "/ludoMatches/matchLeft")

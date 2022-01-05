@@ -38,6 +38,7 @@
             <th style="width:150px;">Status</th>
 
             <th>Actions</th>
+            <th>Check data</th>
 
         </tr>
         </thead>
@@ -83,6 +84,12 @@
             <td>None</td>
             </c:otherwise>
             </c:choose>
+            <td>
+                <spring:url value="/ludoMatches/stats/{matchId}" var="matchUrl">
+                    <spring:param name="matchId" value="${match.id}"/>
+                </spring:url>
+                <a href="${fn:escapeXml(matchUrl)}">Check stats</a>
+            </td>
 
             </c:forEach>
         </tbody>

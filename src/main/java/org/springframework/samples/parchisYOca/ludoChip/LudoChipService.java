@@ -17,30 +17,30 @@ import java.util.*;
 
 @Service
 public class LudoChipService {
-	private static final Integer RED_LAST_TILE = 33; //uno menos que en el tablero porque internamente vamos de 0-67
-	private static final Integer YELLOW_LAST_TILE = 67;
-	private static final Integer GREEN_LAST_TILE = 50;
-	private static final Integer BLUE_LAST_TILE = 16;
-	private static final List<Integer> SAVE_TILES = Arrays.asList(4,11,16,21,28,33,38,45,50,55,62,67);
+    private static final Integer RED_LAST_TILE = 33; //uno menos que en el tablero porque internamente vamos de 0-67
+    private static final Integer YELLOW_LAST_TILE = 67;
+    private static final Integer GREEN_LAST_TILE = 50;
+    private static final Integer BLUE_LAST_TILE = 16;
+    private static final List<Integer> SAVE_TILES = Arrays.asList(4,11,16,21,28,33,38,45,50,55,62,67);
     private static final Integer FIVE = 5;
-    private static final Map<Color, Integer> FIRST_TILES = Map.of(Color.Rojo, 38, Color.Amarillo, 4, Color.Verde, 55, Color.Azul, 21);
+    private static final Map<Color, Integer> FIRST_TILES = Map.of(Color.Red, 38, Color.Yellow, 4, Color.Green, 55, Color.Blue, 21);
 
 
-	private LudoChipRepository ludoChipRepository;
+    private LudoChipRepository ludoChipRepository;
     private LudoBoardService ludoBoardService;
-	private LudoMatchService ludoMatchService;
+    private LudoMatchService ludoMatchService;
     private PlayerLudoStatsRepository playerLudoStatsRepository;
 
 
     @Autowired
-	public LudoChipService(LudoChipRepository ludoChipRepository, LudoBoardService ludoBoardService, PlayerLudoStatsRepository playerLudoStatsRepository,
+    public LudoChipService(LudoChipRepository ludoChipRepository, LudoBoardService ludoBoardService, PlayerLudoStatsRepository playerLudoStatsRepository,
                            LudoMatchService ludoMatchService) {
-		this.ludoChipRepository = ludoChipRepository;
+        this.ludoChipRepository = ludoChipRepository;
         this.ludoBoardService = ludoBoardService;
         this.ludoMatchService = ludoMatchService;
         this.playerLudoStatsRepository=playerLudoStatsRepository;
 
-	}
+    }
     @Transactional
     public Collection<LudoChip> findChipsByMatchId(Integer matchId) throws DataAccessException {
         return ludoChipRepository.findChipsByMatchId(matchId);
@@ -98,7 +98,6 @@ public class LudoChipService {
         return -1;
     }
 
-    @Transactional
     public Pair<Boolean,Integer> checkCasilla(Integer square, List<LudoChip> chips){
         Integer acumulador=0;
         for(int i=0;i<chips.size();i++){

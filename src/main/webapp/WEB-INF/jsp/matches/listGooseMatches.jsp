@@ -37,6 +37,7 @@
             <th style="width: 220px;">End date</th>
             <th style="width:150px;">Status</th>
             <th>Actions</th>
+            <th>Check data</th>
 
         </tr>
         </thead>
@@ -81,6 +82,12 @@
                     <td>None</td>
                 </c:otherwise>
             </c:choose>
+            <td>
+                <spring:url value="/gooseMatches/stats/{matchId}" var="matchUrl">
+                    <spring:param name="matchId" value="${match.id}"/>
+                </spring:url>
+                <a href="${fn:escapeXml(matchUrl)}">Check stats</a>
+            </td>
 
             </c:forEach>
         </tbody>
