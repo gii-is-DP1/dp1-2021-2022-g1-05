@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -276,6 +277,16 @@ public class GooseMatchController {
         gooseMatchDb.setEndDate(new Date());
         gooseMatchService.save(gooseMatchDb);
         return "redirect:/gooseMatches";
+
+    }
+
+    @GetMapping(value="/gooseMatches/stats/{matchId}")
+    public ModelAndView showStats(@PathVariable("matchId") Integer matchId){
+        GooseMatch gooseMatchDb=gooseMatchService.findGooseMatchById(matchId).get();
+        Collection<PlayerGooseStats> pgs = gooseMatchDb.getStats();
+        ModelAndView mav = new ModelAndView("stats/adminMatchStats");
+        mav.addObject("gooseStats", pgs);
+        return mav;
 
     }
 
