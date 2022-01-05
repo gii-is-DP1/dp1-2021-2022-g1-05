@@ -49,19 +49,24 @@ public class UserController {
 
         if(password.length() < 7 || !password.matches(".*[0-9].*")){
             model.put("message", "The password must be at least 7 characters long and contain a number");
+            return VIEWS_PLAYER_CREATE_FORM;
         } else if(username.length() < 1){
-            model.put("message", "The username can´t be empty");
+            model.put("message", "The username can't be empty");
+            return VIEWS_PLAYER_CREATE_FORM;
         }else if (playerService.findPlayerByUsername(username).isPresent()){
             model.put("message", "That username is already taken");
+            return VIEWS_PLAYER_CREATE_FORM;
         }else if (playerService.findPlayerByEmail(email).isPresent()){
             model.put("message", "That email is already taken");
+            return VIEWS_PLAYER_CREATE_FORM;
         } else if(result.hasErrors()) {
+        	return VIEWS_PLAYER_CREATE_FORM;
         } else {
             //creating player, user, and authority
             this.playerService.savePlayer(player);
             return "redirect:/";
         }
-        return VIEWS_PLAYER_CREATE_FORM;
+        
 
     }
 
