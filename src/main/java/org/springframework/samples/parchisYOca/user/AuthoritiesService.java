@@ -35,10 +35,6 @@ public class AuthoritiesService {
         this.userService = userService;
     }
 
-    @Transactional
-    public void saveAuthorities(Authorities authorities) throws DataAccessException {
-        authoritiesRepository.save(authorities);
-    }
 
     @Transactional
     public void saveAuthorities(String username, String role) throws DataAccessException {
@@ -50,10 +46,6 @@ public class AuthoritiesService {
             authoritiesRepository.save(authority);
         }else
             throw new DataAccessException("User '"+username+"' not found!") {};
-    }
-
-    public void deleteAuthorities(Authorities authorities) throws DataAccessException {
-        authoritiesRepository.delete(authorities);
     }
 
 

@@ -16,12 +16,12 @@ public class LudoBoardService {
     private LudoBoardRepository ludoBoardRepository;
     private LudoChipRepository ludoChipRepository;
 
-    //TODO Esto de aqui abajo revisarlo
     @Autowired
     public LudoBoardService(LudoBoardRepository ludoBoardRepository,LudoChipRepository ludoChipRepository){
         this.ludoBoardRepository=ludoBoardRepository;
         this.ludoChipRepository=ludoChipRepository;
     }
+
     @Transactional(readOnly = true)
     public LudoBoard getLudoBoardById(Integer id) throws DataAccessException{
         return ludoBoardRepository.findById(id).get();

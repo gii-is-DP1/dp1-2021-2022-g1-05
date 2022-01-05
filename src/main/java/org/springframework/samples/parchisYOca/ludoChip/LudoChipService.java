@@ -27,18 +27,13 @@ public class LudoChipService {
 
 
     private LudoChipRepository ludoChipRepository;
-    private LudoBoardService ludoBoardService;
     private LudoMatchService ludoMatchService;
-    private PlayerLudoStatsRepository playerLudoStatsRepository;
 
 
     @Autowired
-    public LudoChipService(LudoChipRepository ludoChipRepository, LudoBoardService ludoBoardService, PlayerLudoStatsRepository playerLudoStatsRepository,
-                           LudoMatchService ludoMatchService) {
+    public LudoChipService(LudoChipRepository ludoChipRepository, LudoMatchService ludoMatchService) {
         this.ludoChipRepository = ludoChipRepository;
-        this.ludoBoardService = ludoBoardService;
         this.ludoMatchService = ludoMatchService;
-        this.playerLudoStatsRepository=playerLudoStatsRepository;
 
     }
     @Transactional

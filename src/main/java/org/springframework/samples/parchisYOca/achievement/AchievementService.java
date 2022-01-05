@@ -14,11 +14,6 @@ public class AchievementService {
     private AchievementRepository achievementRepository;
 
     @Transactional(readOnly = true)
-    public int achievementCount() throws DataAccessException {
-        return (int) achievementRepository.count();
-    }
-
-    @Transactional(readOnly = true)
     public Iterable<Achievement> findAll() throws DataAccessException{
         return achievementRepository.findAll();
     }
