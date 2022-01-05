@@ -10,7 +10,7 @@ import org.hibernate.envers.NotAudited;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
-import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.samples.parchisYOca.model.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
