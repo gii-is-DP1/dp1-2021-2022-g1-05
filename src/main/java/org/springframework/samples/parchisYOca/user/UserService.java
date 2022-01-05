@@ -16,11 +16,6 @@ public class UserService {
     private UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public int userCount() throws DataAccessException {
-        return (int) userRepository.count();
-    }
-
-    @Transactional(readOnly = true)
     public Iterable<User> findAll() throws DataAccessException{
         return userRepository.findAll();
     }
@@ -41,8 +36,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    @Transactional
-    public Boolean isAuthenticated() throws DataAccessException {
+    public Boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Boolean ac = false;
 
