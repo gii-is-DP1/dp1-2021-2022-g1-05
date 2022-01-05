@@ -265,7 +265,7 @@ public class PlayerController {
     }
 
     @GetMapping(path="/players/{playerId}/matchStats/{matchCode}")
-    public ModelAndView gooseMatchesOfPlayer(@PathVariable("playerId") int playerId,
+    public ModelAndView statsOfPlayerInMatch(@PathVariable("playerId") int playerId,
                                              @PathVariable("matchCode") String matchCode){
         ModelAndView mav = new ModelAndView("stats/userStatsInAMatch");
         Optional<Player> playerOptional = playerService.findPlayerById(playerId);
@@ -280,6 +280,24 @@ public class PlayerController {
             PlayerLudoStats stats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(username,match.getId()).get();
             mav.addObject("ludoStats", stats);
         }
+        return mav;
+    }
+
+    @GetMapping(path="/stats")
+    public ModelAndView totalStats(){
+        ModelAndView mav = new ModelAndView("stats/totalStats");
+        Iterable<PlayerGooseStats> iterableGooseStats = playerGooseStatsService.findAll();
+        Iterable<PlayerLudoStats> iterableLudoStats = playerLudoStatsService.findAll();
+        Set<PlayerGooseStats> setGooseStats = new HashSet<>();
+        iterableGooseStats.forEach(setGooseStats::add);
+        Set<PlayerLudoStats> setLudoStats = new HashSet<>();
+        iterableLudoStats.forEach(setLudoStats::add);
+
+        PlayerGooseStats totalGooseStats = playerGooseStatsService.sumStats(setGooseStats);
+        PlayerLudoStats totalLudoStats = playerLudoStatsService.sumStats(setLudoStats);
+
+        mav.addObject("gooseStats", totalGooseStats);
+        mav.addObject("ludoStats", totalLudoStats);
         return mav;
     }
 

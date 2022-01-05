@@ -39,6 +39,11 @@ public class PlayerGooseStatsService {
     }
 
     @Transactional(readOnly = true)
+    public Iterable<PlayerGooseStats> findAll() throws DataAccessException {
+        return playerGooseStatsRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
     public Optional<PlayerGooseStats> findGooseStatsByUsernamedAndMatchId(String username, Integer matchId) throws DataAccessException {
         return playerGooseStatsRepository.findPlayerGooseStatsByUsernamedAndMatchId(username, matchId);
     }
