@@ -7,7 +7,7 @@ import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.samples.parchisYOca.model.BaseEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

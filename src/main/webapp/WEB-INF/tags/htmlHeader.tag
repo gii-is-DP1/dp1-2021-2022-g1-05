@@ -1,7 +1,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <%--
-PetClinic :: a Spring Framework demonstration
+Flippingboards :: Your ludo and goose app
 --%>
 
 <head>
@@ -17,8 +17,8 @@ PetClinic :: a Spring Framework demonstration
     <title>Flipping Boards - Ludo and goose game</title>
 
     <%-- CSS generated from LESS --%>
-    <spring:url value="/resources/css/petclinic.css" var="petclinicCss"/>
-    <link href="${petclinicCss}" rel="stylesheet"/>
+    <spring:url value="/resources/css/flippingboards.css" var="flippingboardsCss"/>
+    <link href="${flippingboardsCss}" rel="stylesheet"/>
 
 
     <%-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries --%>
