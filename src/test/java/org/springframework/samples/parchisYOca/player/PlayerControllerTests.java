@@ -31,9 +31,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = PlayerController.class, 
-excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
-classes = WebSecurityConfigurer.class), 
+@WebMvcTest(controllers = PlayerController.class,
+excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class PlayerControllerTests {
@@ -41,8 +41,6 @@ public class PlayerControllerTests {
     private static final String PASSWORD = "1234567";
     private static final String USERNAME = "Juan";
     private static final String EMAIL = "Juant@gmail.com";
-    private static final Boolean TRUE = true;
-    private static final Boolean FALSE = true;
     private static final String AUTH = "admin";
     private static final String NEW_PASSWORD = "ABCd34";
     private static final String NEW_EMAIL = "jjjuan@domain.com";
@@ -52,9 +50,9 @@ public class PlayerControllerTests {
     private static final String MATCH_CODE = "ABCdef";
     private static final Integer WINNER = 1;
     private static final Integer MATCH_ID = 1;
-    
 
-    
+
+
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -69,7 +67,7 @@ public class PlayerControllerTests {
     private GooseMatchService gooseMatchService;
     @MockBean
     private LudoMatchService ludoMatchService;
-    
+
 
     @BeforeEach
     void setup() {
@@ -84,7 +82,7 @@ public class PlayerControllerTests {
     	Authorities authJuan = new Authorities();
     	authJuan.setAuthority(AUTH);
     	authJuan.setId(ID);
-    	userJuan.setEnabled(TRUE);
+    	userJuan.setEnabled(true);
     	userJuan.setPassword(PASSWORD);
     	userJuan.setUsername(USERNAME);
     	Juan.setUser(userJuan);
@@ -111,7 +109,7 @@ public class PlayerControllerTests {
     	lMatch.setStats(setLStats);
     	Optional<LudoMatch> oLudoMatch = Optional.of(lMatch);
     	Set<LudoMatch> setLudoM = Set.of(lMatch);
-    	given(this.userService.isAuthenticated()).willReturn(TRUE);
+    	given(this.userService.isAuthenticated()).willReturn(true);
     	given(this.playerService.findPlayerByUsername(USERNAME)).willReturn(oJuan);
     	given(this.pGooseStatsService.findPlayerGooseStatsByUsername(USERNAME)).willReturn(setGStats);
     	given(this.pLudoStatsService.findPlayerLudoStatsByUsername(USERNAME)).willReturn(setLStats);
