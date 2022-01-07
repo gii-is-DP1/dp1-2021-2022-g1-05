@@ -6,6 +6,78 @@
 <%@ taglib prefix="ParchisYOca" tagdir="/WEB-INF/tags" %>
 
 <ParchisYOca:layout pageName="gooseMatch">
+    <h3>Ranking by ludo games won</h3>
+    <table id="statsTable" class="table table-striped">
+        <thead>
+        <th>Player</th>
+        <th>Wins</th>
+        </thead>
+        <tbody>
+        <c:forEach items="${top3LudoWins}" var="top3LudoWins">
+            <tr>
+                <td><c:out value="${top3LudoWins.player.user.username}"/></td>
+                <td><c:out value="${top3LudoWins.hasWon}"/></td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
+
+    <br>
+
+    <h3>Ranking by goose games won</h3>
+    <table id="statsTable" class="table table-striped">
+        <thead>
+            <th>Player</th>
+            <th>Wins</th>
+        </thead>
+        <tbody>
+            <c:forEach items="${top3GooseWins}" var="top3GooseWins">
+                <tr>
+                    <td><c:out value="${top3GooseWins.player.user.username}"/></td>
+                    <td><c:out value="${top3GooseWins.hasWon}"/></td>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
+
+    <br>
+
+    <h3>Ranking by token eatens in ludo</h3>
+    <table id="statsTable" class="table table-striped">
+        <thead>
+        <th>Player</th>
+        <th>Ludo eaten tokens</th>
+        </thead>
+        <tbody>
+        <c:forEach items="${top3EatenTokens}" var="top3EatenTokens">
+            <tr>
+                <td><c:out value="${top3EatenTokens.player.user.username}"/></td>
+                <td><c:out value="${top3EatenTokens.eatenTokens}"/></td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
+
+    <br>
+
+    <h3>Ranking by times landed on goose squares</h3>
+    <table id="statsTable" class="table table-striped">
+        <thead>
+        <th>Player</th>
+        <th>Goose squares landed on</th>
+        </thead>
+        <tbody>
+        <c:forEach items="${top3GooseSquares}" var="top3GooseSquares">
+            <tr>
+                <td><c:out value="${top3GooseSquares.player.user.username}"/></td>
+                <td><c:out value="${top3GooseSquares.landedGeese}"/></td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
+
+    <br>
+
     <h3>Played stats</h3>
     <table id="statsPlayerTable" class="table table-striped">
         <thead>
@@ -76,6 +148,9 @@
     </table>
 
     <br>
+
+    <h3>Global stats</h3>
+    <p>Aqui deben ir medias de partidas, duraciones y usuarios por partidas</p>
 
 
 </ParchisYOca:layout>

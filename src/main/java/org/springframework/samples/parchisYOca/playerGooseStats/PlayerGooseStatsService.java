@@ -8,8 +8,7 @@ import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsSe
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PlayerGooseStatsService {
@@ -36,6 +35,62 @@ public class PlayerGooseStatsService {
             stats.setHasWon(pgs.getHasWon() + stats.getHasWon());
         }
         return stats;
+    }
+
+    //Used to show rankings
+    private Map<String, PlayerGooseStats> sumStatsByPlayer(Collection<PlayerGooseStats> statsList){
+        Map<String, PlayerGooseStats> map = new HashMap<>();
+        for(PlayerGooseStats pgs : statsList){
+            String username = pgs.getPlayer().getUser().getUsername();
+            if(map.containsKey(username)){
+                PlayerGooseStats stats = map.get(username);
+                List<PlayerGooseStats> statsToSum = List.of(stats,pgs);
+                PlayerGooseStats statsToAdd = sumStats(statsToSum);
+                statsToAdd.setPlayer(pgs.getPlayer());
+                map.put(username, statsToAdd);
+            }else{
+                map.put(username, pgs);
+            }
+        }
+        return map;
+    }
+
+    //Used to show rankings
+    public List<PlayerGooseStats> top3MostGooseWins(Set<PlayerGooseStats> setGooseStats, String statToCheck){
+        Map<String, PlayerGooseStats> gooseStatsByPlayer = sumStatsByPlayer(setGooseStats);
+        PlayerGooseStats most = new PlayerGooseStats();
+        PlayerGooseStats secondMost = new PlayerGooseStats();
+        PlayerGooseStats thirdMost = new PlayerGooseStats();
+
+        for(PlayerGooseStats pgs : gooseStatsByPlayer.values()){
+            if(statToCheck.equals("mostWins")){
+                Integer wins = pgs.getHasWon();
+                if(wins >= most.getHasWon()){
+                    thirdMost = secondMost;
+                    secondMost = most;
+                    most = pgs;
+                } else if(wins >= secondMost.getHasWon()){
+                    thirdMost = secondMost;
+                    secondMost = pgs;
+                } else if (wins >= thirdMost.getHasWon()){
+                    thirdMost = pgs;
+                }
+            }else{
+                Integer gooses = pgs.getLandedGeese();
+                if(gooses >= most.getLandedGeese()){
+                    thirdMost = secondMost;
+                    secondMost = most;
+                    most = pgs;
+                } else if(gooses >= secondMost.getLandedGeese()){
+                    thirdMost = secondMost;
+                    secondMost = pgs;
+                } else if (gooses >= thirdMost.getLandedGeese()){
+                    thirdMost = pgs;
+                }
+            }
+
+        }
+        return List.of(most, secondMost, thirdMost);
     }
 
     @Transactional(readOnly = true)
