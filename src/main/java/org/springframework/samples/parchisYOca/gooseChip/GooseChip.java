@@ -59,7 +59,7 @@ public class GooseChip extends BaseEntity {
 
 
     public static Integer getPositionXInPixels(Integer position, Integer inGameId) {
-    	Integer positionX = null;
+    	Integer positionX = 0;
     	if(firstColum.getFirst().contains(position)) {positionX = firstColum.getSecond();}
     	if(secondColum.getFirst().contains(position)) {positionX = secondColum.getSecond();}
     	if(thirdColum.getFirst().contains(position)) {positionX = thirdColum.getSecond();}
@@ -73,7 +73,7 @@ public class GooseChip extends BaseEntity {
     	return positionX + displacement;
     }
     public static Integer getPositionYInPixels(Integer position, Integer inGameId) {
-    	Integer positionY = null;
+    	Integer positionY = 0;
     	if(firstRow.getFirst().contains(position)) {positionY = firstRow.getSecond();}
     	if(secondRow.getFirst().contains(position)) {positionY = secondRow.getSecond();}
     	if(thirdRow.getFirst().contains(position)) {positionY = thirdRow.getSecond();}
