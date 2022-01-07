@@ -150,6 +150,18 @@ public class LudoMatchController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
+            //Block to check if the player joined through malicious url
+            Boolean isPlayerInLobby = false;
+            for(PlayerLudoStats pls : ludoMatch.getStats()){
+                if(pls.getPlayer().getUser().getUsername().equals(authenticatedUser.getUsername())){
+                    isPlayerInLobby = true;
+                }
+            }
+
+            if(isPlayerInLobby == false){
+                return "redirect:/";
+            }
+
             modelMap.addAttribute("numberOfPlayers", ludoMatch.getStats().size());
             if(playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), ludoMatch.getId()).isPresent()) {
                 modelMap.addAttribute("isOwner", playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), ludoMatch.getId()).get().getIsOwner());
