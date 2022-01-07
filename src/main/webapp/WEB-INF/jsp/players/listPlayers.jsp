@@ -12,8 +12,8 @@
 
     <form:form class="form-horizontal" id="player-id-form">
         <div class="form-group has-feedback" style="margin-left: 2%">
-            <label for="Username" style="margin-right: 0.5%">Username:</label>
-            <input type="text" name="Username" id="Username" placeholder="Enter a userName">
+            <label for="Username" style="margin-right: 0.5%">Username: (leave blank to not filter)</label>
+            <input type="text" name="Username" id="Username" placeholder="Enter a userName ">
         </div>
         <div class="form-group">
             <div class="col-sm col-sm-10" style="margin-left: 2%">

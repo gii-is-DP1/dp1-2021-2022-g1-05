@@ -6,8 +6,7 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PlayerLudoStatsService {
@@ -28,6 +27,61 @@ public class PlayerLudoStatsService {
             stats.setHasWon(pls.getHasWon() + stats.getHasWon());
         }
         return stats;
+    }
+
+    //Used to show rankings
+    public Map<String, PlayerLudoStats> sumStatsByPlayer(Collection<PlayerLudoStats> statsList){
+        Map<String, PlayerLudoStats> map = new HashMap<>();
+        for(PlayerLudoStats pls : statsList){
+            String username = pls.getPlayer().getUser().getUsername();
+            if(!map.containsKey(username)){
+                map.put(username, pls);
+            }else{
+                PlayerLudoStats stats = map.get(username);
+                List<PlayerLudoStats> statsToSum = List.of(stats,pls);
+                PlayerLudoStats statsToAdd = sumStats(statsToSum);
+                map.put(username, statsToAdd);
+            }
+        }
+        return map;
+    }
+
+    //Used to show rankings
+    public List<PlayerLudoStats> top3MostLudoWins(Set<PlayerLudoStats> setLudoStats, String statToCheck){
+        Map<String, PlayerLudoStats> ludoStatsByPlayer = sumStatsByPlayer(setLudoStats);
+        PlayerLudoStats most = new PlayerLudoStats();
+        PlayerLudoStats secondMost = new PlayerLudoStats();
+        PlayerLudoStats thirdMost = new PlayerLudoStats();
+
+        for(PlayerLudoStats pls : ludoStatsByPlayer.values()){
+            if(statToCheck.equals("mostWins")){
+                Integer wins = pls.getHasWon();
+                if(wins >= most.getHasWon()){
+                    thirdMost = secondMost;
+                    secondMost = most;
+                    most = pls;
+                } else if(wins >= secondMost.getHasWon()){
+                    thirdMost = secondMost;
+                    secondMost = pls;
+                } else if (wins >= thirdMost.getHasWon()){
+                    thirdMost = pls;
+                }
+            }else{
+                Integer eatenTokens = pls.getEatenTokens();
+                if(eatenTokens >= most.getHasWon()){
+                    thirdMost = secondMost;
+                    secondMost = most;
+                    most = pls;
+                } else if(eatenTokens >= secondMost.getEatenTokens()){
+                    most = secondMost;
+                    secondMost = pls;
+                } else if (eatenTokens >= thirdMost.getEatenTokens()){
+                    thirdMost = pls;
+                }
+            }
+
+        }
+        return List.of(most, secondMost, thirdMost);
     }
 
     @Autowired

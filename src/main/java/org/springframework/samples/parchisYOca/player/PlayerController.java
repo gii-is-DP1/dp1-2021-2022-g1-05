@@ -295,7 +295,18 @@ public class PlayerController {
 
         PlayerGooseStats totalGooseStats = playerGooseStatsService.sumStats(setGooseStats);
         PlayerLudoStats totalLudoStats = playerLudoStatsService.sumStats(setLudoStats);
+        List<PlayerGooseStats> top3MostGooseWins = playerGooseStatsService.top3MostGooseWins(setGooseStats, "mostWins");
+        List<PlayerGooseStats> top3MostGooseSquares = playerGooseStatsService.top3MostGooseWins(setGooseStats, "mostSquares");
+        List<PlayerLudoStats> top3MostLudoWins = playerLudoStatsService.top3MostLudoWins(setLudoStats, "mostWins");
+        List<PlayerLudoStats> top3MostLudoEatenTokens = playerLudoStatsService.top3MostLudoWins(setLudoStats, "eatenTokens");
 
+
+        mav.addObject("numberOfLudoGames", setLudoStats.size());
+        mav.addObject("numberOfGooseGames", setGooseStats.size());
+        mav.addObject("top3GooseSquares", top3MostGooseSquares);
+        mav.addObject("top3GooseWins", top3MostGooseWins);
+        mav.addObject("top3EatenTokens", top3MostLudoEatenTokens);
+        mav.addObject("top3LudoWins", top3MostLudoWins);
         mav.addObject("gooseStats", totalGooseStats);
         mav.addObject("ludoStats", totalLudoStats);
         return mav;
