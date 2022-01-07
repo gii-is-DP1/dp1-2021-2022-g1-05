@@ -151,6 +151,18 @@ public class GooseMatchController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
+            //Block to check if the player joined through malicious url
+            Boolean isPlayerInLobby = false;
+            for(PlayerGooseStats pgs : gooseMatch.getStats()){
+                if(pgs.getPlayer().getUser().getUsername().equals(authenticatedUser.getUsername())){
+                    isPlayerInLobby = true;
+                }
+            }
+
+            if(isPlayerInLobby == false){
+                return "redirect:/";
+            }
+
             modelMap.addAttribute("numberOfPlayers", gooseMatch.getStats().size());
             if(playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), gooseMatch.getId()).isPresent()){
                 modelMap.addAttribute("isOwner", playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), gooseMatch.getId()).get().getIsOwner());
