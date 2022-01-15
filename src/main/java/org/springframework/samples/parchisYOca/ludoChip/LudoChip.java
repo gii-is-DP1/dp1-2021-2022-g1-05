@@ -7,6 +7,8 @@ import org.springframework.samples.parchisYOca.util.Color;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -14,6 +16,16 @@ import javax.persistence.ManyToOne;
 @Setter
 @Entity
 public class LudoChip  extends BaseEntity {
+	private static final Integer NARROW_TILE = 42;
+	private static final Integer WIDE_TILE = 90;
+	private static final Integer BORDER_WIDTH=14;
+	private static final Integer HOME_DISPLACEMENT=170;
+	private static final Integer X_HOME_R = 53;
+	private static final Integer X_HOME_L= 633;
+	private static final Integer Y_HOME_T = 53;
+	private static final Integer Y_HOME_B = 633;
+	
+	
 
     private Integer position;
     private Color color;
@@ -60,4 +72,81 @@ public class LudoChip  extends BaseEntity {
     	}
 
     }
+    public Integer getX() {
+    	Integer x = null;
+    	switch(gameState) {
+    	case earlyGame:
+    		x = getXHome() + getXHomeDislpacement();
+    		break;
+    	case midGame:
+    		break;
+    	case endGame:
+    		break;
+    	}
+    	return x;
+    }
+    public Integer getY() {
+    	Integer y = null;
+    	switch(gameState) {
+    	case earlyGame:
+    		y = getYHome() + getYHomeDislpacement();
+    		break;
+    	case midGame:
+    		break;
+    	case endGame:
+    		break;
+    	}
+    	return y;
+    }
+    public Integer getXHome() {
+    	switch(inGamePlayerId) {
+		case 0:
+			return X_HOME_R;
+		case 1:
+			return X_HOME_R;
+		case 2:
+			return X_HOME_L;
+		case 3:
+			return X_HOME_L;
+		default:
+			return null;
+    	}
+    	
+    }
+    public Integer getYHome() {
+    	switch(inGamePlayerId) {
+		case 0:
+			return Y_HOME_T;
+		case 1:
+			return Y_HOME_B;
+		case 2:
+			return Y_HOME_T;
+		case 3:
+			return Y_HOME_B;
+		default:
+			return null;
+    	}
+    }
+    public Integer getXHomeDislpacement() {
+    	switch(inGameChipId) {
+    	case 1:
+    		return HOME_DISPLACEMENT;
+    	case 3:
+    		return HOME_DISPLACEMENT;
+    	default:
+    		return 0;
+    	}
+    }
+    public Integer getYHomeDislpacement() {
+    	switch(inGameChipId) {
+    	case 2:
+    		return HOME_DISPLACEMENT;
+    	case 3:
+    		return HOME_DISPLACEMENT;
+    	default:
+    		return 0;
+    	}
+    }
+    
+    
 }

@@ -28,8 +28,8 @@ public class LudoBoard extends BaseEntity {
 
     public LudoBoard(){
         this.background= "../resources/images/LudoBoard.png";
-        this.width=1000;
-        this.height=1000;
+        this.width=900;
+        this.height=900;
     }
 
     @OneToOne(mappedBy = "board")

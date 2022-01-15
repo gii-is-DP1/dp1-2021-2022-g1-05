@@ -89,7 +89,7 @@
             <div class="tablero">
                 <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
                 <c:forEach items="${chips}" var="chip">
-
+					<%-- <ParchisYOca:ludoChip size=20 chip=chip position=chip.getPosition()/> --%>
                 </c:forEach>
             </div>
         </div>
