@@ -106,6 +106,11 @@ public class PlayerLudoStatsService {
         return playerLudoStatsRepository.findPlayerLudoStatsByUsername(username);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<PlayerLudoStats> findPlayerLudoStatsByInGameIdAndMatchId(Integer inGameId,Integer matchId){
+        return playerLudoStatsRepository.findPlayerLudoStatsByInGameIdAndMatchId(inGameId,matchId);
+    }
+
     @Transactional
     public PlayerLudoStats saveStats(PlayerLudoStats playerLudoStats) throws DataAccessException {
         return playerLudoStatsRepository.save(playerLudoStats);
@@ -120,4 +125,5 @@ public class PlayerLudoStatsService {
     public void removeAllLudoStatsFromGame(Integer ludoMatchId) throws DataAccessException {
         playerLudoStatsRepository.deleteStatsFromGame(ludoMatchId);
     }
+
 }

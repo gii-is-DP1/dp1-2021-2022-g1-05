@@ -21,6 +21,10 @@ public class LudoChipService {
     private static final List<Integer> SAFE_TILES = Arrays.asList(4,11,16,21,28,33,38,45,50,55,62,67);
     private static final Integer FIVE = 5;
     private static final Map<Color, Integer> FIRST_TILES = Map.of(Color.Red, 38, Color.Yellow, 4, Color.Green, 55, Color.Blue, 21);
+    public static final Integer PRIMER_DADO_5=0;
+    public static final Integer SEGUNDO_DADO_5=1;
+    public static final Integer SUMA_DADOS_5=2;
+    public static final Integer DOS_DADOS_5=3;
 
 
     private LudoChipRepository ludoChipRepository;
@@ -86,13 +90,13 @@ public class LudoChipService {
 
     public Integer diceFlag(Integer firstDice, Integer secondDice) {
         if(firstDice == FIVE) {
-            return 0;
+            return PRIMER_DADO_5;
         } else if(secondDice == FIVE) {
-            return 1;
+            return SEGUNDO_DADO_5;
         } else if(firstDice+secondDice == FIVE) {
-            return 2;
+            return SUMA_DADOS_5;
         } else if(firstDice == FIVE && secondDice == FIVE) {
-            return 3;
+            return DOS_DADOS_5;
         }
         return -1;
     }
