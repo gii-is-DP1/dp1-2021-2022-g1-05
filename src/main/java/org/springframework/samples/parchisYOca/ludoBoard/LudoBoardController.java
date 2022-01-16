@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +38,7 @@ public class LudoBoardController {
     public static final int INDICE_SEGUNDO_DADO = 1;
     public static final int INDICE_SUMA_DADOS = 2;
 
-
+    private int[] dicesToCheck;
 
     @Autowired
     public LudoBoardController(UserService userService, PlayerLudoStatsService playerLudoStatsService, LudoChipService ludoChipService,
@@ -48,15 +49,26 @@ public class LudoBoardController {
         this.ludoMatchService = ludoMatchService;
     }
 
+    public void populateModel(Map<String, Object> model, Integer matchId, int[] dicesToShow) {
+        LudoMatch match = ludoMatchService.findludoMatchById(matchId).get();
+        model.put("stats", match.getStats());
+        model.put("chips", ludoChipService.findChipsByMatchId(matchId));
+        model.put("firstDice", dicesToShow[INDICE_PRIMER_DADO]);
+        model.put("secondDice", dicesToShow[INDICE_SEGUNDO_DADO]);
+        model.put("sumDice", dicesToShow[INDICE_SUMA_DADOS]);
+        model.put("ludoBoard", ludoMatchService.findludoMatchById(match.getId()).get().getBoard());
+    }
+
     @GetMapping(value="/ludoInGame/dicesRolled")
     public String ludoDicesRolled(HttpSession session, Map<String, Object> model){
-        Integer matchId = (Integer) session.getAttribute("matchId");
-        int[] rolledDices = (int[])session.getAttribute("dices");
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+
+            Integer matchId = (Integer) session.getAttribute("matchId");
+            int[] dicesToShow = (int[])session.getAttribute("dices");
 
             PlayerLudoStats inGamePlayerStats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(
                 authenticatedUser.getUsername(), matchId).get();
@@ -65,44 +77,41 @@ public class LudoBoardController {
 
             //putting things in the model
             model.put("dicesRolled", 1);
-            LudoMatch match = ludoMatchService.findludoMatchById(matchId).get();
-            model.put("stats", match.getStats());
-            model.put("chips", ludoChipService.findChipsByMatchId(matchId));
-            model.put("firstDice", rolledDices[INDICE_PRIMER_DADO]);
-            model.put("secondDice", rolledDices[INDICE_SEGUNDO_DADO]);
-            model.put("sumDice", rolledDices[INDICE_SUMA_DADOS]);
-            model.put("ludoBoard", ludoMatchService.findludoMatchById(match.getId()).get().getBoard());
+            model.put("diceIndex", 0);
+            populateModel(model, matchId, dicesToShow);
+
+            dicesToCheck = dicesToShow;
 
             for(LudoChip lc : ludoChips){
                 Integer inGameId = inGamePlayerStats.getInGameId();
                 //To check that the chip belongs to the player
                 if(lc.getInGamePlayerId() == inGameId){
                     LudoChip loggedPlayerChip = lc;
-                    boolean flagDobles = rolledDices[INDICE_PRIMER_DADO] == rolledDices[INDICE_SEGUNDO_DADO];
+
 
                     //Comprobar si ha sacado 5 y tiene fichas en base
-                    if(rolledDices[INDICE_PRIMER_DADO] == 5 || rolledDices[INDICE_SEGUNDO_DADO] == 5 ||
-                        rolledDices[INDICE_SUMA_DADOS] == 5) {
-                        Integer diceCode = ludoChipService.manageFives(inGameId,matchId, rolledDices[INDICE_PRIMER_DADO], rolledDices[INDICE_SEGUNDO_DADO]);
+                    if(dicesToCheck[INDICE_PRIMER_DADO] == 5 || dicesToCheck[INDICE_SEGUNDO_DADO] == 5 ||
+                        dicesToCheck[INDICE_SUMA_DADOS] == 5) {
+                        Integer diceCode = ludoChipService.manageFives(inGameId,matchId, dicesToCheck[INDICE_PRIMER_DADO], dicesToCheck[INDICE_SEGUNDO_DADO]);
                         model.put("diceCode", diceCode);
                         if(diceCode==0){
-                            rolledDices[INDICE_PRIMER_DADO]=0;
-                            rolledDices[INDICE_SUMA_DADOS]=rolledDices[INDICE_SUMA_DADOS]-rolledDices[INDICE_PRIMER_DADO];
+                            dicesToCheck[INDICE_PRIMER_DADO]=0;
+                            dicesToCheck[INDICE_SUMA_DADOS]=dicesToCheck[INDICE_SUMA_DADOS]-dicesToCheck[INDICE_PRIMER_DADO];
                         }
                         else if(diceCode==1){
-                            rolledDices[INDICE_SEGUNDO_DADO]=0;
-                            rolledDices[INDICE_SUMA_DADOS]=rolledDices[INDICE_SUMA_DADOS]-rolledDices[INDICE_SEGUNDO_DADO];
+                            dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+                            dicesToCheck[INDICE_SUMA_DADOS]=dicesToCheck[INDICE_SUMA_DADOS]-dicesToCheck[INDICE_SEGUNDO_DADO];
                         }
                         else if(diceCode==2){
-                            rolledDices[INDICE_PRIMER_DADO]=0;
-                            rolledDices[INDICE_SEGUNDO_DADO]=0;
-                            rolledDices[INDICE_SUMA_DADOS]=0;
+                            dicesToCheck[INDICE_PRIMER_DADO]=0;
+                            dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+                            dicesToCheck[INDICE_SUMA_DADOS]=0;
 
                         } else if(diceCode == 3){
                             //TODO cuando saque dos cincos tiene que no dejarte tener el turno y tirar de nuevo los dados
-                            rolledDices[INDICE_PRIMER_DADO]=0;
-                            rolledDices[INDICE_SEGUNDO_DADO]=0;
-                            rolledDices[INDICE_SUMA_DADOS]=0;
+                            dicesToCheck[INDICE_PRIMER_DADO]=0;
+                            dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+                            dicesToCheck[INDICE_SUMA_DADOS]=0;
                             return "redirect:/ludoMatches/" + matchId;
                         }
                     }
@@ -115,20 +124,43 @@ public class LudoBoardController {
         }
     }
 
-    @GetMapping(value = "/ludoInGame/sumDice/{diceIndex}")
-    public String ludoSumDice(@PathVariable("diceIndex") Integer diceIndex, ModelMap model,
-                               HttpServletRequest request, HttpSession session) {
+    @GetMapping(value = "/ludoInGame/chooseChip/{diceIndex}")
+    public String ludoChooseChip(@PathVariable("diceIndex") Integer diceIndex, ModelMap model, HttpSession session) {
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
 
-            return "matches/ludoSumDice";
+            Integer matchId = (Integer) session.getAttribute("matchId");
+            int[] dicesToShow = (int[])session.getAttribute("dices");
+
+            model.addAttribute("diceIndex", diceIndex);
+            LudoMatch match = ludoMatchService.findludoMatchById(matchId).get();
+            model.put("thisPlayerStats", playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(),matchId).get());
+
+            populateModel(model, matchId, dicesToShow);
+            return "matches/ludoMatch";
         } else {
             return "redirect:/";
         }
 
     }
 
+    @GetMapping(value = "/ludoInGame/sumDice/{diceIndex}/{inGameChipId}")
+    public String ludoSumDice(@PathVariable("diceIndex") Integer diceIndex, @PathVariable("inGameChipId") Integer inGameChipId,
+                              ModelMap model) {
+        Boolean logged = userService.isAuthenticated();
+
+        if(logged==true) {
+            boolean flagDobles = dicesToCheck[INDICE_PRIMER_DADO] == dicesToCheck[INDICE_SEGUNDO_DADO];
+            return "matches/ludoMatch";
+        } else {
+            return "redirect:/";
+        }
+
+
+    }
 
 
 }
