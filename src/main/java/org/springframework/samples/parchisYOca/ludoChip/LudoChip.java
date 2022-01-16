@@ -18,14 +18,14 @@ import javax.persistence.ManyToOne;
 @Setter
 @Entity
 public class LudoChip  extends BaseEntity {
-	/*private static final Integer NARROW_TILE = 42;
+	private static final Integer NARROW_TILE = 42;
 	private static final Integer WIDE_TILE = 90;
 	private static final Integer BORDER_WIDTH=14;
 	private static final Integer HOME_DISPLACEMENT=170;
 	private static final Integer X_HOME_R = 53;
 	private static final Integer X_HOME_L= 633;
 	private static final Integer Y_HOME_T = 53;
-	private static final Integer Y_HOME_B = 633;*/
+	private static final Integer Y_HOME_B = 633;
 	private static final Pair<List<Integer>, Integer> row1 = Pair.of(Arrays.asList(32, 33, 34), 14);
 	private static final Pair<List<Integer>, Integer> row2 = Pair.of(Arrays.asList(31, 35), 53);
 	private static final Pair<List<Integer>, Integer> row3 = Pair.of(Arrays.asList(30, 36), 95);
@@ -115,13 +115,89 @@ public class LudoChip  extends BaseEntity {
     	}
 
     }
-    public Integer getX() {
+    public static Integer getX(LudoChip chip, Boolean isNotAlone) {
     	Integer x = null;
+    	switch(chip.getGameState()) {
+    	case earlyGame:
+    		x = getXHome(chip.getColor(), chip.getInGameChipId());
+    		break;
+    	case midGame:
+    		break;
+    	case endGame:
+    		break;
+    	}
     	return x;
     }
-    public Integer getY() {
+    public static Integer getY(LudoChip chip, Boolean isNotAlone) {
     	Integer y = null;
+    	switch(chip.getGameState()) {
+    	case earlyGame:
+    		y = getYHome(chip.getColor(), chip.getInGameChipId());
+    		break;
+    	case midGame:
+    		break;
+    	case endGame:
+		break;
+	}
     	return y;
+    }
+    public static Integer getXHome(Color color, Integer chipId) {
+    	Integer homeX = null;
+    	Integer disp = null;
+    	switch(color) {
+    	case Red:
+    		homeX = X_HOME_L;
+    		break;
+    	case Green:
+    		homeX = X_HOME_L;
+    		break;
+    	case Blue:
+    		homeX = X_HOME_R;
+    		break;
+    	case Yellow:
+    		homeX = X_HOME_R;
+    		break;
+    	}
+    	switch(chipId) {
+    	case 1:
+    		disp = HOME_DISPLACEMENT;
+    		break;
+    	case 3:
+    		disp = HOME_DISPLACEMENT;
+    		break;
+    	default: 
+    		disp = 0;
+    	}
+    	return homeX + disp;
+    }
+    public static Integer getYHome(Color color, Integer chipId) {
+    	Integer homeY = null;
+    	Integer disp = null;
+    	switch(color) {
+    	case Red:
+    		homeY = Y_HOME_T;
+    		break;
+    	case Green:
+    		homeY = Y_HOME_B;
+    		break;
+    	case Blue:
+    		homeY = Y_HOME_T;
+    		break;
+    	case Yellow:
+    		homeY = Y_HOME_B;
+    		break;
+    	}
+    	switch(chipId) {
+    	case 2:
+    		disp= HOME_DISPLACEMENT;
+    		break;
+    	case 3:
+    		disp = HOME_DISPLACEMENT;
+    		break;
+    	default: 
+    		disp = 0;
+    	}
+    	return homeY + disp;
     }
     
     
