@@ -119,5 +119,5 @@ public class LudoChipService {
         }
         chip.setPosition(chip.getPosition()+movements);
         save(chip);
-    }
+    }a
 }

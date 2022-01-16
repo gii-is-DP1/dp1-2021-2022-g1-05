@@ -110,7 +110,7 @@
                 <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
             </div>
         </div>
-    </div>
+    </div>a
 
 
 
