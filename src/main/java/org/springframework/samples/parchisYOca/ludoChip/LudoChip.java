@@ -22,8 +22,8 @@ public class LudoChip  extends BaseEntity {
 	private static final Integer WIDE_TILE = 90;
 	private static final Integer BORDER_WIDTH=14;
 	private static final Integer HOME_DISPLACEMENT=170;
-	private static final Integer X_HOME_R = 53;
-	private static final Integer X_HOME_L= 633;
+	private static final Integer X_HOME_L = 53;
+	private static final Integer X_HOME_R= 633;
 	private static final Integer Y_HOME_T = 53;
 	private static final Integer Y_HOME_B = 633;
 	private static final Pair<List<Integer>, Integer> row1 = Pair.of(Arrays.asList(32, 33, 34), 14);
@@ -115,26 +115,30 @@ public class LudoChip  extends BaseEntity {
     	}
 
     }
-    public static Integer getX(LudoChip chip, Boolean isNotAlone) {
+    public static Integer getX(Color color,Integer chipId,GameState gameState,
+    		Boolean isNotAlone, Integer position) {
     	Integer x = null;
-    	switch(chip.getGameState()) {
+    	switch(gameState) {
     	case earlyGame:
-    		x = getXHome(chip.getColor(), chip.getInGameChipId());
+    		x = getXHome(color, chipId);
     		break;
     	case midGame:
+    		x = getXMidgame(position, isNotAlone);
     		break;
     	case endGame:
     		break;
     	}
     	return x;
     }
-    public static Integer getY(LudoChip chip, Boolean isNotAlone) {
+    public static Integer getY(Color color,Integer chipId,GameState gameState, 
+    		Boolean isNotAlone, Integer position) {
     	Integer y = null;
-    	switch(chip.getGameState()) {
+    	switch(gameState) {
     	case earlyGame:
-    		y = getYHome(chip.getColor(), chip.getInGameChipId());
+    		y = getYHome(color, chipId);
     		break;
     	case midGame:
+    		y = getYMidgame(position, isNotAlone);
     		break;
     	case endGame:
 		break;
@@ -199,6 +203,50 @@ public class LudoChip  extends BaseEntity {
     	}
     	return homeY + disp;
     }
-    
-    
+    public static Integer getXMidgame(Integer position, Boolean isNotAlone) {
+    	Integer x = null;
+    	if(col1.getFirst().contains(position)) {x = col1.getSecond();}
+    	if(col2.getFirst().contains(position)) {x = col2.getSecond();}
+    	if(col3.getFirst().contains(position)) {x = col3.getSecond();}
+    	if(col4.getFirst().contains(position)) {x = col4.getSecond();}
+    	if(col5.getFirst().contains(position)) {x = col5.getSecond();}
+    	if(col6.getFirst().contains(position)) {x = col6.getSecond();}
+    	if(col7.getFirst().contains(position)) {x = col7.getSecond();}
+    	if(col8.getFirst().contains(position)) {x = col8.getSecond();}
+    	if(col9.getFirst().contains(position)) {x = col9.getSecond();}
+    	if(col10.getFirst().contains(position)) {x = col10.getSecond();}
+    	if(col11.getFirst().contains(position)) {x = col11.getSecond();}
+    	if(col12.getFirst().contains(position)) {x = col12.getSecond();}
+    	if(col13.getFirst().contains(position)) {x = col13.getSecond();}
+    	if(col14.getFirst().contains(position)) {x = col14.getSecond();}
+    	if(col15.getFirst().contains(position)) {x = col15.getSecond();}
+    	if(col16.getFirst().contains(position)) {x = col16.getSecond();}
+    	if(col17.getFirst().contains(position)) {x = col17.getSecond();}
+    	if(corsX4159.getFirst().contains(position)) {x = corsX4159.getSecond();}
+    	if(corsX824.getFirst().contains(position)) {x = corsX824.getSecond();}
+    	return x;
+    }
+    public static Integer getYMidgame(Integer position, Boolean isNotAlone) {
+    	Integer y = null;
+    	if(row1.getFirst().contains(position)) {y = row1.getSecond();}
+    	if(row2.getFirst().contains(position)) {y = row2.getSecond();}
+    	if(row3.getFirst().contains(position)) {y = row3.getSecond();}
+    	if(row4.getFirst().contains(position)) {y = row4.getSecond();}
+    	if(row5.getFirst().contains(position)) {y = row5.getSecond();}
+    	if(row6.getFirst().contains(position)) {y = row6.getSecond();}
+    	if(row7.getFirst().contains(position)) {y = row7.getSecond();}
+    	if(row8.getFirst().contains(position)) {y = row8.getSecond();}
+    	if(row9.getFirst().contains(position)) {y = row9.getSecond();}
+    	if(row10.getFirst().contains(position)) {y = row10.getSecond();}
+    	if(row11.getFirst().contains(position)) {y = row11.getSecond();}
+    	if(row12.getFirst().contains(position)) {y = row12.getSecond();}
+    	if(row13.getFirst().contains(position)) {y = row13.getSecond();}
+    	if(row14.getFirst().contains(position)) {y = row14.getSecond();}
+    	if(row15.getFirst().contains(position)) {y = row15.getSecond();}
+    	if(row16.getFirst().contains(position)) {y = row16.getSecond();}
+    	if(row17.getFirst().contains(position)) {y = row17.getSecond();}
+    	if(corsY2442.getFirst().contains(position)) {y = corsY2442.getSecond();}
+    	if(corsY597.getFirst().contains(position)) {y = corsY597.getSecond();}
+    	return y;
+    }
 }
