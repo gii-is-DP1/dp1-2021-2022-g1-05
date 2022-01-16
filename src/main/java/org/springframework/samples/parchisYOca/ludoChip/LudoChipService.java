@@ -4,9 +4,7 @@ import org.hibernate.envers.tools.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
-import org.springframework.samples.parchisYOca.ludoBoard.LudoBoardService;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
-import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsRepository;
 import org.springframework.samples.parchisYOca.util.Color;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +18,7 @@ public class LudoChipService {
     private static final Integer YELLOW_LAST_TILE = 67;
     private static final Integer GREEN_LAST_TILE = 50;
     private static final Integer BLUE_LAST_TILE = 16;
-    private static final List<Integer> SAVE_TILES = Arrays.asList(4,11,16,21,28,33,38,45,50,55,62,67);
+    private static final List<Integer> SAFE_TILES = Arrays.asList(4,11,16,21,28,33,38,45,50,55,62,67);
     private static final Integer FIVE = 5;
     private static final Map<Color, Integer> FIRST_TILES = Map.of(Color.Red, 38, Color.Yellow, 4, Color.Green, 55, Color.Blue, 21);
 
@@ -113,23 +111,19 @@ public class LudoChipService {
         return new Pair(false,null);
 
     }
-
-    public void move(LudoChip chip,Integer movements,List<LudoChip> chips,Integer inGamePlayerId){
+//  todo gestionar los 20 extra por comer en el controlador
+    public boolean move(LudoChip chip,Integer movements,List<LudoChip> chips,Integer inGamePlayerId){
         for(int i=0;i<movements;i++){
             if(checkCasilla(chip.getPosition()+i,chips).getFirst()) {
                 chip.setPosition(chip.getPosition() + i - 1);
-                //todo mirar si hay ficha en la casilla de antes
                 save(chip);
-                break;
+                return eat(chip.getPosition()+i-1,chips,inGamePlayerId);
             }
-        }
-        if(eat(chip.getPosition()+movements,chips,inGamePlayerId)){
-            //TODO movimientos extra
         }
         chip.setPosition(chip.getPosition()+movements);
         save(chip);
+        return eat(chip.getPosition()+movements,chips,inGamePlayerId);
     }
-
 
     public boolean eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId){
         boolean result=false;
@@ -140,7 +134,7 @@ public class LudoChipService {
             }
         }
         for(LudoChip enemyChip: otherPlayerChips){
-            if(enemyChip.getPosition()==square){
+            if(enemyChip.getPosition()==square && !SAFE_TILES.contains(enemyChip.getPosition())){
                 enemyChip.setGameState(GameState.earlyGame);
                 result=true;
             }

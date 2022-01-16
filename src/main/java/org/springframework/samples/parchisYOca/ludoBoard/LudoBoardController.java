@@ -165,7 +165,8 @@ public class LudoBoardController {
             List<LudoChip> chips =new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
 
             LudoChip chip=ludoChipService.findConcreteChip(matchId,inGameChipId,inGamePlayerId).get();
-            ludoChipService.move(chip,dicesToCheck[diceIndex],chips,inGamePlayerId);
+            boolean hasEaten=ludoChipService.move(chip,dicesToCheck[diceIndex],chips,inGamePlayerId);
+
             return "matches/ludoMatch";
         } else {
             return "redirect:/";
