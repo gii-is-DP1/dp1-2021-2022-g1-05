@@ -2,6 +2,11 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.samples.parchisYOca.achievement.AchievementService;
 import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
@@ -40,19 +45,25 @@ public class LudoMatchController {
     private final PlayerService playerService;
     private final PlayerLudoStatsService playerLudoStatsService;
     private final UserService userService;
+    private final AchievementService achievementService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
     private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
     private static final String REFRESH_RATE_LOBBY = "3";
     private static final String REFRESH_RATE_MATCH = "2";
+    private static final Integer NUMBER_OF_ELEMENTS_PER_PAGE = 6;
 
     @Autowired
-    public LudoMatchController(LudoMatchService ludoMatchService, PlayerService playerService, PlayerLudoStatsService playerLudoStatsService, UserService userService, AuthoritiesService authoritiesService, LudoChipService ludoChipService, LudoBoardService ludoBoardService){
+    public LudoMatchController(LudoMatchService ludoMatchService, PlayerService playerService,
+                               PlayerLudoStatsService playerLudoStatsService, UserService userService,
+                               LudoChipService ludoChipService, AchievementService achievementService,
+                               LudoBoardService ludoBoardService, AuthoritiesService authoritiesService){
         this.ludoMatchService = ludoMatchService;
         this.playerService = playerService;
         this.playerLudoStatsService = playerLudoStatsService;
         this.ludoChipService = ludoChipService;
         this.ludoBoardService = ludoBoardService;
+        this.achievementService = achievementService;
         this.userService = userService;
     }
 
@@ -225,6 +236,12 @@ public class LudoMatchController {
 
             //To show the other players if their game has been closed or has ended
             if(ludoMatchService.findludoMatchById(matchId).get().getEndDate() != null){
+                //Calls achievementService to check new achievements
+                for(PlayerLudoStats pls : match.getStats()){
+                    Collection<PlayerLudoStats> statsInDb = playerLudoStatsService.findPlayerLudoStatsByUsername(pls.getPlayer().getUser().getUsername());
+                    PlayerLudoStats sumStats = playerLudoStatsService.sumStats(statsInDb);
+                    achievementService.checkLudoAchievements(sumStats);
+                }
                 model.addAttribute("hasEnded", 1);
                 if(everyoneExceptOneLeft == true){
                     model.addAttribute("message", "Everyone except you left, so you won!");
@@ -253,16 +270,19 @@ public class LudoMatchController {
     }
 
     @GetMapping(value="/ludoMatches")
-    public String listadoPartidas(ModelMap modelMap){
+    public String listadoPartidas(@RequestParam String page, ModelMap modelMap){
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.desc("startDate")));
+        Slice<LudoMatch> slice = ludoMatchService.findAllPaging(pageable);
         String vista = "matches/listLudoMatches";
-        Iterable<LudoMatch> ludoMatches = ludoMatchService.findAll();
-        modelMap.addAttribute("ludoMatches",ludoMatches);
+        modelMap.addAttribute("numberOfPages", Math.ceil(ludoMatchService.findAll().size()/NUMBER_OF_ELEMENTS_PER_PAGE));
+        modelMap.addAttribute("ludoMatches",slice.getContent());
         return vista;
     }
 
     @PostMapping(value = "/ludoMatches")
-    public String filterLudoMatches(ModelMap modelMap, @RequestParam String filterBy, @RequestParam String date) {
+    public String filterLudoMatches(ModelMap modelMap, @RequestParam String page, @RequestParam String filterBy, @RequestParam String date) {
         String vista = "matches/listLudoMatches";
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.desc("startDate")));
         String[] dateValues = date.split("-");
         if(dateValues.length == 3){
             Calendar correctDate = Calendar.getInstance();
@@ -270,16 +290,20 @@ public class LudoMatchController {
             correctDate.set(Calendar.HOUR_OF_DAY,0);
             Date correctDateRepresentation = correctDate.getTime();
             if(filterBy.equals("startDate")){
-                Collection<LudoMatch> matches = ludoMatchService.findMatchesByStartDate(correctDateRepresentation);
-                modelMap.addAttribute("ludoMatches",matches);
+                Slice<LudoMatch> matches = ludoMatchService.findMatchesByStartDate(correctDateRepresentation, pageable);
+                modelMap.addAttribute("ludoMatches",matches.getContent());
+                modelMap.addAttribute("numberOfPages", Math.ceil(matches.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
             } else{
-                Collection<LudoMatch> matches = ludoMatchService.findMatchesByEndDate(correctDateRepresentation);
-                modelMap.addAttribute("ludoMatches",matches);
+                Slice<LudoMatch> matches = ludoMatchService.findMatchesByEndDate(correctDateRepresentation, pageable);
+                modelMap.addAttribute("ludoMatches",matches.getContent());
+                modelMap.addAttribute("numberOfPages", Math.ceil(matches.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
             }
         }else{
-            Iterable<LudoMatch> ludoMatches = ludoMatchService.findAll();
-            modelMap.addAttribute("ludoMatches",ludoMatches);
+            Slice<LudoMatch> matches = ludoMatchService.findAllPaging(pageable);
+            modelMap.addAttribute("ludoMatches",matches.getContent());
+            modelMap.addAttribute("numberOfPages", Math.ceil(matches.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
         }
+
         return vista;
     }
 
@@ -288,7 +312,7 @@ public class LudoMatchController {
         LudoMatch ludoMatchDb=ludoMatchService.findludoMatchById(matchId).get();
         ludoMatchDb.setEndDate(new Date());
         ludoMatchService.save(ludoMatchDb);
-        return "redirect:/ludoMatches";
+        return "redirect:/ludoMatches?page=0";
 
     }
 

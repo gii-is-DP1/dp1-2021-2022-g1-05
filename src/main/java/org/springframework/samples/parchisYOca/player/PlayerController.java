@@ -1,6 +1,11 @@
 package org.springframework.samples.parchisYOca.player;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
@@ -24,15 +29,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.LongStream;
+
 
 @Controller
 public class PlayerController {
 
     private static final String VIEWS_PLAYER_UPDATE_FORM = "players/UpdatePlayerForm";
+    private static final Integer NUMBER_OF_ELEMENTS_PER_PAGE = 6;
 
 
     private final PlayerService playerService;
@@ -139,25 +143,31 @@ public class PlayerController {
     }
 
     @GetMapping(value = "/players")
-    public String showAllPlayers(ModelMap modelMap) {
-        Iterable<Player> players = playerService.findAll();
+    public String showAllPlayers(@RequestParam String page, ModelMap modelMap) {
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("user.username")));
+        Slice<Player> slice = playerService.findAllPaging(pageable);
         String playersInGame = "";
-        for(Player p : players){
+
+        for(Player p : slice.getContent()){
             if (gooseMatchService.findLobbyByUsername(p.getUser().getUsername()).isPresent() ||
             ludoMatchService.findLobbyByUsername(p.getUser().getUsername()).isPresent()){
                 playersInGame = playersInGame + p.getUser().getUsername() + " ";
             }
         }
-        modelMap.addAttribute("players", players);
+
+        modelMap.addAttribute("numberOfPages", Math.ceil(playerService.findAll().size()/NUMBER_OF_ELEMENTS_PER_PAGE));
+        modelMap.addAttribute("players", slice.getContent());
         modelMap.addAttribute("playersInGame", playersInGame);
         return "players/listPlayers";
     }
 
     @PostMapping(value = "/players")
-    public String filterPlayers(ModelMap modelMap, @RequestParam String Username) {
+    public String filterPlayers(ModelMap modelMap, @RequestParam String page, @RequestParam String Username) {
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("user.username")));
         String vista = "players/listPlayers";
-        Iterable<Player> players = playerService.findAllFilteringByUsername(Username);
-        modelMap.addAttribute("players", players);
+        Slice<Player> players = playerService.findAllFilteringByUsername(Username, pageable);
+        modelMap.addAttribute("players", players.getContent());
+        modelMap.addAttribute("numberOfPages", Math.ceil(players.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
         return vista;
     }
 
@@ -198,35 +208,21 @@ public class PlayerController {
 }
 
     @GetMapping(path="/players/disable/{playerId}")
-    public String disablePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
-        String view = "players/listPlayers";
+    public String disablePlayer(@PathVariable("playerId") int playerId){
         Player player = playerService.findPlayerById(playerId).get();
         if(!player.equals(null)){
             playerService.disable(player);
-            modelMap.addAttribute("message", "Player successfully disabled!");
-            view=showAllPlayers(modelMap);
-
-        }else{
-            modelMap.addAttribute("message", "Player not found!");
-            view=showAllPlayers(modelMap);
         }
-        return view;
+        return "redirect:/players?page=0";
     }
 
     @GetMapping(path="/players/enable/{playerId}")
-    public String enablePlayer(@PathVariable("playerId") int playerId, ModelMap modelMap){
-        String view = "players/listPlayers";
+    public String enablePlayer(@PathVariable("playerId") int playerId){
         Player player = playerService.findPlayerById(playerId).get();
-        if(!player.equals(null)){
+        if(!player.equals(null)) {
             playerService.enable(player);
-            modelMap.addAttribute("message", "Player successfully enabled!");
-            view=showAllPlayers(modelMap);
-
-        }else{
-            modelMap.addAttribute("message", "Player not found!");
-            view=showAllPlayers(modelMap);
         }
-        return view;
+        return "redirect:/players?page=0";
     }
 
     @GetMapping(path="/players/{playerId}/delete")
@@ -257,12 +253,13 @@ public class PlayerController {
     }
 
     @GetMapping(path="/players/{playerId}/ludoMatchesPlayed")
-    public ModelAndView ludoMatchesOfPlayer(@PathVariable("playerId") int playerId){
+    public ModelAndView ludoMatchesOfPlayer(@RequestParam String page, @PathVariable("playerId") int playerId){
         Optional<Player> playerOptional = playerService.findPlayerById(playerId);
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.desc("startDate")));
         ModelAndView mav = new ModelAndView("matches/listMatchesInProfile");
-        Collection<LudoMatch> matches = ludoMatchService.findMatchesByUsername(playerOptional.get().getUser().getUsername());
+        Slice<LudoMatch> matches = ludoMatchService.findMatchesByUsernameWithPaging(playerOptional.get().getUser().getUsername(), pageable);
         Map<LudoMatch,String> matchesAndWinners = new HashMap<>();
-        for(LudoMatch ludoMatch : matches){
+        for(LudoMatch ludoMatch : matches.getContent()){
             if(playerService.findWinnerByLudoMatchCode(ludoMatch.getMatchCode()).isPresent()){
                 String winner = playerService.findWinnerByLudoMatchCode(ludoMatch.getMatchCode()).get().getUser().getUsername();
                 matchesAndWinners.put(ludoMatch, winner);
@@ -271,18 +268,21 @@ public class PlayerController {
                 matchesAndWinners.put(ludoMatch, winner);
             }
         }
+        mav.addObject("gameFrom", "ludo");
         mav.addObject("playerId", playerId);
         mav.addObject("matches", matchesAndWinners);
+        mav.addObject("numberOfPages", Math.ceil(matches.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
         return mav;
     }
 
     @GetMapping(path="/players/{playerId}/gooseMatchesPlayed")
-    public ModelAndView gooseMatchesOfPlayer(@PathVariable("playerId") int playerId){
+    public ModelAndView gooseMatchesOfPlayer(@RequestParam String page, @PathVariable("playerId") int playerId){
         Optional<Player> playerOptional = playerService.findPlayerById(playerId);
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.desc("startDate")));
         ModelAndView mav = new ModelAndView("matches/listMatchesInProfile");
-        Collection<GooseMatch> matches = gooseMatchService.findMatchesByUsername(playerOptional.get().getUser().getUsername());
+        Slice<GooseMatch> matches = gooseMatchService.findMatchesByUsernameWithPaging(playerOptional.get().getUser().getUsername(), pageable);
         Map<GooseMatch,String> matchesAndWinners = new HashMap<>();
-        for(GooseMatch gooseMatch : matches){
+        for(GooseMatch gooseMatch : matches.getContent()){
             if(playerService.findWinnerByGooseMatchCode(gooseMatch.getMatchCode()).isPresent()){
                 String winner = playerService.findWinnerByGooseMatchCode(gooseMatch.getMatchCode()).get().getUser().getUsername();
                 matchesAndWinners.put(gooseMatch, winner);
@@ -291,8 +291,10 @@ public class PlayerController {
                 matchesAndWinners.put(gooseMatch, winner);
             }
         }
+        mav.addObject("gameFrom", "goose");
         mav.addObject("playerId", playerId);
         mav.addObject("matches", matchesAndWinners);
+        mav.addObject("numberOfPages", Math.ceil(matches.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
         return mav;
     }
 

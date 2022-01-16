@@ -2,10 +2,11 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.samples.parchisYOca.player.Player;
-import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsRepository;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,8 +58,13 @@ public class GooseMatchService {
     }
 
     @Transactional(readOnly = true)
-    public Iterable<GooseMatch> findAll() throws DataAccessException{
+    public Collection<GooseMatch> findAll() throws DataAccessException{
         return gooseMatchRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<GooseMatch> findAllPaging(Pageable pageable) throws DataAccessException {
+        return gooseMatchRepository.findAll(pageable);
     }
 
     @Transactional(readOnly=true)
@@ -77,13 +83,18 @@ public class GooseMatchService {
     }
 
     @Transactional(readOnly=true)
-    public Collection<GooseMatch> findMatchesByStartDate(Date date) throws DataAccessException{
-        return gooseMatchRepository.findGooseMatchByStartDate(date);
+    public Slice<GooseMatch> findMatchesByUsernameWithPaging(String username, Pageable pageable) throws DataAccessException{
+        return gooseMatchRepository.findMatchesByUsernameWithPaging(username, pageable);
     }
 
     @Transactional(readOnly=true)
-    public Collection<GooseMatch> findMatchesByEndDate(Date date) throws DataAccessException{
-        return gooseMatchRepository.findGooseMatchByEndDate(date);
+    public Page<GooseMatch> findMatchesByStartDate(Date date, Pageable pageable) throws DataAccessException{
+        return gooseMatchRepository.findGooseMatchByStartDate(date, pageable);
+    }
+
+    @Transactional(readOnly=true)
+    public Page<GooseMatch> findMatchesByEndDate(Date date, Pageable pageable) throws DataAccessException{
+        return gooseMatchRepository.findGooseMatchByEndDate(date, pageable);
     }
 
     @Transactional

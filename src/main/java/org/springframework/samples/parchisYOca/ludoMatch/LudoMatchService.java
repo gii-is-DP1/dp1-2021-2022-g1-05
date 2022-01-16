@@ -2,6 +2,9 @@ package org.springframework.samples.parchisYOca.ludoMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
@@ -33,8 +36,13 @@ public class LudoMatchService {
     }
 
     @Transactional(readOnly = true)
-    public Iterable<LudoMatch> findAll() throws DataAccessException{
+    public Collection<LudoMatch> findAll() throws DataAccessException{
         return ludoMatchRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<LudoMatch> findAllPaging(Pageable pageable) throws DataAccessException{
+        return ludoMatchRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -52,14 +60,19 @@ public class LudoMatchService {
         return ludoMatchRepository.findMatchesByUsername(username);
     }
 
-    @Transactional(readOnly=true)
-    public Collection<LudoMatch> findMatchesByStartDate(Date date) throws DataAccessException{
-        return ludoMatchRepository.findLudoMatchByStartDate(date);
+    @Transactional(readOnly = true)
+    public Slice<LudoMatch> findMatchesByUsernameWithPaging(String username, Pageable pageable) throws DataAccessException{
+        return ludoMatchRepository.findMatchesByUsernameWithPaging(username, pageable);
     }
 
     @Transactional(readOnly=true)
-    public Collection<LudoMatch> findMatchesByEndDate(Date date) throws DataAccessException{
-        return ludoMatchRepository.findLudoMatchByEndDate(date);
+    public Page<LudoMatch> findMatchesByStartDate(Date date, Pageable pageable) throws DataAccessException{
+        return ludoMatchRepository.findLudoMatchByStartDate(date, pageable);
+    }
+
+    @Transactional(readOnly=true)
+    public Page<LudoMatch> findMatchesByEndDate(Date date, Pageable pageable) throws DataAccessException{
+        return ludoMatchRepository.findLudoMatchByEndDate(date, pageable);
     }
 
     @Transactional

@@ -2,6 +2,8 @@ package org.springframework.samples.parchisYOca.achievement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.samples.parchisYOca.achievement.exceptions.AchievementAlreadyExists;
 import org.springframework.samples.parchisYOca.achievement.exceptions.NameAlreadyExists;
 import org.springframework.samples.parchisYOca.player.Player;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,6 +32,11 @@ public class AchievementService {
     @Transactional(readOnly = true)
     public Iterable<Achievement> findAll() throws DataAccessException{
         return achievementRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<Achievement> findAllPaging(Pageable pageable) throws DataAccessException{
+        return achievementRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -57,7 +63,7 @@ public class AchievementService {
 
     @Transactional
     public void delete(Achievement achievement) throws DataAccessException{
-        Iterable<Player> players = playerService.findAll();
+        Collection<Player> players = playerService.findAll();
         for(Player p : players){
             Set<Achievement> achievements = p.getAchievements();
             if(achievements.contains(achievement)){

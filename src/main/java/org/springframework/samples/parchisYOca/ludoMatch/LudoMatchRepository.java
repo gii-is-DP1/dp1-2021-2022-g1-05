@@ -1,9 +1,9 @@
 package org.springframework.samples.parchisYOca.ludoMatch;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
@@ -19,13 +19,18 @@ public interface LudoMatchRepository extends CrudRepository<LudoMatch, Integer> 
     @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch JOIN FETCH ludoMatch.stats stats WHERE stats.player.user.username = :username")
     Collection<LudoMatch> findMatchesByUsername(String username);
 
+    @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch JOIN ludoMatch.stats stats WHERE stats.player.user.username = :username")
+    Page<LudoMatch> findMatchesByUsernameWithPaging(String username, Pageable pageable);
+
     @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch WHERE ludoMatch.startDate > :date")
-    Collection<LudoMatch> findLudoMatchByStartDate(Date date);
+    Page<LudoMatch> findLudoMatchByStartDate(Date date, Pageable pageable);
 
     @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch WHERE ludoMatch.endDate > :date")
-    Collection<LudoMatch> findLudoMatchByEndDate(Date date);
+    Page<LudoMatch> findLudoMatchByEndDate(Date date, Pageable pageable);
 
     @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch WHERE ludoMatch.endDate is not null")
     Collection<LudoMatch> findEndedLudoMatches();
 
+    Collection<LudoMatch> findAll();
+    Page<LudoMatch> findAll(Pageable pageable);
 }

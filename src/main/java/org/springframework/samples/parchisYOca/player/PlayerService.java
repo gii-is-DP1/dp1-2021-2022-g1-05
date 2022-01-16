@@ -2,14 +2,15 @@ package org.springframework.samples.parchisYOca.player;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
-import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.samples.parchisYOca.user.AuthoritiesService;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
 
 
@@ -82,13 +83,18 @@ public class PlayerService {
     }
 
     @Transactional(readOnly = true)
-    public Iterable<Player> findAll() throws DataAccessException {
+    public Collection<Player> findAll() throws DataAccessException {
         return playerRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public Iterable<Player> findAllFilteringByUsername(String username) throws DataAccessException {
-        return playerRepository.findAllPlayersFilterByUsername(username);
+    public Slice<Player> findAllPaging(Pageable pageable) throws DataAccessException {
+        return playerRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<Player> findAllFilteringByUsername(String username, Pageable pageable) throws DataAccessException {
+        return playerRepository.findAllPlayersFilterByUsername(username, pageable);
     }
 
     @Transactional
