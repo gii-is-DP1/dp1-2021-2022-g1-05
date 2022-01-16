@@ -108,6 +108,9 @@
                     </c:choose>
                 </c:forEach>
                 <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
+                <c:forEach items="${chips}" var="chip">
+                    <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
+                </c:forEach>
             </div>
         </div>
     </div>
