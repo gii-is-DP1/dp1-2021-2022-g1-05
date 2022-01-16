@@ -41,6 +41,7 @@ public class PlayerLudoStatsService {
                 PlayerLudoStats stats = map.get(username);
                 List<PlayerLudoStats> statsToSum = List.of(stats,pls);
                 PlayerLudoStats statsToAdd = sumStats(statsToSum);
+                stats.setPlayer(pls.getPlayer());
                 map.put(username, statsToAdd);
             }
         }
@@ -74,7 +75,7 @@ public class PlayerLudoStatsService {
                     secondMost = most;
                     most = pls;
                 } else if(eatenTokens >= secondMost.getEatenTokens()){
-                    most = secondMost;
+                    thirdMost = secondMost;
                     secondMost = pls;
                 } else if (eatenTokens >= thirdMost.getEatenTokens()){
                     thirdMost = pls;
