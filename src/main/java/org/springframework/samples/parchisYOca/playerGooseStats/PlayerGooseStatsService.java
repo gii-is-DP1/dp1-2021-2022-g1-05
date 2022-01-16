@@ -33,6 +33,7 @@ public class PlayerGooseStatsService {
             stats.setLandedInn(pgs.getLandedInn() + stats.getLandedInn());
             stats.setLandedJails(pgs.getLandedJails() + stats.getLandedJails());
             stats.setHasWon(pgs.getHasWon() + stats.getHasWon());
+            stats.setPlayer(pgs.getPlayer());
         }
         return stats;
     }

@@ -46,13 +46,14 @@
 
             <br>
 
-            <h3>Player achievements</h3>
+            <h3>Player achievements unlocked</h3>
 
             <table id="achievementsPlayerTable" class="table table-striped">
                 <thead>
                 <tr>
                     <th style="width: 150px;">Achievement name</th>
                     <th style="width: 200px;">Achievement description</th>
+                    <th style="width: 200px;">Achievement number to beat</th>
 
                 </tr>
                 </thead>
@@ -64,6 +65,9 @@
                     </td>
                     <td>
                         <c:out value="${achievement.description}"/>
+                    </td>
+                    <td>
+                        <c:out value="${achievement.numberToBeat}"/>
                     </td>
 
                     </c:forEach>
@@ -144,6 +148,13 @@
             <br>
 
             <h3>Played matches</h3>
+            <h4>Number of total goose games played by you: <c:out value="${numberOfGooseGames}"></c:out></h4>
+            <h4>Number of total ludo games played by you: <c:out value="${numberOfLudoGames}"></c:out></h4>
+            <h4>Number of total games played by you: <c:out value="${numberOfGooseGames + numberOfLudoGames}"></c:out></h4>
+            <h4>Average duration of the goose games played by you: <c:out value="${averageGooseDuration}"></c:out></h4>
+            <h4>Average duration of the ludo games by you: <c:out value="${averageLudoDuration}"></c:out></h4>
+
+            <br>
 
             <spring:url value="{playerId}/ludoMatchesPlayed" var="editUrl">
                 <spring:param name="playerId" value="${player.id}"/>

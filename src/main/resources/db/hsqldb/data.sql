@@ -1,6 +1,6 @@
-INSERT INTO achievements(id, name, description) VALUES(1, 'NombreAchievement1', 'Descripción achievement 1');
-INSERT INTO achievements(id, name, description) VALUES(2, 'NombreAchievement2', 'Descripción achievement 2');
-INSERT INTO achievements(id, name, description) VALUES(3, 'NombreAchievement3', 'Descripción achievement 3');
+INSERT INTO achievements(id, name, description, number_to_beat) VALUES(1, 'Walk 20 times on goose square', 'Number of times landed on goose squares', 20);
+INSERT INTO achievements(id, name, description, number_to_beat) VALUES(2, 'Walk 20 times on goose square', 'Number of times landed on goose squares', 100);
+INSERT INTO achievements(id, name, description, number_to_beat) VALUES(3, 'Win 20 goose games', 'Number of goose games won', 20);
 
 INSERT INTO users(username, password, enabled) VALUES('ManuK', '1234567', 'true');
 INSERT INTO users(username, password, enabled) VALUES('marioespiro', 'admin121', 'true');
@@ -26,11 +26,6 @@ INSERT INTO authorities(id, authority, username) VALUES(5, 'player', 'jose');
 INSERT INTO authorities(id, authority, username) VALUES(6, 'player', 'antonio');
 INSERT INTO authorities(id, authority, username) VALUES(7, 'player', 'paco');
 
---INSERT INTO ludo_Matches(id, match_Code) VALUES(1, '111111');
---INSERT INTO goose_Matches(id, match_Code, board_id) VALUES(1, '111111', 1);
-
-INSERT INTO achievements_players(achievements_id, players_id) VALUES(2, 1);
-INSERT INTO achievements_players(achievements_id, players_id) VALUES(3, 1);
 
 
 

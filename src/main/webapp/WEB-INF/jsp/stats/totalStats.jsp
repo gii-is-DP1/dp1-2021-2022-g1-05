@@ -6,6 +6,16 @@
 <%@ taglib prefix="ParchisYOca" tagdir="/WEB-INF/tags" %>
 
 <ParchisYOca:layout pageName="gooseMatch">
+
+    <h3>Global stats</h3>
+    <h4>Number of total goose games: <c:out value="${numberOfGooseGames}"></c:out></h4>
+    <h4>Number of total ludo games: <c:out value="${numberOfLudoGames}"></c:out></h4>
+    <h4>Number of total games: <c:out value="${numberOfLudoGames + numberOfGooseGames}"></c:out></h4>
+    <h4>Average duration of goose games: <c:out value="${averageGooseDuration}"></c:out></h4>
+    <h4>Average duration of ludo games: <c:out value="${averageLudoDuration}"></c:out></h4>
+
+    <br>
+
     <h3>Ranking by ludo games won</h3>
     <table id="statsTable" class="table table-striped">
         <thead>
@@ -149,8 +159,7 @@
 
     <br>
 
-    <h3>Global stats</h3>
-    <p>Aqui deben ir medias de partidas, duraciones y usuarios por partidas</p>
+
 
 
 </ParchisYOca:layout>
