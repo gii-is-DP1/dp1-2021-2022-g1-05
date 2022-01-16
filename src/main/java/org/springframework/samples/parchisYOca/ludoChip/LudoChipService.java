@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoardService;
-import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchRepository;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsRepository;
 import org.springframework.samples.parchisYOca.util.Color;
@@ -36,6 +35,12 @@ public class LudoChipService {
         this.ludoMatchService = ludoMatchService;
 
     }
+
+    @Transactional
+    public Optional<LudoChip> findConcreteChip(Integer matchId, Integer inGameChipId, Integer inGamePlayerId){
+        return ludoChipRepository.findChip(matchId,inGameChipId,inGamePlayerId);
+    }
+
     @Transactional
     public Collection<LudoChip> findChipsByMatchId(Integer matchId) throws DataAccessException {
         return ludoChipRepository.findChipsByMatchId(matchId);
@@ -109,15 +114,38 @@ public class LudoChipService {
 
     }
 
-    public void move(LudoChip chip,Integer movements,List<LudoChip> chips){
+    public void move(LudoChip chip,Integer movements,List<LudoChip> chips,Integer inGamePlayerId){
         for(int i=0;i<movements;i++){
             if(checkCasilla(chip.getPosition()+i,chips).getFirst()) {
                 chip.setPosition(chip.getPosition() + i - 1);
+                //todo mirar si hay ficha en la casilla de antes
                 save(chip);
                 break;
             }
         }
+        if(eat(chip.getPosition()+movements,chips,inGamePlayerId)){
+            //TODO movimientos extra
+        }
         chip.setPosition(chip.getPosition()+movements);
         save(chip);
     }
+
+
+    public boolean eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId){
+        boolean result=false;
+        List<LudoChip> otherPlayerChips = new ArrayList<>();
+        for(LudoChip chip: chips){
+            if(!(chip.getInGamePlayerId()==inGamePlayerId)){
+                otherPlayerChips.add(chip);
+            }
+        }
+        for(LudoChip enemyChip: otherPlayerChips){
+            if(enemyChip.getPosition()==square){
+                enemyChip.setGameState(GameState.earlyGame);
+                result=true;
+            }
+        }
+        return result;
+    }
+
 }
