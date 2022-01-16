@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
@@ -22,6 +23,7 @@ import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -102,7 +104,7 @@ public class PlayerControllerTests {
     	Juan.setGooseStats(setGStats);
     	Juan.setLudoStats(setLStats);
     	Optional<Player> oJuan = Optional.of(Juan);
-    	Set<Player> playerSet = Set.of(Juan);
+    	List<Player> playerSet = List.of(Juan);
     	gMatch.setStats(setGStats);
     	Optional<GooseMatch> oGooseMatch = Optional.of(gMatch);
     	Set<GooseMatch> setGooseM = Set.of(gMatch);
@@ -119,7 +121,7 @@ public class PlayerControllerTests {
     	given(this.playerService.findAll()).willReturn(playerSet);
     	given(this.gooseMatchService.findLobbyByUsername(USERNAME)).willReturn(oGooseMatch);
     	given(this.ludoMatchService.findLobbyByUsername(USERNAME)).willReturn(oLudoMatch);
-    	given(this.playerService.findAllFilteringByUsername(USERNAME)).willReturn(playerSet);
+    	given(this.playerService.findAllFilteringByUsername(USERNAME, Pageable.unpaged()).getContent()).willReturn(playerSet);
     	given(this.ludoMatchService.findMatchesByUsername(USERNAME)).willReturn(setLudoM);
     	given(this.gooseMatchService.findMatchesByUsername(USERNAME)).willReturn(setGooseM);
     	given(this.gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE)).willReturn(oGooseMatch);

@@ -32,24 +32,24 @@
 				</flippingboards:menuItem>
 
                 <sec:authorize access="hasAuthority('admin')">
-                    <flippingboards:menuItem active="${name eq 'owners'}" url="/players"
+                    <flippingboards:menuItem active="${name eq 'players'}" url="/players?page=0"
                         title="find players">
                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                         <span>Players</span>
                     </flippingboards:menuItem>
-                    <flippingboards:menuItem active="${name eq 'ludoMatches'}" url="/ludoMatches"
+                    <flippingboards:menuItem active="${name eq 'ludoMatches'}" url="/ludoMatches?page=0"
                          title="find ludo matches">
                         <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                         <span>Ludo</span>
                     </flippingboards:menuItem>
-                    <flippingboards:menuItem active="${name eq 'gooseMatches'}" url="/gooseMatches"
+                    <flippingboards:menuItem active="${name eq 'gooseMatches'}" url="/gooseMatches?page=0"
                                              title="find goose matches">
                         <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                         <span>Goose</span>
                     </flippingboards:menuItem>
 
                 </sec:authorize>
-                <flippingboards:menuItem active="${name eq 'achievements'}" url="/achievements"
+                <flippingboards:menuItem active="${name eq 'achievements'}" url="/achievements?page=0"
                                          title="global achievement list">
                     <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
                     <span>Achievements</span>

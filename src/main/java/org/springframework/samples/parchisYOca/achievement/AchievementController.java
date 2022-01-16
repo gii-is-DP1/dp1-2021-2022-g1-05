@@ -1,6 +1,10 @@
 package org.springframework.samples.parchisYOca.achievement;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.samples.parchisYOca.achievement.exceptions.AchievementAlreadyExists;
 import org.springframework.samples.parchisYOca.achievement.exceptions.NameAlreadyExists;
 import org.springframework.samples.parchisYOca.player.Player;
@@ -13,10 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -29,6 +30,7 @@ public class AchievementController {
         "Number of times landed on dice squares", "Number of goose games won");
     private final List<String> LUDO_DESCRIPTIONS = List.of("Number of eaten tokens",
         "Number of walked squares", "Number of ludo games won");
+    private static final Integer NUMBER_OF_ELEMENTS_PER_PAGE = 5;
 
     @Autowired
     private AchievementService achievementService;
@@ -40,10 +42,12 @@ public class AchievementController {
     private PlayerService playerService;
 
     @GetMapping()
-    public String listadoLogros(ModelMap modelMap){
+    public String listadoLogros(@RequestParam String page, ModelMap modelMap){
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("name")));
         String vista = "achievements/listAchievements";
-        Iterable<Achievement> achievements = achievementService.findAll();
-        modelMap.addAttribute("achievements",achievements);
+        Slice<Achievement> achievements = achievementService.findAllPaging(pageable);
+        modelMap.addAttribute("achievements",achievements.getContent());
+        modelMap.addAttribute("numberOfPages", Math.ceil(achievements.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true) {
@@ -102,21 +106,15 @@ public class AchievementController {
             }
 
         }
-        return "redirect:/achievements";
+        return "redirect:/achievements?page=0";
     }
 
     @GetMapping(path="/delete/{achievementId}")
-    public String borrarLogro(@PathVariable("achievementId") int achievementId, ModelMap modelMap){
+    public String borrarLogro(@PathVariable("achievementId") int achievementId){
         String view = "achievements/listAchievements";
         Optional<Achievement> achievement = achievementService.findAchievementById(achievementId);
         if(achievement.isPresent()){
             achievementService.delete(achievement.get());
-            modelMap.addAttribute("message", "Achievement successfully deleted!");
-            view=listadoLogros(modelMap);
-
-        }else{
-            modelMap.addAttribute("message", "Achievement not found!");
-            view=listadoLogros(modelMap);
         }
         return view;
     }

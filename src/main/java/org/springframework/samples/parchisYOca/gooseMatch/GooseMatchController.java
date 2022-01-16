@@ -1,6 +1,10 @@
 package org.springframework.samples.parchisYOca.gooseMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.achievement.AchievementService;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
@@ -46,6 +50,7 @@ public class GooseMatchController {
     private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
     private static final String REFRESH_RATE_MATCH = "2";
     private static final String REFRESH_RATE_LOBBY = "3";
+    private static final Integer NUMBER_OF_ELEMENTS_PER_PAGE = 6;
 
     @Autowired
     public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService,
@@ -263,16 +268,19 @@ public class GooseMatchController {
     }
 
     @GetMapping(value="/gooseMatches")
-    public String listadoPartidas(ModelMap modelMap){
+    public String listadoPartidas(@RequestParam String page, ModelMap modelMap){
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.desc("startDate")));
+        Slice<GooseMatch> slice = gooseMatchService.findAllPaging(pageable);
         String vista = "matches/listGooseMatches";
-        Iterable<GooseMatch> gooseMatches = gooseMatchService.findAll();
-        modelMap.addAttribute("gooseMatches",gooseMatches);
+        modelMap.addAttribute("numberOfPages", Math.ceil(gooseMatchService.findAll().size()/NUMBER_OF_ELEMENTS_PER_PAGE));
+        modelMap.addAttribute("gooseMatches",slice.getContent());
         return vista;
     }
 
     @PostMapping(value = "/gooseMatches")
-    public String filterGooseMatches(ModelMap modelMap, @RequestParam String filterBy, @RequestParam String date) {
+    public String filterGooseMatches(ModelMap modelMap, @RequestParam String page,  @RequestParam String filterBy, @RequestParam String date) {
         String vista = "matches/listGooseMatches";
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.desc("startDate")));
         String[] dateValues = date.split("-");
         if(dateValues.length == 3){
             Calendar correctDate = Calendar.getInstance();
@@ -280,15 +288,18 @@ public class GooseMatchController {
             correctDate.set(Calendar.HOUR_OF_DAY,0);
             Date correctDateRepresentation = correctDate.getTime();
             if(filterBy.equals("startDate")){
-                Collection<GooseMatch> matches = gooseMatchService.findMatchesByStartDate(correctDateRepresentation);
-                modelMap.addAttribute("gooseMatches",matches);
+                Slice<GooseMatch> matches = gooseMatchService.findMatchesByStartDate(correctDateRepresentation, pageable);
+                modelMap.addAttribute("gooseMatches",matches.getContent());
+                modelMap.addAttribute("numberOfPages", Math.ceil(matches.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
             } else{
-                Collection<GooseMatch> matches = gooseMatchService.findMatchesByEndDate(correctDateRepresentation);
-                modelMap.addAttribute("gooseMatches",matches);
+                Slice<GooseMatch> matches = gooseMatchService.findMatchesByEndDate(correctDateRepresentation, pageable);
+                modelMap.addAttribute("gooseMatches",matches.getContent());
+                modelMap.addAttribute("numberOfPages", Math.ceil(matches.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
             }
         }else{
-            Iterable<GooseMatch> gooseMatches = gooseMatchService.findAll();
-            modelMap.addAttribute("gooseMatches",gooseMatches);
+            Slice<GooseMatch> matches = gooseMatchService.findAllPaging(pageable);
+            modelMap.addAttribute("gooseMatches",matches.getContent());
+            modelMap.addAttribute("numberOfPages", Math.ceil(matches.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
         }
         return vista;
     }
@@ -298,7 +309,7 @@ public class GooseMatchController {
         GooseMatch gooseMatchDb=gooseMatchService.findGooseMatchById(matchId).get();
         gooseMatchDb.setEndDate(new Date());
         gooseMatchService.save(gooseMatchDb);
-        return "redirect:/gooseMatches";
+        return "redirect:/gooseMatches?page=0";
 
     }
 

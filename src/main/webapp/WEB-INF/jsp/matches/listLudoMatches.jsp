@@ -94,4 +94,14 @@
             </c:forEach>
         </tbody>
     </table>
+
+    <div class="row" style="text-align: center">
+        <p>Select page to display: </p>
+        <c:forEach begin="0" end="${numberOfPages}" var="number">
+            <spring:url value="/ludoMatches?page={number}" var="pageUrl">
+                <spring:param name="number" value="${number}"/>
+            </spring:url>
+            <a class="button button-primary" href="${fn:escapeXml(pageUrl)}">${number}</a>
+        </c:forEach>
+    </div>
 </parchisYOca:layout>

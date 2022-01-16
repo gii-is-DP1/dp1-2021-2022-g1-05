@@ -2,6 +2,8 @@ package org.springframework.samples.parchisYOca.player;
 
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -13,8 +15,8 @@ public interface PlayerRepository extends CrudRepository<Player, Integer> {
     @Query("SELECT player FROM Player player JOIN FETCH player.user WHERE player.user.username = :username")
     Optional<Player> findPlayerByUsername(String username) throws DataAccessException;
 
-    @Query("SELECT player FROM Player player JOIN FETCH player.user WHERE player.user.username LIKE CONCAT('%',:username,'%')")
-    Collection<Player> findAllPlayersFilterByUsername(String username) throws DataAccessException;
+    @Query("SELECT player FROM Player player JOIN player.user WHERE player.user.username LIKE CONCAT('%',:username,'%')")
+    Page<Player> findAllPlayersFilterByUsername(String username, Pageable pageable) throws DataAccessException;
 
     @Query("SELECT player FROM Player player  WHERE player.email = :email")
     Optional<Player> findPlayerByEmail(String email) throws DataAccessException;
@@ -24,4 +26,7 @@ public interface PlayerRepository extends CrudRepository<Player, Integer> {
 
     @Query("SELECT pls.player FROM PlayerLudoStats pls WHERE pls.hasWon = 1 AND pls.ludoMatch.matchCode = :matchCode")
     Optional<Player> findWinnerByLudoMatchCode(String matchCode) throws DataAccessException;
+
+    Collection<Player> findAll();
+    Page<Player> findAll(Pageable pageable);
 }

@@ -45,4 +45,33 @@
             </c:forEach>
         </tbody>
     </table>
+
+
+    <c:choose>
+        <c:when test="${gameFrom eq 'ludo'}">
+            <div class="row" style="text-align: center">
+                <p>Select page to display: </p>
+                <c:forEach begin="0" end="${numberOfPages}" var="number">
+                    <spring:url value="/players/{playerId}/ludoMatchesPlayed?page={number}" var="pageUrl">
+                        <spring:param name="number" value="${number}"/>
+                        <spring:param name="playerId" value="${playerId}"/>
+                    </spring:url>
+                    <a class="button button-primary" href="${fn:escapeXml(pageUrl)}">${number}</a>
+                </c:forEach>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div class="row" style="text-align: center">
+                <p>Select page to display: </p>
+                <c:forEach begin="0" end="${numberOfPages}" var="number">
+                    <spring:url value="/players/{playerId}/gooseMatchesPlayed?page={number}" var="pageUrl">
+                        <spring:param name="number" value="${number}"/>
+                        <spring:param name="playerId" value="${playerId}"/>
+                    </spring:url>
+                    <a class="button button-primary" href="${fn:escapeXml(pageUrl)}">${number}</a>
+                </c:forEach>
+            </div>
+        </c:otherwise>
+    </c:choose>
+
 </parchisYOca:layout>

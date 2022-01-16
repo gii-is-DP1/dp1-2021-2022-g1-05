@@ -156,11 +156,11 @@
 
             <br>
 
-            <spring:url value="{playerId}/ludoMatchesPlayed" var="editUrl">
+            <spring:url value="{playerId}/ludoMatchesPlayedpage=0" var="editUrl">
                 <spring:param name="playerId" value="${player.id}"/>
             </spring:url>
             <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Ludo matches</a>
-            <spring:url value="{playerId}/gooseMatchesPlayed" var="editUrl">
+            <spring:url value="{playerId}/gooseMatchesPlayed?page=0" var="editUrl">
                 <spring:param name="playerId" value="${player.id}"/>
             </spring:url>
             <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Goose matches</a>
