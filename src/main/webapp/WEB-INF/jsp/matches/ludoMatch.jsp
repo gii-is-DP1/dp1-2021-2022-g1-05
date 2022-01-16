@@ -57,24 +57,26 @@
             <div class="col-md-3">
                 <c:if test="${dicesRolled ne null}">
                     <p><c:out value="Which dice will you sum first?"/></p>
+                    <spring:url value="/ludoInGame/chooseChip/1" var="chooseChipURL1"></spring:url>
+                    <spring:url value="/ludoInGame/chooseChip/2" var="chooseChipURL2"></spring:url>
                     <c:choose>
                         <c:when test="${diceCode eq 0}">
                             <img src="../resources/images/dado1.png" width="100px" style="opacity: 0.4">
-                            <a href="/ludoInGame/sumDice/2">
+                            <a href="${fn:escapeXml(chooseChipURL2)}">
                                 <img src="../resources/images/dado2.png" width="100px">
                             </a>
                         </c:when>
                         <c:when test="${diceCode eq 1}">
-                            <a href="/ludoInGame/sumDice/1">
+                            <a href="${fn:escapeXml(chooseChipURL1)}">
                                 <img src="../resources/images/dado1.png" width="100px">
                             </a>
                             <img src="../resources/images/dado2.png" width="100px" style="opacity: 0.4">
                         </c:when>
                         <c:otherwise>
-                            <a href="/ludoInGame/sumDice/1">
+                            <a href="${fn:escapeXml(chooseChipURL1)}">
                                 <img src="../resources/images/dado1.png" width="100px">
                             </a>
-                            <a href="/ludoInGame/sumDice/2">
+                            <a href="${fn:escapeXml(chooseChipURL2)}">
                                 <img src="../resources/images/dado2.png" width="100px">
                             </a>
                         </c:otherwise>
@@ -87,10 +89,25 @@
                 <a href="/ludoMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
             </c:if>
             <div class="tablero">
-                <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
+                <%-- <ParchisYOca:ludoChip size=20 chip=chip position=chip.getPosition()/> --%>
+                <!-- TODO Esta infraestructura de enlaces hay que mantenerla, tenlo en cuenta cuando muestres las fichas correctamente -->
                 <c:forEach items="${chips}" var="chip">
-					<%-- <ParchisYOca:ludoChip size=20 chip=chip position=chip.getPosition()/> --%>
+                    <c:choose>
+                        <c:when test="${diceIndex ne 0 and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
+                            <spring:url value="/ludoInGame/sumDice/{diceIndex}/{inGameChipId}" var="sumDiceURL">
+                                <spring:param name="diceIndex" value="${diceIndex}"/>
+                                <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
+                            </spring:url>
+                            <a href="${fn:escapeXml(sumDiceURL)}">
+                                <img src="/resources/images/RED.png" style="width: 50px"/>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <img src="/resources/images/BLUE.png" style="width: 50px"/>
+                        </c:otherwise>
+                    </c:choose>
                 </c:forEach>
+                <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
             </div>
         </div>
     </div>

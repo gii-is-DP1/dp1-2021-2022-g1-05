@@ -27,7 +27,7 @@ public class LudoBoard extends BaseEntity {
     private Integer height;
 
     public LudoBoard(){
-        this.background= "../resources/images/LudoBoard.png";
+        this.background= "/resources/images/LudoBoard.png";
         this.width=900;
         this.height=900;
     }

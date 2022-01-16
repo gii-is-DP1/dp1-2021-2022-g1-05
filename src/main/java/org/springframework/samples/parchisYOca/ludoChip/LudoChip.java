@@ -111,7 +111,7 @@ public class LudoChip  extends BaseEntity {
     		break;
     	case endGame:
     		//ver como posicionar la ficha en esta parte del juego
-    		this.position = null;
+    		this.position = position;
     	}
 
     }

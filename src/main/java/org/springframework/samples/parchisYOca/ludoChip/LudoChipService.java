@@ -48,18 +48,19 @@ public class LudoChipService {
 
     @Transactional
     public Integer manageFives(Integer inGameId,Integer matchId, Integer firstDice, Integer secondDice){
-        List<LudoChip> chips = new ArrayList<>();
+        List<LudoChip> chipsInBase = new ArrayList<>();
         LudoBoard board=ludoMatchService.findludoMatchById(matchId).get().getBoard();
         List<LudoChip> allChips=new ArrayList<>(board.getChips());
         for(int i =0;i<allChips.size();i++){
             if(allChips.get(i).getInGamePlayerId()==inGameId&&allChips.get(i).getGameState().equals(GameState.earlyGame)){
-                chips.add(allChips.get(i));
+                chipsInBase.add(allChips.get(i));
             }
 
         }
 
-        if(!chips.isEmpty()) {
-            LudoChip chipToModify = chips.get(0);
+
+        if(!chipsInBase.isEmpty()) {
+            LudoChip chipToModify = chipsInBase.get(0);
             Color color = chipToModify.getColor();
 
             if(!checkCasilla(FIRST_TILES.get(color), allChips).getFirst()) {
@@ -68,7 +69,7 @@ public class LudoChipService {
                     chipToModify.setGameState(GameState.midGame);
                     chipToModify.setPosition(FIRST_TILES.get(color));
                     save(chipToModify);
-                } else {
+                } else if(result == 3){
                     chipToModify.setGameState(GameState.midGame);
                     chipToModify.setPosition(FIRST_TILES.get(color));
                     save(chipToModify);
@@ -106,5 +107,17 @@ public class LudoChipService {
         }
         return new Pair(false,null);
 
+    }
+
+    public void move(LudoChip chip,Integer movements,List<LudoChip> chips){
+        for(int i=0;i<movements;i++){
+            if(checkCasilla(chip.getPosition()+i,chips).getFirst()) {
+                chip.setPosition(chip.getPosition() + i - 1);
+                save(chip);
+                break;
+            }
+        }
+        chip.setPosition(chip.getPosition()+movements);
+        save(chip);
     }
 }
