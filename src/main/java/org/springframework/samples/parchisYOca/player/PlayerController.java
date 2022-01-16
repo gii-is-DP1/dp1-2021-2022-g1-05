@@ -104,14 +104,18 @@ public class PlayerController {
 
             for(PlayerGooseStats pgs : gooseStatsOfPlayer){
                 GooseMatch gm = pgs.getGooseMatch();
-                Long millis = gm.getEndDate().getTime() - gm.getStartDate().getTime();
-                durationsGoose.add(millis);
+                if(gm.getEndDate() != null){
+                    Long millis = gm.getEndDate().getTime() - gm.getStartDate().getTime();
+                    durationsGoose.add(millis);
+                }
             }
 
             for(PlayerLudoStats pls : ludoStatsOfPlayer){
                 LudoMatch lm = pls.getLudoMatch();
-                Long millis = lm.getEndDate().getTime() - lm.getStartDate().getTime();
-                durationsGoose.add(millis);
+                if(lm.getEndDate() != null){
+                    Long millis = lm.getEndDate().getTime() - lm.getStartDate().getTime();
+                    durationsGoose.add(millis);
+                }
             }
 
             String averageGoose = Durations.listDurationsToString(durationsGoose);
@@ -320,8 +324,8 @@ public class PlayerController {
         iterableGooseStats.forEach(setGooseStats::add);
         Set<PlayerLudoStats> setLudoStats = new HashSet<>();
         iterableLudoStats.forEach(setLudoStats::add);
-        Iterable<GooseMatch> gooseMatches = gooseMatchService.findAll();
-        Iterable<LudoMatch> ludoMatches = ludoMatchService.findAll();
+        Iterable<GooseMatch> gooseMatches = gooseMatchService.findEndedGooseMatches();
+        Iterable<LudoMatch> ludoMatches = ludoMatchService.findEndedLudoMatches();
         Integer numberOfGooseMatches = 0;
         Integer numberOfLudoMatches = 0;
         List<Long> durationsGoose = new ArrayList<>();

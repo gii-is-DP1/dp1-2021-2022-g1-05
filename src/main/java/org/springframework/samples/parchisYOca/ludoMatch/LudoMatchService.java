@@ -22,8 +22,6 @@ public class LudoMatchService {
         this.playerLudoStatsService = playerLudoStatsService;
     }
 
-
-
     @Transactional(readOnly = true)
     public Optional<LudoMatch> findludoMatchByMatchCode(String matchCode) throws DataAccessException{
         return ludoMatchRepository.findMatchByMatchCode(matchCode);
@@ -42,6 +40,11 @@ public class LudoMatchService {
     @Transactional(readOnly = true)
     public Optional<LudoMatch> findLobbyByUsername(String username) throws DataAccessException{
         return ludoMatchRepository.findLobbyByUsername(username);
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<LudoMatch> findEndedLudoMatches() throws DataAccessException{
+        return ludoMatchRepository.findEndedLudoMatches();
     }
 
     @Transactional(readOnly = true)
