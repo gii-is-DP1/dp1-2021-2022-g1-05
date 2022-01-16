@@ -67,6 +67,11 @@ public class GooseMatchService {
     }
 
     @Transactional(readOnly=true)
+    public Collection<GooseMatch> findEndedGooseMatches() throws DataAccessException{
+        return gooseMatchRepository.findEndedGooseMatches();
+    }
+
+    @Transactional(readOnly=true)
     public Collection<GooseMatch> findMatchesByUsername(String username) throws DataAccessException{
         return gooseMatchRepository.findMatchesByUsername(username);
     }

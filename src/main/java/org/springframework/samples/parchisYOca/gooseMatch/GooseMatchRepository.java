@@ -24,6 +24,9 @@ public interface GooseMatchRepository extends CrudRepository<GooseMatch, Integer
     @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch WHERE gooseMatch.endDate > :date")
     Collection<GooseMatch> findGooseMatchByEndDate(Date date);
 
+    @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch WHERE gooseMatch.endDate is not null")
+    Collection<GooseMatch> findEndedGooseMatches();
+
 
 
 

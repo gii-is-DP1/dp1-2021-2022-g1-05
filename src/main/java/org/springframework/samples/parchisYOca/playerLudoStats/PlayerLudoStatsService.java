@@ -25,6 +25,7 @@ public class PlayerLudoStatsService {
             stats.setScoredTokens(pls.getScoredTokens() + stats.getScoredTokens());
             stats.setWalkedSquares(pls.getWalkedSquares() + stats.getWalkedSquares());
             stats.setHasWon(pls.getHasWon() + stats.getHasWon());
+            stats.setPlayer(pls.getPlayer());
         }
         return stats;
     }
