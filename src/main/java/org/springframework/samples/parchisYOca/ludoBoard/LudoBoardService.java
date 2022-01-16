@@ -13,10 +13,11 @@ import java.util.Set;
 
 @Service
 public class LudoBoardService {
+
     private LudoBoardRepository ludoBoardRepository;
     private LudoChipRepository ludoChipRepository;
 
-    //TODO Esto de aqui abajo revisarlo
+
     @Autowired
     public LudoBoardService(LudoBoardRepository ludoBoardRepository,LudoChipRepository ludoChipRepository){
         this.ludoBoardRepository=ludoBoardRepository;
@@ -27,7 +28,7 @@ public class LudoBoardService {
         return ludoBoardRepository.findById(id).get();
     }
 
-    //TODO revisar las posiciones originales
+
     @Transactional(readOnly=true)
     public LudoBoard save(LudoBoard ludoBoard, Set<PlayerLudoStats> playerLudoStats) throws DataAccessException {
         LudoBoard ludoBoardDb=ludoBoardRepository.save(ludoBoard);

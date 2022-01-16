@@ -51,13 +51,14 @@ public class GooseBoardController {
 
     @GetMapping(value = "/gooseInGame/dicesRolled")
     public String gooseDicesRolled(HttpSession session) throws InvalidChipPositionException {
-        Integer matchId = (Integer) session.getAttribute("matchId");
-        int[] rolledDices = (int[])session.getAttribute("dices");
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+
+            Integer matchId = (Integer) session.getAttribute("matchId");
+            int[] rolledDices = (int[])session.getAttribute("dices");
 
             PlayerGooseStats inGamePlayerStats = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(
                 authenticatedUser.getUsername(), matchId).get();
@@ -136,7 +137,7 @@ public class GooseBoardController {
             	session.setAttribute("especial", "Don't try that silly boy");
             	return "redirect:/gooseMatches/"+matchId;
             }
-            
+
         }else{
             return "redirect:/";
         }

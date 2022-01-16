@@ -231,6 +231,7 @@ public class LudoMatchController {
                 }
             }
             model.put("ludoBoard", ludoMatchService.findludoMatchById(match.getId()).get().getBoard());
+            model.put("diceIndex", 0);
 
             return view;
         }else{

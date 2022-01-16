@@ -22,7 +22,7 @@
                                                 <c:out value="${chip.getColor()}-> ${stat.player.user.username}: EN CASA"/>
                                             </c:when>
                                             <c:otherwise>
-                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position}"/>
+                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
                                             </c:otherwise>
                                         </c:choose>
                                     </p></li>
@@ -60,21 +60,21 @@
                     <c:choose>
                         <c:when test="${diceCode eq 0}">
                             <img src="../resources/images/dado1.png" width="100px" style="opacity: 0.4">
-                            <a href="/ludoInGame/sumDice/2">
+                            <a href="/ludoInGame/chooseChip/2">
                                 <img src="../resources/images/dado2.png" width="100px">
                             </a>
                         </c:when>
                         <c:when test="${diceCode eq 1}">
-                            <a href="/ludoInGame/sumDice/1">
+                            <a href="/ludoInGame/chooseChip/1">
                                 <img src="../resources/images/dado1.png" width="100px">
                             </a>
                             <img src="../resources/images/dado2.png" width="100px" style="opacity: 0.4">
                         </c:when>
                         <c:otherwise>
-                            <a href="/ludoInGame/sumDice/1">
+                            <a href="/ludoInGame/chooseChip/1">
                                 <img src="../resources/images/dado1.png" width="100px">
                             </a>
-                            <a href="/ludoInGame/sumDice/2">
+                            <a href="/ludoInGame/chooseChip/2">
                                 <img src="../resources/images/dado2.png" width="100px">
                             </a>
                         </c:otherwise>
@@ -87,10 +87,24 @@
                 <a href="/ludoMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
             </c:if>
             <div class="tablero">
-                <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
+                <!-- TODO Esta infraestructura de enlaces hay que mantenerla, tenlo en cuenta cuando muestres las fichas correctamente -->
                 <c:forEach items="${chips}" var="chip">
-
+                    <c:choose>
+                        <c:when test="${diceIndex ne 0 and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
+                            <spring:url value="/ludoMatches/sumDice/{diceIndex}/{inGameChipId}" var="sumDiceURL">
+                                <spring:param name="diceIndex" value="${diceIndex}"/>
+                                <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
+                            </spring:url>
+                            <a href="${fn:escapeXml(sumDiceURL)}">
+                                <img src="/resources/images/RED.png" style="width: 50px"/>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <img src="/resources/images/BLUE.png" style="width: 50px"/>
+                        </c:otherwise>
+                    </c:choose>
                 </c:forEach>
+                <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
             </div>
         </div>
     </div>
