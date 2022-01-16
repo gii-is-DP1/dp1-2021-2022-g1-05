@@ -48,13 +48,13 @@
                         <span>Goose</span>
                     </flippingboards:menuItem>
 
-                    <flippingboards:menuItem active="${name eq 'achievements'}" url="/achievements"
-                                             title="global achievement list">
-                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                        <span>Achievements</span>
-                    </flippingboards:menuItem>
-
                 </sec:authorize>
+                <flippingboards:menuItem active="${name eq 'achievements'}" url="/achievements"
+                                         title="global achievement list">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                    <span>Achievements</span>
+                </flippingboards:menuItem>
+
                 <flippingboards:menuItem active="${name eq 'stats'}" url="/stats"
                                          title="global stats list">
                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>

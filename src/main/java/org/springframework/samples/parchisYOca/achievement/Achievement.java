@@ -8,6 +8,7 @@ import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -20,13 +21,13 @@ public class Achievement extends BaseEntity {
 
     @NotEmpty
     @Size(min = 3, max = 50)
-    @Column(name = "name", unique=true)
+    @Column(name = "name")
     private String name;
 
     @NotEmpty
     private String description;
 
-    @ManyToMany
-    private Set<Player> players;
+    @NotNull
+    private String numberToBeat;
 
 }

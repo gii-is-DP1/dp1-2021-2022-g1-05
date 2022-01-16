@@ -10,6 +10,7 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.UserService;
+import org.springframework.samples.parchisYOca.util.Durations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +24,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.LongStream;
 
 @Controller
 public class PlayerController {
@@ -89,13 +93,37 @@ public class PlayerController {
                 mav.addObject("hasPermission", "true"); //To check if user has permission to see data
             }
 
+            Collection<PlayerGooseStats> gooseStatsOfPlayer = playerGooseStatsService.findPlayerGooseStatsByUsername(authenticatedUser.getUsername());
+            Collection<PlayerLudoStats> ludoStatsOfPlayer = playerLudoStatsService.findPlayerLudoStatsByUsername(authenticatedUser.getUsername());
+
             //To show user stats
-            PlayerGooseStats pgs = playerGooseStatsService.sumStats(
-                playerGooseStatsService.findPlayerGooseStatsByUsername(authenticatedUser.getUsername()));
-            PlayerLudoStats pls = playerLudoStatsService.sumStats(
-                playerLudoStatsService.findPlayerLudoStatsByUsername(authenticatedUser.getUsername()));
-            mav.addObject("gooseStats", pgs);
-            mav.addObject("ludoStats", pls);
+            PlayerGooseStats playerGooseStats = playerGooseStatsService.sumStats(gooseStatsOfPlayer);
+            PlayerLudoStats playerLudoStats = playerLudoStatsService.sumStats(ludoStatsOfPlayer);
+            List<Long> durationsGoose = new ArrayList<>();
+            List<Long> durationsLudo = new ArrayList<>();
+
+            for(PlayerGooseStats pgs : gooseStatsOfPlayer){
+                GooseMatch gm = pgs.getGooseMatch();
+                Long millis = gm.getEndDate().getTime() - gm.getStartDate().getTime();
+                durationsGoose.add(millis);
+            }
+
+            for(PlayerLudoStats pls : ludoStatsOfPlayer){
+                LudoMatch lm = pls.getLudoMatch();
+                Long millis = lm.getEndDate().getTime() - lm.getStartDate().getTime();
+                durationsGoose.add(millis);
+            }
+
+            String averageGoose = Durations.listDurationsToString(durationsGoose);
+            String averageLudo = Durations.listDurationsToString(durationsLudo);
+
+            mav.addObject("numberOfGooseGames", gooseStatsOfPlayer.size());
+            mav.addObject("numberOfLudoGames", ludoStatsOfPlayer.size());
+            mav.addObject("gooseStats", playerGooseStats);
+            mav.addObject("ludoStats", playerLudoStats);
+            mav.addObject("averageGooseDuration", averageGoose);
+            mav.addObject("averageLudoDuration", averageLudo);
+
 
         }
 
@@ -292,6 +320,28 @@ public class PlayerController {
         iterableGooseStats.forEach(setGooseStats::add);
         Set<PlayerLudoStats> setLudoStats = new HashSet<>();
         iterableLudoStats.forEach(setLudoStats::add);
+        Iterable<GooseMatch> gooseMatches = gooseMatchService.findAll();
+        Iterable<LudoMatch> ludoMatches = ludoMatchService.findAll();
+        Integer numberOfGooseMatches = 0;
+        Integer numberOfLudoMatches = 0;
+        List<Long> durationsGoose = new ArrayList<>();
+        List<Long> durationsLudo = new ArrayList<>();
+
+
+        for(GooseMatch gm : gooseMatches){
+            numberOfGooseMatches++;
+            Long millis = gm.getEndDate().getTime() - gm.getStartDate().getTime();
+            durationsGoose.add(millis);
+        }
+
+        for(LudoMatch lm : ludoMatches){
+            numberOfLudoMatches++;
+            Long millis = lm.getEndDate().getTime() - lm.getStartDate().getTime();
+            durationsGoose.add(millis);
+        }
+
+        String mediaGoose = Durations.listDurationsToString(durationsGoose);
+        String mediaLudo = Durations.listDurationsToString(durationsLudo);
 
         PlayerGooseStats totalGooseStats = playerGooseStatsService.sumStats(setGooseStats);
         PlayerLudoStats totalLudoStats = playerLudoStatsService.sumStats(setLudoStats);
@@ -301,8 +351,10 @@ public class PlayerController {
         List<PlayerLudoStats> top3MostLudoEatenTokens = playerLudoStatsService.top3MostLudoWins(setLudoStats, "eatenTokens");
 
 
-        mav.addObject("numberOfLudoGames", setLudoStats.size());
-        mav.addObject("numberOfGooseGames", setGooseStats.size());
+        mav.addObject("numberOfLudoGames", numberOfGooseMatches);
+        mav.addObject("numberOfGooseGames", numberOfLudoMatches);
+        mav.addObject("averageGooseDuration", mediaGoose);
+        mav.addObject("averageLudoDuration", mediaLudo);
         mav.addObject("top3GooseSquares", top3MostGooseSquares);
         mav.addObject("top3GooseWins", top3MostGooseWins);
         mav.addObject("top3EatenTokens", top3MostLudoEatenTokens);

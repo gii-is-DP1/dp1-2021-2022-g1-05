@@ -1,6 +1,8 @@
 package org.springframework.samples.parchisYOca.gooseMatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.parchisYOca.achievement.Achievement;
+import org.springframework.samples.parchisYOca.achievement.AchievementService;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoardService;
 import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
@@ -38,6 +40,7 @@ public class GooseMatchController {
     private final GooseBoardService gooseBoardService;
     private final GooseChipService gooseChipService;
     private final UserService userService;
+    private final AchievementService achievementService;
 
     private static final Integer MATCH_CODE_LENGTH = 6;
     private static final Integer MAX_NUMBER_OF_PLAYERS = 4;
@@ -47,13 +50,15 @@ public class GooseMatchController {
     @Autowired
     public GooseMatchController(GooseMatchService gooseMatchService, PlayerService playerService,
                                 PlayerGooseStatsService playerGooseStatsService,
-                                GooseBoardService gooseBoardService, GooseChipService gooseChipService, UserService userService){
+                                GooseBoardService gooseBoardService, GooseChipService gooseChipService,
+                                UserService userService, AchievementService achievementService){
         this.gooseMatchService = gooseMatchService;
         this.playerService = playerService;
         this.playerGooseStatsService = playerGooseStatsService;
         this.gooseBoardService = gooseBoardService;
         this.gooseChipService = gooseChipService;
         this.userService = userService;
+        this.achievementService = achievementService;
     }
 
     @GetMapping("/gooseMatches/new")
@@ -217,7 +222,6 @@ public class GooseMatchController {
 
             //Checks if everyone except one left
             Boolean everyoneExceptOneLeft = gooseMatchService.findEveryoneExceptOneLeft(match);
-            System.out.println(everyoneExceptOneLeft);
             if (stats.getPlayerLeft() == 0 && everyoneExceptOneLeft == true) {
                 stats.setHasWon(1);
                 playerGooseStatsService.saveStats(stats);
@@ -226,6 +230,12 @@ public class GooseMatchController {
 
             //To show the other players if their game has been closed or has ended
             if(gooseMatchService.findGooseMatchById(matchId).get().getEndDate() != null){
+                //Calls achievementService to check new achievements
+                for(PlayerGooseStats pgs : match.getStats()){
+                    Collection<PlayerGooseStats> statsInDb = playerGooseStatsService.findPlayerGooseStatsByUsername(pgs.getPlayer().getUser().getUsername());
+                    PlayerGooseStats sumStats = playerGooseStatsService.sumStats(statsInDb);
+                    achievementService.checkGooseAchievements(sumStats);
+                }
                 model.addAttribute("hasEnded", 1);
                 if(everyoneExceptOneLeft == true){
                     model.addAttribute("message", "Everyone except you left, so you won!");

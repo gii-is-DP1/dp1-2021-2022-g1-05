@@ -22,7 +22,7 @@ import java.util.Set;
 @Table(name="players")
 public class Player extends Person implements Serializable { //Implementing serializable to fix an issue
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "players")
+    @ManyToMany(cascade = CascadeType.ALL)
     private Set<Achievement> achievements;
 
     @OneToOne(cascade = CascadeType.ALL)
