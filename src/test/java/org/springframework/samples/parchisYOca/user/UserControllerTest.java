@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
@@ -26,9 +25,9 @@ import java.util.Optional;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.BDDMockito.given;
 
-@WebMvcTest(controllers = UserController.class, 
-excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
-classes = WebSecurityConfigurer.class), 
+@WebMvcTest(controllers = UserController.class,
+excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class UserControllerTest {
@@ -43,7 +42,7 @@ public class UserControllerTest {
 	private static final String EUN_ERROR_MSG = "The username can't be empty";
 	private static final String MAIL_ERROR_MSG = "That email is already taken";
 	private static final String PSSW_ERROR_MSG ="The password must be at least 7 characters long and contain a number";
-	
+
 	@Autowired
     private MockMvc mockMvc;
 	@Autowired
@@ -52,7 +51,7 @@ public class UserControllerTest {
 	private UserService userService;
 	@MockBean
 	private PlayerService playerService;
-	
+
 	@BeforeEach
 	void setup() {
 		Optional<Player> voidOp = Optional.empty();

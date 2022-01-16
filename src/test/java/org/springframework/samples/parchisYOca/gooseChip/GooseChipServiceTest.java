@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 //TODO echar un vistazo a @BeforeEach
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
-public class GooseChipTest {
+public class GooseChipServiceTest {
     @Autowired
     protected GooseChipService gooseChipService;
     @Autowired

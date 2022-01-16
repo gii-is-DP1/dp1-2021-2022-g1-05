@@ -149,11 +149,24 @@ public class LudoBoardController {
 
     @GetMapping(value = "/ludoInGame/sumDice/{diceIndex}/{inGameChipId}")
     public String ludoSumDice(@PathVariable("diceIndex") Integer diceIndex, @PathVariable("inGameChipId") Integer inGameChipId,
-                              ModelMap model) {
+                              ModelMap model,HttpSession session) {
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Integer matchId = (Integer) session.getAttribute("matchId");
+            User authenticatedUser = (User) authentication.getPrincipal();
+
+            PlayerLudoStats pls=playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(),matchId).get();
+            Integer inGamePlayerId=pls.getInGameId();
+
             boolean flagDobles = dicesToCheck[INDICE_PRIMER_DADO] == dicesToCheck[INDICE_SEGUNDO_DADO];
+
+            List<LudoChip> chips =new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
+
+            LudoChip chip=ludoChipService.findConcreteChip(matchId,inGameChipId,inGamePlayerId).get();
+            boolean hasEaten=ludoChipService.move(chip,dicesToCheck[diceIndex],chips,inGamePlayerId);
+
             return "matches/ludoMatch";
         } else {
             return "redirect:/";

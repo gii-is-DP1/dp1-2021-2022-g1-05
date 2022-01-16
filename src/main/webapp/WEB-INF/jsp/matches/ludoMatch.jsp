@@ -89,8 +89,7 @@
                 <a href="/ludoMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
             </c:if>
             <div class="tablero">
-                <%-- <ParchisYOca:ludoChip size=20 chip=chip position=chip.getPosition()/> --%>
-                <!-- TODO Esta infraestructura de enlaces hay que mantenerla, tenlo en cuenta cuando muestres las fichas correctamente -->
+                <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
                 <c:forEach items="${chips}" var="chip">
                     <c:choose>
                         <c:when test="${diceIndex ne 0 and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
@@ -99,18 +98,15 @@
                                 <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
                             </spring:url>
                             <a href="${fn:escapeXml(sumDiceURL)}">
-                                <img src="/resources/images/RED.png" style="width: 50px"/>
+                                <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
                             </a>
                         </c:when>
                         <c:otherwise>
-                            <img src="/resources/images/BLUE.png" style="width: 50px"/>
+                            <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
                         </c:otherwise>
                     </c:choose>
                 </c:forEach>
-                <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
-                <c:forEach items="${chips}" var="chip">
-                    <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
-                </c:forEach>
+
             </div>
         </div>
     </div>
