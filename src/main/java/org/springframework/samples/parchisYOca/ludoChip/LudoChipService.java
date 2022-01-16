@@ -108,4 +108,16 @@ public class LudoChipService {
         return new Pair(false,null);
 
     }
+
+    public void move(LudoChip chip,Integer movements,List<LudoChip> chips){
+        for(int i=0;i<movements;i++){
+            if(checkCasilla(chip.getPosition()+i,chips).getFirst()) {
+                chip.setPosition(chip.getPosition() + i - 1);
+                save(chip);
+                break;
+            }
+        }
+        chip.setPosition(chip.getPosition()+movements);
+        save(chip);
+    }
 }
