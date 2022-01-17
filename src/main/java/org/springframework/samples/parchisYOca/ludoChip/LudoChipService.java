@@ -113,8 +113,8 @@ public class LudoChipService {
             }
         }
         return new Pair(false,null);
-
     }
+
 //  todo gestionar los 20 extra por comer en el controlador
     public boolean move(LudoChip chip,Integer movements,List<LudoChip> chips,Integer inGamePlayerId){
         for(int i=0;i<movements;i++){
@@ -156,4 +156,15 @@ public class LudoChipService {
         }
         return res;
     }
+
+
+    public Boolean checkOcuppied(Integer square, List<LudoChip> chips){
+        for(int i=0;i<chips.size();i++){
+            if(chips.get(i).getGameState() != GameState.earlyGame && chips.get(i).getPosition()==square ){
+               return true;
+            }
+        }
+        return false;
+    }
+
 }
