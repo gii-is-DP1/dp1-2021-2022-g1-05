@@ -16,7 +16,6 @@ import javax.persistence.Table;
 @Setter
 @Entity
 @ToString
-@Audited
 @Table(name="playerGooseStats")
 public class PlayerGooseStats extends BaseEntity {
 
