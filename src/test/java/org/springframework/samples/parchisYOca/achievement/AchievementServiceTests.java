@@ -38,6 +38,7 @@ public class AchievementServiceTests {
         assertThat(addedAchievement).isEqualTo(achievementService.findAchievementById(addedAchievement.getId()).get());
     }
 
+
     @Test
     @Transactional
     public void testAddWithNoName(){
