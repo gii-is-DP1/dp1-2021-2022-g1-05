@@ -28,11 +28,14 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.validation.Valid;
 import java.util.*;
 
 
 @Controller
+@Slf4j
 public class PlayerController {
 
     private static final String VIEWS_PLAYER_UPDATE_FORM = "players/UpdatePlayerForm";
@@ -69,10 +72,12 @@ public class PlayerController {
         if(logged==true) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User currentUser = (User) authentication.getPrincipal();
+            log.info("Showing {}'s profile", currentUser.getUsername());
             Player player = playerService.findPlayerByUsername(currentUser.getUsername()).get();
             Integer playerId = player.getId();
             return "redirect:/players/"+playerId;
         }
+        log.info("Someno who was not logged in tried to see their own profile");
         return "redirect:/";
 
     }
@@ -82,18 +87,20 @@ public class PlayerController {
     public ModelAndView showPlayer(@PathVariable("playerId") int playerId) {
         ModelAndView mav = new ModelAndView("players/playerDetails");
         Boolean logged = userService.isAuthenticated();
-
+        log.info("Showing page of player with id: {}", playerId);
         if(logged == true){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
             Player player = playerService.findPlayerByUsername(authenticatedUser.getUsername()).get();
             List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities()); //Gets lists of authorities
-
+            log.info("Checking {}'s authorities", player.getUser().getUsername());
             if (gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()).isPresent() ||
                 ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()).isPresent()){
+            	log.debug("{} is playing a game", player.getUser().getUsername());
                 mav.addObject("inGame","true"); //Not delete account when in game
             }
             if (playerId == player.getId() || authorities.get(0).toString().equals("admin")){
+            	log.debug("{} is owner of the profile or admin", player.getUser().getUsername());
                 mav.addObject("hasPermission", "true"); //To check if user has permission to see data
             }
 
