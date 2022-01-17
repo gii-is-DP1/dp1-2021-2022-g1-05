@@ -68,8 +68,8 @@ public class LudoChip  extends BaseEntity {
 	private static final Pair<List<Integer>, Integer> corsY597 = Pair.of(Arrays.asList(59,7), 546);
 	private static final Pair<List<Integer>, Integer> corsX4159 = Pair.of(Arrays.asList(41,59), 334);
 	private static final Pair<List<Integer>, Integer> corsX824 = Pair.of(Arrays.asList(8,24), 546);
-    
-	
+
+
 	private Integer position;
     private Color color;
     @Range(min=0, max=3)
@@ -130,7 +130,7 @@ public class LudoChip  extends BaseEntity {
     	}
     	return x;
     }
-    public static Integer getY(Color color,Integer chipId,GameState gameState, 
+    public static Integer getY(Color color,Integer chipId,GameState gameState,
     		Boolean isNotAlone, Integer position) {
     	Integer y = null;
     	switch(gameState) {
@@ -169,7 +169,7 @@ public class LudoChip  extends BaseEntity {
     	case 3:
     		disp = HOME_DISPLACEMENT;
     		break;
-    	default: 
+    	default:
     		disp = 0;
     	}
     	return homeX + disp;
@@ -198,7 +198,7 @@ public class LudoChip  extends BaseEntity {
     	case 3:
     		disp = HOME_DISPLACEMENT;
     		break;
-    	default: 
+    	default:
     		disp = 0;
     	}
     	return homeY + disp;

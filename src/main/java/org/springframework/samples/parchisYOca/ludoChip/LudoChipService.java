@@ -130,12 +130,12 @@ public class LudoChipService {
     public boolean move(LudoChip chip,Integer movements,List<LudoChip> chips,Integer inGamePlayerId, Integer matchId){
         for(int i=1;i<=movements;i++){
             if(checkCasilla(chip.getPosition()+i,chips).getFirst()) {
-                chip.setPosition(chip.getPosition() + i - 1);
+                chip.setPosition(checkCasilla(chip.getPosition()+i,chips).getSecond()-1);
                 save(chip);
                 PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(chip.getInGamePlayerId(), matchId).get();
                 pls.setWalkedSquares(pls.getWalkedSquares()+ i - 1);
                 playerLudoStatsService.saveStats(pls);
-                return eat(chip.getPosition()+i-1,chips,inGamePlayerId, matchId);
+                return eat(chip.getPosition(),chips,inGamePlayerId, matchId);
             }
         }
         chip.setPosition(chip.getPosition()+movements);
@@ -143,7 +143,7 @@ public class LudoChipService {
         PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(chip.getInGamePlayerId(), matchId).get();
         pls.setWalkedSquares(pls.getWalkedSquares()+movements);
         playerLudoStatsService.saveStats(pls);
-        return eat(chip.getPosition()+movements,chips,inGamePlayerId, matchId);
+        return eat(chip.getPosition(),chips,inGamePlayerId, matchId);
     }
 
     public boolean eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId, Integer matchId){
@@ -157,16 +157,19 @@ public class LudoChipService {
         for(LudoChip enemyChip: otherPlayerChips){
             if(enemyChip.getPosition()==square && !SAFE_TILES.contains(enemyChip.getPosition())){
                 enemyChip.setGameState(GameState.earlyGame);
-                result=true;
+                save(enemyChip);
+
                 PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(inGamePlayerId, matchId).get();
                 pls.setEatenTokens(pls.getEatenTokens()+1);
                 playerLudoStatsService.saveStats(pls);
+
+                result=true;
             }
         }
         return result;
     }
 
-    public boolean noChipsOutOfHome(Set<LudoChip> ludoChips, Integer inGameId) {
+    public boolean noChipsOutOfHome(List<LudoChip> ludoChips, Integer inGameId) {
         boolean res=true;
 
         for(LudoChip chip:ludoChips){
@@ -187,4 +190,16 @@ public class LudoChipService {
         return false;
     }
 
+    public List<LudoChip> breakBlocks(List<LudoChip> ludoChips, Integer inGameId) {
+        List<LudoChip> chipsToBreak = new ArrayList<>();
+        for(LudoChip chipToCheck: ludoChips) {
+            if(chipToCheck.getInGamePlayerId() == inGameId) {
+
+                if(checkCasilla(chipToCheck.getPosition(), ludoChips).getFirst()) {
+                    chipsToBreak.add(chipToCheck);
+                }
+            }
+        }
+        return chipsToBreak;
+    }
 }

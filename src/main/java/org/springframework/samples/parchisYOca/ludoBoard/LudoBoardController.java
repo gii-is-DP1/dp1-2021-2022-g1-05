@@ -66,7 +66,7 @@ public class LudoBoardController {
 
             Integer matchId = (Integer) session.getAttribute("matchId");
             int[] dicesToShow = (int[])session.getAttribute("dices");
-            Set<LudoChip> ludoChips = new HashSet<>(ludoChipService.findChipsByMatchId(matchId));
+            List<LudoChip> ludoChips = new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
 
             PlayerLudoStats inGamePlayerStats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(
                 authenticatedUser.getUsername(), matchId).get();
@@ -125,6 +125,13 @@ public class LudoBoardController {
                     inGamePlayerStats.setHasTurn(0);
                     playerLudoStatsService.saveStats(inGamePlayerStats);
                     playerLudoStatsService.saveStats(nextInGameStats);
+                } else {
+                    List<LudoChip> positionsToBreak = ludoChipService.breakBlocks(ludoChips, inGameId);
+                    if(positionsToBreak.size() != 0) {
+                        model.put("breakBlock", true);
+                        model.put("message", "You got doubles so you must break a block!");
+                        return "redirect:/ludoInGame/chooseChip/0";
+                    }
                 }
 
                 return "redirect:/ludoMatches/" + matchId;
@@ -195,6 +202,7 @@ public class LudoBoardController {
             dicesToCheck[diceIndex]=0;
             if(hasEaten){
                 dicesToCheck[diceIndex]=20;
+                model.addAttribute("message", "hola jaj");
                 return "redirect:/ludoInGame/chooseChip/"+diceIndex;
             }//TODO si ha llegado al final
             else if(checkDicesLeft()){
