@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.util.Color;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +31,14 @@ public class LudoChipService {
 
     private LudoChipRepository ludoChipRepository;
     private LudoMatchService ludoMatchService;
+    private PlayerLudoStatsService playerLudoStatsService;
 
 
     @Autowired
-    public LudoChipService(LudoChipRepository ludoChipRepository, LudoMatchService ludoMatchService) {
+    public LudoChipService(LudoChipRepository ludoChipRepository, LudoMatchService ludoMatchService, PlayerLudoStatsService playerLudoStatsService) {
         this.ludoChipRepository = ludoChipRepository;
         this.ludoMatchService = ludoMatchService;
+        this.playerLudoStatsService = playerLudoStatsService;
 
     }
 
@@ -72,16 +76,23 @@ public class LudoChipService {
 
             if(!checkCasilla(FIRST_TILES.get(color), allChips).getFirst()) {
                 Integer result = diceFlag(firstDice, secondDice);
+
+                //Aumentar la estadística de fichas sacadas
+                PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(chipToModify.getInGamePlayerId(), matchId).get();
+                pls.setTakeOuts(pls.getTakeOuts()+1);
+
                 if(result >= 0 && result < 3) {
                     chipToModify.setGameState(GameState.midGame);
                     chipToModify.setPosition(FIRST_TILES.get(color));
                     save(chipToModify);
-                } else if(result == 3){
+                } else if(result == DOS_DADOS_5){
                     chipToModify.setGameState(GameState.midGame);
                     chipToModify.setPosition(FIRST_TILES.get(color));
                     save(chipToModify);
+                    pls.setDoubleRolls(pls.getDoubleRolls()+1);
                     manageFives(inGameId, matchId, 0, secondDice);
                 }
+                playerLudoStatsService.saveStats(pls);
                 return result;
             }
         }
@@ -116,20 +127,26 @@ public class LudoChipService {
     }
 
 //  todo gestionar los 20 extra por comer en el controlador
-    public boolean move(LudoChip chip,Integer movements,List<LudoChip> chips,Integer inGamePlayerId){
-        for(int i=0;i<movements;i++){
+    public boolean move(LudoChip chip,Integer movements,List<LudoChip> chips,Integer inGamePlayerId, Integer matchId){
+        for(int i=1;i<=movements;i++){
             if(checkCasilla(chip.getPosition()+i,chips).getFirst()) {
-                chip.setPosition(chip.getPosition() + i - 1);
+                chip.setPosition(checkCasilla(chip.getPosition()+i,chips).getSecond()-1);
                 save(chip);
-                return eat(chip.getPosition()+i-1,chips,inGamePlayerId);
+                PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(chip.getInGamePlayerId(), matchId).get();
+                pls.setWalkedSquares(pls.getWalkedSquares()+ i - 1);
+                playerLudoStatsService.saveStats(pls);
+                return eat(chip.getPosition(),chips,inGamePlayerId, matchId);
             }
         }
         chip.setPosition(chip.getPosition()+movements);
         save(chip);
-        return eat(chip.getPosition()+movements,chips,inGamePlayerId);
+        PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(chip.getInGamePlayerId(), matchId).get();
+        pls.setWalkedSquares(pls.getWalkedSquares()+movements);
+        playerLudoStatsService.saveStats(pls);
+        return eat(chip.getPosition(),chips,inGamePlayerId, matchId);
     }
 
-    public boolean eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId){
+    public boolean eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId, Integer matchId){
         boolean result=false;
         List<LudoChip> otherPlayerChips = new ArrayList<>();
         for(LudoChip chip: chips){
@@ -140,13 +157,19 @@ public class LudoChipService {
         for(LudoChip enemyChip: otherPlayerChips){
             if(enemyChip.getPosition()==square && !SAFE_TILES.contains(enemyChip.getPosition())){
                 enemyChip.setGameState(GameState.earlyGame);
+                save(enemyChip);
+
+                PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(inGamePlayerId, matchId).get();
+                pls.setEatenTokens(pls.getEatenTokens()+1);
+                playerLudoStatsService.saveStats(pls);
+
                 result=true;
             }
         }
         return result;
     }
 
-    public boolean noChipsOutOfHome(Set<LudoChip> ludoChips, Integer inGameId) {
+    public boolean noChipsOutOfHome(List<LudoChip> ludoChips, Integer inGameId) {
         boolean res=true;
 
         for(LudoChip chip:ludoChips){
@@ -167,4 +190,16 @@ public class LudoChipService {
         return false;
     }
 
+    public List<LudoChip> breakBlocks(List<LudoChip> ludoChips, Integer inGameId) {
+        List<LudoChip> chipsToBreak = new ArrayList<>();
+        for(LudoChip chipToCheck: ludoChips) {
+            if(chipToCheck.getInGamePlayerId() == inGameId) {
+
+                if(checkCasilla(chipToCheck.getPosition(), ludoChips).getFirst()) {
+                    chipsToBreak.add(chipToCheck);
+                }
+            }
+        }
+        return chipsToBreak;
+    }
 }

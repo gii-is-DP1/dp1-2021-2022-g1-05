@@ -22,7 +22,7 @@ public class PlayerLudoStats extends BaseEntity {
     private Integer eatenTokens = 0;
     private Integer doubleRolls = 0;
     private Integer greedyRolls = 0;
-    private Integer createdBlocks = 0;
+    private Integer createdBlocks = 0;  //TODO Borrar esto y cambiar donde afecte
     private Integer scoredTokens = 0;
     private Integer takeOuts = 0;
     private Integer walkedSquares = 0;
