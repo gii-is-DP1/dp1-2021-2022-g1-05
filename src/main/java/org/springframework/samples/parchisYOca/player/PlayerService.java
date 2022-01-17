@@ -115,7 +115,7 @@ public class PlayerService {
     @Transactional
     public void disable(Player player) throws DataAccessException {
     	log.debug("Disabling player: {}", player.getUser().getUsername());
-        player.getUser().setEnabled(false);
+        player.getUser().setEnabled(player.getUser().isEnabled());
 
     }
 

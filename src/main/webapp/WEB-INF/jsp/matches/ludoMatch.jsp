@@ -10,7 +10,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                <h3>Joined players:</h3>
+                <h3>Chips list:</h3>
                 <ul>
                     <c:forEach items="${stats}" var="stat">
                         <c:forEach items="${chips}" var="chip">
@@ -20,6 +20,15 @@
                                         <c:choose>
                                             <c:when test="${chip.position eq null}">
                                                 <c:out value="${chip.getColor()}-> ${stat.player.user.username}: EN CASA"/>
+                                            </c:when>
+                                            <c:when test="${diceIndex ne null and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
+                                                <spring:url value="/ludoInGame/sumDice/{diceIndex}/{inGameChipId}" var="sumDiceURL">
+                                                    <spring:param name="diceIndex" value="${diceIndex}"/>
+                                                    <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
+                                                </spring:url>
+                                                <a href="${fn:escapeXml(sumDiceURL)}">
+                                                    <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
+                                                </a>
                                             </c:when>
                                             <c:otherwise>
                                                 <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
@@ -31,6 +40,8 @@
                                     <li><p><c:out value="${chip.getColor()}-> JUGADOR INACTIVO: ${chip.position+1}"/></p></li>
                                 </c:when>
                             </c:choose>
+
+
                         </c:forEach>
                     </c:forEach>
                 </ul>
@@ -57,8 +68,8 @@
             <div class="col-md-3">
                 <c:if test="${dicesRolled ne null}">
                     <p><c:out value="Which dice will you sum first?"/></p>
-                    <spring:url value="/ludoInGame/chooseChip/1" var="chooseChipURL1"></spring:url>
-                    <spring:url value="/ludoInGame/chooseChip/2" var="chooseChipURL2"></spring:url>
+                    <spring:url value="/ludoInGame/chooseChip/0" var="chooseChipURL1"></spring:url>
+                    <spring:url value="/ludoInGame/chooseChip/1" var="chooseChipURL2"></spring:url>
                     <c:choose>
                         <c:when test="${diceCode eq 0}">
                             <img src="../resources/images/dado1.png" width="100px" style="opacity: 0.4">
@@ -88,34 +99,16 @@
             <c:if test="${hasEnded != 1}">
                 <a href="/ludoMatches/matchLeft"><button class="btn btn-danger" type="submit">Leave the game</button></a>
             </c:if>
+
+
             <div class="tablero">
                 <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
                 <c:forEach items="${chips}" var="chip">
-
-                    <c:choose>
-                        <c:when test="${diceIndex ne null and thisPlayerStats.inGameId eq chip.inGamePlayerId and chip.position ne null}">
-                            <p> aqui entra</p>
-                            <spring:url value="/ludoInGame/sumDice/{diceIndex}/{inGameChipId}" var="sumDiceURL">
-                                <spring:param name="diceIndex" value="${diceIndex}"/>
-                                <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
-                            </spring:url>
-                            <a href="${fn:escapeXml(sumDiceURL)}">
-                                <p> click aqui </p>
-                            </a>
-                        </c:when>
-                        <c:otherwise>
-                            <p>otherwise</p>
-                            <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
-                        </c:otherwise>
-                    </c:choose>
                     <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
-
                 </c:forEach>
 
             </div>
         </div>
     </div>
-
-
 
 </ParchisYOca:layout>
