@@ -79,9 +79,8 @@ public class LudoBoardController {
             populateModel(model, matchId, dicesToShow);
 
             dicesToCheck = dicesToShow;
-
+            Integer inGameId = inGamePlayerStats.getInGameId();
             for(LudoChip lc : ludoChips){
-                Integer inGameId = inGamePlayerStats.getInGameId();
                 //To check that the chip belongs to the player
                 if(lc.getInGamePlayerId() == inGameId){
                     LudoChip loggedPlayerChip = lc;
@@ -100,19 +99,29 @@ public class LudoBoardController {
 
                         }
                         else if(diceCode==SUMA_DADOS_5){
-                            dicesToCheck[INDICE_PRIMER_DADO]=0;
-                            dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+                            dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
                             nextInGameStats.setHasTurn(1);
                             inGamePlayerStats.setHasTurn(0);
                             return "redirect:/ludoMatches/" + matchId;
                         } else if(diceCode == DOS_DADOS_5){
-                            dicesToCheck[INDICE_PRIMER_DADO]=0;
-                            dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+                            dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
                             return "redirect:/ludoMatches/" + matchId;
                         }
                     }
                 }
             }
+            if(ludoChipService.noChipsOutOfHome(ludoChips,inGameId)){
+                dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+                nextInGameStats.setHasTurn(1);
+                inGamePlayerStats.setHasTurn(0);
+                return "redirect:/ludoMatches/" + matchId;
+            }
+            else if(dicesToCheck[INDICE_PRIMER_DADO] == 0 && dicesToCheck[INDICE_SEGUNDO_DADO] == 0){
+                nextInGameStats.setHasTurn(1);
+                inGamePlayerStats.setHasTurn(0);
+                return "redirect:/ludoMatches/" + matchId;
+            }
+
             return "matches/ludoMatch";
         }else{
             return "redirect:/";
@@ -168,21 +177,18 @@ public class LudoBoardController {
 
             Integer nextInGameId = (inGamePlayerId+1)%chips.size()/4;
             PlayerLudoStats nextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
-
+            dicesToCheck[diceIndex]=0;
             if(hasEaten){
                 dicesToCheck[diceIndex]=20;
                 return "redirect:/ludoInGame/chooseChip/"+diceIndex;
             }//TODO si ha llegado al final
             else if(checkDicesLeft()){
-                dicesToCheck[diceIndex]=0;
                 return "redirect:/ludoInGame/chooseChip/"+Integer.toString((diceIndex+1)%2);
             }
             else if(flagDobles){
-                dicesToCheck[diceIndex]=0;
                 return "redirect:/ludoMatches/"+matchId;
             }
             else{
-                dicesToCheck[diceIndex]=0;
                 pls.setHasTurn(0);
                 nextInGameStats.setHasTurn(1);
                 return "redirect:/ludoMatches/"+matchId;

@@ -8,5 +8,6 @@
  var canvas = document.getElementById("canvas");
  var ctx = canvas.getContext("2d");
  var image = document.getElementById('${chip.getColor()}');
+
  ctx.drawImage(image,${chip.getX(chip.color,chip.inGameChipId, chip.gameState, false, position)},${chip.getY(chip.color,chip.inGameChipId, chip.gameState, false, position)},${size},${size});
  </script>

@@ -146,4 +146,14 @@ public class LudoChipService {
         return result;
     }
 
+    public boolean noChipsOutOfHome(Set<LudoChip> ludoChips, Integer inGameId) {
+        boolean res=true;
+
+        for(LudoChip chip:ludoChips){
+            if(chip.getGameState()!=GameState.earlyGame&&chip.getInGamePlayerId()==inGameId){
+                res=false;
+            }
+        }
+        return res;
+    }
 }
