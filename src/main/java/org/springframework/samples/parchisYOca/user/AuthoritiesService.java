@@ -21,9 +21,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class AuthoritiesService {
 
     private org.springframework.samples.parchisYOca.user.AuthoritiesRepository authoritiesRepository;
@@ -39,13 +42,17 @@ public class AuthoritiesService {
     @Transactional
     public void saveAuthorities(String username, String role) throws DataAccessException {
         Authorities authority = new Authorities();
+        log.debug("Saving authority {} for user {}", role, username);
         Optional<User> user = userService.findUserByUsername(username);
         if(user.isPresent()) {
+        	log.debug("User {} found, saving authority as {}", username, role);
             authority.setUser(user.get());
             authority.setAuthority(role);
             authoritiesRepository.save(authority);
-        }else
+        }else {
+        	log.debug("User {} not found", username);
             throw new DataAccessException("User '"+username+"' not found!") {};
+        }
     }
 
 
