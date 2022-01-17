@@ -47,7 +47,7 @@ public class AchievementController {
         String vista = "achievements/listAchievements";
         Slice<Achievement> achievements = achievementService.findAllPaging(pageable);
         modelMap.addAttribute("achievements",achievements.getContent());
-        modelMap.addAttribute("numberOfPages", Math.ceil(achievements.getNumberOfElements()/NUMBER_OF_ELEMENTS_PER_PAGE));
+        modelMap.addAttribute("numberOfPages", Math.ceil(achievementService.findAll().size()/NUMBER_OF_ELEMENTS_PER_PAGE));
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true) {

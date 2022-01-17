@@ -72,6 +72,7 @@ public class PlayerService {
         //and if so, set the username so that it matches the current one, just in case
         if( player.getId()!=null) {
         	log.debug("Player {} already exists so we are updating",player.getUser().getUsername());
+
             User userIntroduced = player.getUser();
             log.debug("Modifying user for player: {}", player.getUser().getUsername());
             userIntroduced.setUsername(playerRepository.findById(player.getId()).get().getUser().getUsername());

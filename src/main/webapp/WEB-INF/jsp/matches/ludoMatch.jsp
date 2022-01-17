@@ -22,13 +22,13 @@
                                                 <c:out value="${chip.getColor()}-> ${stat.player.user.username}: EN CASA"/>
                                             </c:when>
                                             <c:otherwise>
-                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position}"/>
+                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
                                             </c:otherwise>
                                         </c:choose>
                                     </p></li>
                                 </c:when>
                                 <c:when test="${stat.inGameId eq chip.inGamePlayerId and stat.playerLeft eq 1}">
-                                    <li><p><c:out value="${chip.getColor()}-> JUGADOR INACTIVO: ${chip.position}"/></p></li>
+                                    <li><p><c:out value="${chip.getColor()}-> JUGADOR INACTIVO: ${chip.position+1}"/></p></li>
                                 </c:when>
                             </c:choose>
                         </c:forEach>
@@ -91,20 +91,25 @@
             <div class="tablero">
                 <ParchisYOca:ludoBoard ludoBoard="${ludoBoard}"/>
                 <c:forEach items="${chips}" var="chip">
+
                     <c:choose>
-                        <c:when test="${diceIndex ne 0 and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
+                        <c:when test="${diceIndex ne null and thisPlayerStats.inGameId eq chip.inGamePlayerId and chip.position ne null}">
+                            <p> aqui entra</p>
                             <spring:url value="/ludoInGame/sumDice/{diceIndex}/{inGameChipId}" var="sumDiceURL">
                                 <spring:param name="diceIndex" value="${diceIndex}"/>
                                 <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
                             </spring:url>
                             <a href="${fn:escapeXml(sumDiceURL)}">
-                                <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
+                                <p> click aqui </p>
                             </a>
                         </c:when>
                         <c:otherwise>
+                            <p>otherwise</p>
                             <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
                         </c:otherwise>
                     </c:choose>
+                    <ParchisYOca:ludoChip size="40" chip="${chip}" position="${chip.position}"/>
+
                 </c:forEach>
 
             </div>

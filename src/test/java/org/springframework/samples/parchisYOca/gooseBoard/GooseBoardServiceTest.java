@@ -26,6 +26,7 @@ public class GooseBoardServiceTest {
     protected final Integer NUMBER_OF_PLAYERS = 4;
     protected final Integer INVALID_NUMBER_OF_PLAYERS_1 = 6;
     protected final Integer INVALID_NUMBER_OF_PLAYERS_2 = -2;
+
     @Autowired
     protected GooseBoardService gooseBoardService;
 

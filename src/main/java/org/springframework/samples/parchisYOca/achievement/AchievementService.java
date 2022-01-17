@@ -30,7 +30,7 @@ public class AchievementService {
     }
 
     @Transactional(readOnly = true)
-    public Iterable<Achievement> findAll() throws DataAccessException{
+    public Collection<Achievement> findAll() throws DataAccessException{
         return achievementRepository.findAll();
     }
 
