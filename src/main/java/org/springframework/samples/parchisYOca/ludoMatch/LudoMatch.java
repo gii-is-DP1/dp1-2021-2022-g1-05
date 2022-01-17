@@ -38,7 +38,7 @@ public class LudoMatch extends BaseEntity {
     @Size(max=6)
     @Column(unique = true)
     private String matchCode;
-
+    @NotAudited
     @OneToMany(mappedBy = "ludoMatch")
     @Size(min=1, max=4)
     private Set<PlayerLudoStats> stats;

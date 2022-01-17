@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.model.Person;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -28,10 +29,10 @@ public class Player extends Person implements Serializable { //Implementing seri
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
-
+    @NotAudited
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "player")
     private Set<PlayerGooseStats> gooseStats;
-
+    @NotAudited
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "player")
     private Set<PlayerLudoStats> ludoStats;
 
