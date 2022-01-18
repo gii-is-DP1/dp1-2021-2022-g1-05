@@ -41,22 +41,15 @@ public class UserServiceTest {
 	private static final User RAN_USER = TestDataGenerator.generateUser(GOOD_UNAME, GOOD_PSSWRD);
 	private static final String RAN_U_NAME = RAN_USER.getUsername();
 	private static final String RAN_U_PSSWRD = RAN_USER.getPassword();
-	
-	
+
+
 	/*private static SecurityContextHolder contextHolder = new SecurityContextHolder();
 	private static SecurityContext context;
 	private static Authentication auth;*/
 
 	@Autowired
 	private UserService uService;
-	
-	@BeforeEach
-	public void setup() {
-		
-	}
 
-	
-	
 	@Test
 	@Transactional
 	public void testFindAll() {
@@ -87,9 +80,9 @@ public class UserServiceTest {
 		Collection<GrantedAuthority> auths = new HashSet<GrantedAuthority>();
 		GrantedAuthority authority = new SimpleGrantedAuthority("admin");
 		auths.add(authority);
-		org.springframework.security.core.userdetails.User newUser = new org.springframework.security.core.userdetails.User( 
+		org.springframework.security.core.userdetails.User newUser = new org.springframework.security.core.userdetails.User(
 				RAN_USER.getUsername(), RAN_USER.getPassword(), true, true, true, true, auths);
-		
+
 		Authentication principal = new UsernamePasswordAuthenticationToken(newUser,RAN_USER.getPassword(),auths);
 		SecurityContext context = contextHolder.getContext();
 		Authentication authentication = context.getAuthentication();
@@ -104,9 +97,9 @@ public class UserServiceTest {
 		Collection<GrantedAuthority> auths = new HashSet<GrantedAuthority>();
 		GrantedAuthority authority = new SimpleGrantedAuthority("admin");
 		auths.add(authority);
-		org.springframework.security.core.userdetails.User newUser = new org.springframework.security.core.userdetails.User( 
+		org.springframework.security.core.userdetails.User newUser = new org.springframework.security.core.userdetails.User(
 				RAN_USER.getUsername(), RAN_USER.getPassword(), true, true, true, true, auths);
-		
+
 		Authentication principal = new UsernamePasswordAuthenticationToken(newUser,RAN_USER.getPassword(),auths);
 		SecurityContext context = contextHolder.getContext();
 		context.setAuthentication(principal);
