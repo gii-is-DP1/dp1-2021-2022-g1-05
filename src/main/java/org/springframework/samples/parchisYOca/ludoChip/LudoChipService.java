@@ -5,6 +5,7 @@ import org.hibernate.envers.tools.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
@@ -29,6 +30,12 @@ public class LudoChipService {
     public static final Integer DOS_DADOS_5=3;
     public static final Integer FINAL_TILE=7;
 
+    public static final Integer NO_OPERATION=0;
+    public static final Integer ATE_CHIP=1;
+    public static final Integer LANDED_FINAL=2;
+    public static final Integer GOT_BLOCKED=3;
+    //public static final Integer BLOCKED_AND_ATE=4;
+    public static final Integer ENDED_THE_GAME=5;
 
     private LudoChipRepository ludoChipRepository;
     private LudoMatchService ludoMatchService;
@@ -81,7 +88,7 @@ public class LudoChipService {
         if(!chipsInBase.isEmpty()) {
             LudoChip chipToModify = chipsInBase.get(0);
             Color color = chipToModify.getColor();
-            if(!checkCasilla(FIRST_TILES.get(color), allChips).getFirst()) {
+            if(!checkCasilla(FIRST_TILES.get(color), allChips)) {
                 Integer result = diceFlag(firstDice, secondDice);
                 log.debug("Checking if starting tile is not occupied");
                 //Aumentar la estadística de fichas sacadas
@@ -131,36 +138,46 @@ public class LudoChipService {
         return -1;
     }
 
-    public Pair<Boolean,Integer> checkCasilla(Integer square, List<LudoChip> chips){
+    public Boolean checkCasilla(Integer square, List<LudoChip> chips){
     	log.debug("Checking if tile number '{}' is occupied by any chip", square);
         Integer acumulador=0;
         for(int i=0;i<chips.size();i++){
             if(acumulador==2){
-                Pair<Boolean,Integer> result= new Pair(true,square);
-                return result;
+                return true;
             }
             else if(chips.get(i).getPosition() == square && chips.get(i).getGameState() != GameState.earlyGame){
                 acumulador++;
             }
         }
-        return new Pair(false,null);
+        return false;
     }
+
     public Boolean checkFinalTiles(Integer square, LudoChip chip){
         log.debug("Checking if tile number '{}' is the start of that colors endgame", square);
         return square==LAST_TILES.get(chip.getColor());
     }
 
+    @Transactional
+    public Integer move(LudoChip chip,Integer movements,List<LudoChip> chips,PlayerLudoStats pls, Integer matchId) {
+        if(chip.getGameState()==GameState.midGame) {
+            return moveMidGame(chip, movements, chips, pls, matchId);
+        } else if(chip.getGameState()==GameState.endGame) {
+            return moveEndGame(chip, movements, pls);
+        }
+        return -1;
+    }
 
-    public boolean move(LudoChip chip,Integer movements,List<LudoChip> chips,PlayerLudoStats pls, Integer matchId){
+    @Transactional
+    public Integer moveMidGame(LudoChip chip,Integer movements,List<LudoChip> chips,PlayerLudoStats pls, Integer matchId){
         Integer inGamePlayerId=pls.getInGameId();
         pls.setLastChipMovedId(chip.getInGameChipId());
         for(int i=1;i<=movements;i++){
-            if(checkCasilla(chip.getPosition()+i,chips).getFirst()){
-                chip.setPosition(checkCasilla(chip.getPosition()+i,chips).getSecond()-1);
+            if(checkCasilla(chip.getPosition()+i,chips)){
+                chip.setPosition(chip.getPosition()+i-1);
                 save(chip);
                 pls.setWalkedSquares(pls.getWalkedSquares()+ i - 1);
                 playerLudoStatsService.saveStats(pls);
-                return eat(chip.getPosition(),chips,inGamePlayerId, matchId);
+                return GOT_BLOCKED + eat(chip.getPosition(),chips,inGamePlayerId, matchId);
             }
             else if(checkFinalTiles(chip.getPosition()+i,chip)){
                 chip.setGameState(GameState.endGame);
@@ -168,7 +185,7 @@ public class LudoChipService {
                 save(chip);
                 pls.setWalkedSquares(pls.getWalkedSquares()+movements);
                 playerLudoStatsService.saveStats(pls);
-                return false;
+                return NO_OPERATION;
             }
         }
         chip.setPosition(chip.getPosition()+movements);
@@ -178,8 +195,39 @@ public class LudoChipService {
         return eat(chip.getPosition(),chips,inGamePlayerId, matchId);
     }
 
-    public boolean eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId, Integer matchId){
-        boolean result=false;
+    @Transactional
+    public Integer moveEndGame(LudoChip chip,Integer movements,PlayerLudoStats pls){
+        pls.setLastChipMovedId(chip.getInGameChipId());
+        chip.setPosition(chip.getPosition()+movements);
+        save(chip);
+        pls.setWalkedSquares(pls.getWalkedSquares()+movements);
+        List<LudoChip> thisPlayerChips = new ArrayList<>(getChipsByInGamePlayerId(pls.getInGameId()));
+
+        Integer chipsInFinalTileAcum = 0;
+        for(LudoChip chipToCheck: thisPlayerChips) {
+            if(chipToCheck.getGameState()==GameState.endGame && chipToCheck.getPosition()==7) {
+                chipsInFinalTileAcum++;
+            }
+        }
+        if(chipsInFinalTileAcum==4) {
+            pls.setHasWon(1);
+            LudoMatch ludoMatch = ludoMatchService.findMatchByPlayerLudoStats(pls).get();
+            ludoMatch.setEndDate(new Date());
+            ludoMatchService.save(ludoMatch);
+            playerLudoStatsService.saveStats(pls);
+            return ENDED_THE_GAME;
+        }
+        playerLudoStatsService.saveStats(pls);
+        if(chip.getPosition()==FINAL_TILE) {
+            return LANDED_FINAL;
+        }
+
+        return NO_OPERATION;
+    }
+
+    @Transactional
+    public Integer eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId, Integer matchId){
+        Integer result=NO_OPERATION;
         List<LudoChip> otherPlayerChips = new ArrayList<>();
         for(LudoChip chip: chips){
             if(!(chip.getInGamePlayerId()==inGamePlayerId)){
@@ -195,7 +243,7 @@ public class LudoChipService {
                 pls.setEatenTokens(pls.getEatenTokens()+1);
                 playerLudoStatsService.saveStats(pls);
 
-                result=true;
+                result=ATE_CHIP;
             }
         }
         return result;
@@ -228,13 +276,17 @@ public class LudoChipService {
         List<LudoChip> chipsToBreak = new ArrayList<>();
         for(LudoChip chipToCheck: ludoChips) {
             if(chipToCheck.getInGamePlayerId() == inGameId) {
-                if(checkCasilla(chipToCheck.getPosition(), ludoChips).getFirst()) {
-                    chipsToBreak.add(chipToCheck);
+                if (chipToCheck.getGameState().equals(GameState.midGame) || chipToCheck.getPosition() != LudoChip.FINAL_TILE) {
+                    if(checkCasilla(chipToCheck.getPosition(), ludoChips)) {
+                        chipsToBreak.add(chipToCheck);
+                    }
                 }
             }
         }
         return chipsToBreak;
     }
+
+    @Transactional
     public void ManageGreedy(PlayerLudoStats playerStats) {
         List<LudoChip> playerChips=new ArrayList<>(getChipsByInGamePlayerId(playerStats.getInGameId()));
         for(LudoChip chip: playerChips){

@@ -30,7 +30,6 @@ public class LudoBoardService {
         return ludoBoardRepository.findById(id).get();
     }
 
-    //TODO revisar las posiciones originales
     @Transactional(readOnly=true)
     public LudoBoard save(LudoBoard ludoBoard, Set<PlayerLudoStats> playerLudoStats) throws DataAccessException {
         LudoBoard ludoBoardDb=ludoBoardRepository.save(ludoBoard);
@@ -49,7 +48,7 @@ public class LudoBoardService {
         return ludoBoardDb;
     }
 
-
+    @Transactional
     public boolean checkGreedy(PlayerLudoStats inGamePlayerStats, boolean flagDobles) {
         if(flagDobles){
             inGamePlayerStats.setTurnDoubleRolls(inGamePlayerStats.getTurnDoubleRolls()+1);
@@ -64,4 +63,5 @@ public class LudoBoardService {
         }
         return false;
     }
+
 }

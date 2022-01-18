@@ -4,6 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="ParchisYOca" tagdir="/WEB-INF/tags" %>
+<%@ page import="org.springframework.samples.parchisYOca.ludoChip.GameState" %>
 
 <ParchisYOca:layout pageName="ludoMatch">
     <h2>Ludo game match!</h2>
@@ -19,7 +20,10 @@
                                     <li><p>
                                         <c:choose>
                                             <c:when test="${chip.position eq null}">
-                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: EN CASA"/>
+                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: At home"/>
+                                            </c:when>
+                                            <c:when test="${chip.gameState eq GameState.endGame and chip.position eq 7}">
+                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: FINAL TILE"/>
                                             </c:when>
                                             <c:when test="${diceIndex ne null and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
                                                 <c:choose>
@@ -29,7 +33,14 @@
                                                             <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
                                                         </spring:url>
                                                         <a href="${fn:escapeXml(sumDiceURL)}">
-                                                            <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
+                                                            <c:choose>
+                                                                <c:when test="${chip.gameState eq GameState.endGame}">
+                                                                    <c:out value="${chip.getColor()}-> ${stat.player.user.username}: Last stage ${chip.position+1}"/>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
+                                                                </c:otherwise>
+                                                            </c:choose>
                                                         </a>
                                                     </c:when>
                                                     <c:otherwise>
@@ -38,7 +49,14 @@
                                                 </c:choose>
                                             </c:when>
                                             <c:otherwise>
-                                                <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
+                                                <c:choose>
+                                                    <c:when test="${chip.gameState eq GameState.endGame}">
+                                                        <c:out value="${chip.getColor()}-> ${stat.player.user.username}: Last stage ${chip.position+1}"/>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </c:otherwise>
                                         </c:choose>
                                     </p></li>

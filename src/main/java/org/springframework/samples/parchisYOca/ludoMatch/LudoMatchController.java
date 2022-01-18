@@ -249,7 +249,7 @@ public class LudoMatchController {
                     model.addAttribute("message", "The game has ended!");
                 }
             } else {
-                //To show if they landed on a special square
+                //To show if they rolled double dices or got blocked
                 if (session.getAttribute("especial") != null) {
                     String mensaje = session.getAttribute("especial").toString();
                     model.put("message", mensaje);
