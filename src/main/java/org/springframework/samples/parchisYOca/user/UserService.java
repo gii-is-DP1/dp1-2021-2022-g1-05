@@ -44,6 +44,7 @@ public class UserService {
 
     public Boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getName());
         Boolean ac = false;
         log.debug("Authenticating user: {}", authentication.getName());
         if(authentication.getPrincipal().toString() != "anonymousUser"){
