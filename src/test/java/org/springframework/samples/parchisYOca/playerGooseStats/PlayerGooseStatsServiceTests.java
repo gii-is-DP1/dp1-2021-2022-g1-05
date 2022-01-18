@@ -14,8 +14,13 @@ import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.ConstraintViolationException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class PlayerGooseStatsServiceTests {
@@ -64,10 +69,8 @@ public class PlayerGooseStatsServiceTests {
         newMatch1.setStartDate(new Date());
         newMatch1.setId(1);
         newMatch1.setEndDate(new Date());
-        Set<PlayerGooseStats> statsOfGame1 = newMatch1.getStats();
-        statsOfGame1.add(pgs1);
-        statsOfGame1.add(pgs2);
-        statsOfGame1.add(pgs3);
+        Set<PlayerGooseStats> statsOfGame1 = Set.of(pgs1, pgs2,pgs3);
+        newMatch1.setStats(statsOfGame1);
         GooseMatch addedMatch1 = gooseMatchService.save(newMatch1);
         GooseMatch newMatch2 = new GooseMatch();
         String matchCode2 = MATCH_CODE_2;
@@ -117,14 +120,24 @@ public class PlayerGooseStatsServiceTests {
 
     @Test
     @Transactional
-    @Disabled
-    public void testRemoveGooseStatsFromGame() {
-        Integer matchId = 1;
-        Integer statsToRemoveId = 1;
-        GooseMatch gm = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_1).get();
-        Assertions.assertThat(gm.getStats().size()).isEqualTo(1);
-        gooseMatchService.removeGooseStatsFromGame(playerGooseStatsService.findById(statsToRemoveId).get(),matchId);
-        Assertions.assertThat(gm.getStats().size()).isEqualTo(0);
+    public void testSumStats() {
+        Collection<PlayerGooseStats> pgs = playerGooseStatsService.findAll();
+        PlayerGooseStats pgsAfterSum = new PlayerGooseStats(); //Stats same as the sum of every stat on the ddbb
+        Player player = playerService.findPlayerByUsername(USERNAME).get();
+        pgsAfterSum.setPlayer(player);
+        pgsAfterSum.setHasWon(2);
+        pgsAfterSum.setLandedGeese(70);
+        pgsAfterSum.setLandedDice(110);
+        pgsAfterSum.setLandedDeath(2);
+
+        Assertions.assertThat(playerGooseStatsService.sumStats(pgs).getPlayer()).isEqualTo(pgsAfterSum.getPlayer());
+        Assertions.assertThat(playerGooseStatsService.sumStats(pgs).getHasWon()).isEqualTo(pgsAfterSum.getHasWon());
+        Assertions.assertThat(playerGooseStatsService.sumStats(pgs).getLandedGeese()).isEqualTo(pgsAfterSum.getLandedGeese());
+        Assertions.assertThat(playerGooseStatsService.sumStats(pgs).getLandedDice()).isEqualTo(pgsAfterSum.getLandedDice());
+        Assertions.assertThat(playerGooseStatsService.sumStats(pgs).getLandedDeath()).isEqualTo(pgsAfterSum.getLandedDeath());
+        assertThrows(NullPointerException.class, () ->{
+            playerGooseStatsService.sumStats(null);
+        });
     }
 
 }

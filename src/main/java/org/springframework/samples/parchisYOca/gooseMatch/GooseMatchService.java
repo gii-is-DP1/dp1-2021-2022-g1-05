@@ -157,11 +157,11 @@ public class GooseMatchService {
 
     @Transactional
     public void removeGooseStatsFromGame(PlayerGooseStats pgs, Integer gooseMatchId) throws DataAccessException {
-        log.debug("Deleting PlayerGooseStats '{}' from matchId '{}'",pgs.toString(),gooseMatchId);
+        log.debug("Deleting PlayerGooseStats '{}' from matchId '{}'",pgs.getId(),gooseMatchId);
         GooseMatch gm = gooseMatchRepository.findById(gooseMatchId).get();
-        Set<PlayerGooseStats> statsOfGame = gm.getStats();
+        List<PlayerGooseStats> statsOfGame = new ArrayList<>(gm.getStats());
         statsOfGame.remove(pgs);
-        gm.setStats(statsOfGame);
+        gm.setStats(new HashSet<>(statsOfGame));
         gooseMatchRepository.save(gm);
     }
 
