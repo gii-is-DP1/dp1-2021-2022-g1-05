@@ -101,8 +101,6 @@ public class PlayerControllerTests {
     	juanLStats.setHasWon(WINNER);
     	Optional<PlayerLudoStats> oJuanLStats = Optional.of(juanLStats);
     	Set<PlayerLudoStats> setLStats = Set.of(juanLStats);
-    	Juan.setGooseStats(setGStats);
-    	Juan.setLudoStats(setLStats);
     	Optional<Player> oJuan = Optional.of(Juan);
     	List<Player> playerSet = List.of(Juan);
     	gMatch.setStats(setGStats);

@@ -114,20 +114,25 @@ public class PlayerController {
             List<Long> durationsLudo = new ArrayList<>();
 
             for(PlayerGooseStats pgs : gooseStatsOfPlayer){
-                GooseMatch gm = pgs.getGooseMatch();
-                if(gm.getEndDate() != null){
-                    Long millis = gm.getEndDate().getTime() - gm.getStartDate().getTime();
-                    durationsGoose.add(millis);
+                if(gooseMatchService.findMatchByPlayerGooseStats(pgs).isPresent()){
+                    GooseMatch gm = gooseMatchService.findMatchByPlayerGooseStats(pgs).get();
+                    if(gm.getEndDate() != null){
+                        Long millis = gm.getEndDate().getTime() - gm.getStartDate().getTime();
+                        durationsGoose.add(millis);
+                    }
                 }
             }
 
-            for(PlayerLudoStats pls : ludoStatsOfPlayer){
-                LudoMatch lm = pls.getLudoMatch();
-                if(lm.getEndDate() != null){
-                    Long millis = lm.getEndDate().getTime() - lm.getStartDate().getTime();
-                    durationsGoose.add(millis);
+            for(PlayerLudoStats pls : ludoStatsOfPlayer) {
+                if (ludoMatchService.findMatchByPlayerLudoStats(pls).isPresent()) {
+                    LudoMatch lm = ludoMatchService.findMatchByPlayerLudoStats(pls).get();
+                    if (lm.getEndDate() != null) {
+                        Long millis = lm.getEndDate().getTime() - lm.getStartDate().getTime();
+                        durationsGoose.add(millis);
+                    }
                 }
             }
+
 
             String averageGoose = Durations.listDurationsToString(durationsGoose);
             String averageLudo = Durations.listDurationsToString(durationsLudo);

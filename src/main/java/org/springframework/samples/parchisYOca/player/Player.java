@@ -29,12 +29,6 @@ public class Player extends Person implements Serializable { //Implementing seri
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
-    @NotAudited
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "player")
-    private Set<PlayerGooseStats> gooseStats;
-    @NotAudited
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "player")
-    private Set<PlayerLudoStats> ludoStats;
 
 }
 

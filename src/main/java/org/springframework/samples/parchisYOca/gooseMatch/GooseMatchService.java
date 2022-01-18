@@ -118,6 +118,12 @@ public class GooseMatchService {
     }
 
     @Transactional
+    public Optional<GooseMatch> findMatchByPlayerGooseStats(PlayerGooseStats pgs) throws DataAccessException {
+        log.debug("Finding Goose match with stats '{}'",pgs.toString() );
+        return gooseMatchRepository.findMatchByPlayerGooseStats(pgs);
+    }
+
+    @Transactional
     public GooseMatch saveGooseMatchWithPlayer(GooseMatch gooseMatch, Player player, Boolean isOwner) throws DataAccessException {
     	log.debug("Saving Goose match with code '{}' and player '{}'", gooseMatch.getMatchCode(), player.getUser().getUsername());
         //Saves the match
@@ -126,7 +132,6 @@ public class GooseMatchService {
         //Saves the relation between player and match
         PlayerGooseStats playerStats = new PlayerGooseStats();
         playerStats.setPlayer(player);
-        playerStats.setGooseMatch(gooseMatchDB);
         Set<PlayerGooseStats> statsSet = new HashSet<>();
 
         //To assign the in game id
@@ -148,5 +153,24 @@ public class GooseMatchService {
 
         return gooseMatchDB;
 
+    }
+
+    @Transactional
+    public void removeGooseStatsFromGame(PlayerGooseStats pgs, Integer gooseMatchId) throws DataAccessException {
+        log.debug("Deleting PlayerGooseStats '{}' from matchId '{}'",pgs.toString(),gooseMatchId);
+        GooseMatch gm = gooseMatchRepository.findById(gooseMatchId).get();
+        Set<PlayerGooseStats> statsOfGame = gm.getStats();
+        statsOfGame.remove(pgs);
+        gm.setStats(statsOfGame);
+        gooseMatchRepository.save(gm);
+    }
+
+    @Transactional
+    public void removeAllGooseStatsFromGame(Integer gooseMatchId) throws DataAccessException {
+        log.debug("Removing all PlayerGooseStats from match with id '{}'", gooseMatchId);
+        GooseMatch gm = gooseMatchRepository.findById(gooseMatchId).get();
+        Set<PlayerGooseStats> emptyStats = new HashSet<>();
+        gm.setStats(emptyStats);
+        gooseMatchRepository.save(gm);
     }
 }

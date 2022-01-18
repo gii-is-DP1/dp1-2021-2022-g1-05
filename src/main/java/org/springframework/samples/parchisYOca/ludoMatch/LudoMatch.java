@@ -39,7 +39,7 @@ public class LudoMatch extends BaseEntity {
     @Column(unique = true)
     private String matchCode;
     @NotAudited
-    @OneToMany(mappedBy = "ludoMatch")
+    @OneToMany
     @Size(min=1, max=4)
     private Set<PlayerLudoStats> stats;
 

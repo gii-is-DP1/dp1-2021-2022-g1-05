@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
@@ -30,6 +32,9 @@ public interface LudoMatchRepository extends CrudRepository<LudoMatch, Integer> 
 
     @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch WHERE ludoMatch.endDate is not null")
     Collection<LudoMatch> findEndedLudoMatches();
+
+    @Query(value = "SELECT DISTINCT ludoMatch FROM LudoMatch ludoMatch WHERE :pls MEMBER OF ludoMatch.stats")
+    Optional<LudoMatch> findMatchByPlayerLudoStats(PlayerLudoStats pls);
 
     Collection<LudoMatch> findAll();
     Page<LudoMatch> findAll(Pageable pageable);

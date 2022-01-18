@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 
 import java.util.Collection;
 import java.util.Date;
@@ -31,6 +33,9 @@ public interface GooseMatchRepository extends CrudRepository<GooseMatch, Integer
 
     @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch WHERE gooseMatch.endDate is not null")
     Collection<GooseMatch> findEndedGooseMatches();
+
+    @Query(value = "SELECT DISTINCT gooseMatch FROM GooseMatch gooseMatch WHERE :pgs MEMBER OF gooseMatch.stats")
+    Optional<GooseMatch> findMatchByPlayerGooseStats(PlayerGooseStats pgs);
 
     Collection<GooseMatch> findAll();
     Page<GooseMatch> findAll(Pageable pageable);

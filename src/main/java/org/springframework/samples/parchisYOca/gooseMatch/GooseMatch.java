@@ -39,7 +39,7 @@ public class GooseMatch extends BaseEntity {
     @Column(unique = true)
     private String matchCode;
     @NotAudited
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gooseMatch", orphanRemoval = true)
+    @OneToMany
     @Size(max=4)
     private Set<PlayerGooseStats> stats;
 

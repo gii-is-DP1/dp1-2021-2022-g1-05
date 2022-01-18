@@ -337,12 +337,12 @@ public class LudoMatchController {
             PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), userMatch.getId()).get();
 
             if(pls.getIsOwner() == 1 && userMatch.getStartDate() == null) {
-                playerLudoStatsService.removeAllLudoStatsFromGame(userMatch.getId());
+                ludoMatchService.removeAllLudoStatsFromGame(userMatch.getId());
                 userMatch.setClosedLobby(1);
                 ludoMatchService.save(userMatch);
                 mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
             } else if (userMatch.getStartDate() == null) {
-                playerLudoStatsService.removeLudoStatsFromGame(pls.getInGameId(), userMatch.getId());
+                ludoMatchService.removeLudoStatsFromGame(pls, userMatch.getId());
                 mav.addObject("message", "You left the lobby");
             } else {
                 pls.setPlayerLeft(1);

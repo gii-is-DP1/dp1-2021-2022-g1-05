@@ -37,6 +37,4 @@ public class PlayerLudoStats extends BaseEntity {
 
     @ManyToOne
     Player player;
-    @ManyToOne
-    LudoMatch ludoMatch;
 }

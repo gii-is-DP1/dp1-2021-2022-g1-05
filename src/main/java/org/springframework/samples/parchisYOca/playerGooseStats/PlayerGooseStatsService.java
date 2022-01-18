@@ -2,6 +2,8 @@ package org.springframework.samples.parchisYOca.playerGooseStats;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
@@ -107,6 +109,12 @@ public class PlayerGooseStatsService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<PlayerGooseStats> findById(Integer id) throws DataAccessException {
+        log.debug("Getting the stats with id {}", id);
+        return playerGooseStatsRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<PlayerGooseStats> findGooseStatsByUsernamedAndMatchId(String username, Integer matchId) throws DataAccessException {
     	log.debug("Getting the stats of {} in the Goose match with id {}", username, matchId);
         return playerGooseStatsRepository.findPlayerGooseStatsByUsernamedAndMatchId(username, matchId);
@@ -130,18 +138,5 @@ public class PlayerGooseStatsService {
     	log.debug("Saving {}'s PlayerGooseStats", playerGooseStats.getPlayer().getUser().getUsername());
         return playerGooseStatsRepository.save(playerGooseStats);
     }
-
-    @Transactional
-    public void removeGooseStatsFromGame(Integer statsId, Integer gooseMatchId) throws DataAccessException {
-    	log.debug("Deleting PlayerGooseStats with id '{}' and matchId '{}'",statsId,gooseMatchId);
-        playerGooseStatsRepository.deletePlayerFromGame(statsId, gooseMatchId);
-    }
-
-    @Transactional
-    public void removeAllGooseStatsFromGame(Integer gooseMatchId) throws DataAccessException {
-    	log.debug("Removing all PlayerGooseStats from match with id '{}'", gooseMatchId);
-        playerGooseStatsRepository.deleteStatsFromGame(gooseMatchId);
-    }
-
 
 }
