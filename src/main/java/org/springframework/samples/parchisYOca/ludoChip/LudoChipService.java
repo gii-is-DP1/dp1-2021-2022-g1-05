@@ -5,6 +5,7 @@ import org.hibernate.envers.tools.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
@@ -32,7 +33,9 @@ public class LudoChipService {
     public static final Integer NO_OPERATION=0;
     public static final Integer ATE_CHIP=1;
     public static final Integer LANDED_FINAL=2;
-
+    public static final Integer GOT_BLOCKED=3;
+    //public static final Integer BLOCKED_AND_ATE=4;
+    public static final Integer ENDED_THE_GAME=5;
 
     private LudoChipRepository ludoChipRepository;
     private LudoMatchService ludoMatchService;
@@ -174,7 +177,7 @@ public class LudoChipService {
                 save(chip);
                 pls.setWalkedSquares(pls.getWalkedSquares()+ i - 1);
                 playerLudoStatsService.saveStats(pls);
-                return eat(chip.getPosition(),chips,inGamePlayerId, matchId);
+                return GOT_BLOCKED + eat(chip.getPosition(),chips,inGamePlayerId, matchId);
             }
             else if(checkFinalTiles(chip.getPosition()+i,chip)){
                 chip.setGameState(GameState.endGame);
@@ -208,7 +211,11 @@ public class LudoChipService {
         }
         if(chipsInFinalTileAcum==4) {
             pls.setHasWon(1);
-
+            LudoMatch ludoMatch = ludoMatchService.findMatchByPlayerLudoStats(pls).get();
+            ludoMatch.setEndDate(new Date());
+            ludoMatchService.save(ludoMatch);
+            playerLudoStatsService.saveStats(pls);
+            return ENDED_THE_GAME;
         }
         playerLudoStatsService.saveStats(pls);
         if(chip.getPosition()==FINAL_TILE) {
@@ -269,8 +276,10 @@ public class LudoChipService {
         List<LudoChip> chipsToBreak = new ArrayList<>();
         for(LudoChip chipToCheck: ludoChips) {
             if(chipToCheck.getInGamePlayerId() == inGameId) {
-                if(checkCasilla(chipToCheck.getPosition(), ludoChips)) {
-                    chipsToBreak.add(chipToCheck);
+                if (chipToCheck.getGameState().equals(GameState.midGame) || chipToCheck.getPosition() != LudoChip.FINAL_TILE) {
+                    if(checkCasilla(chipToCheck.getPosition(), ludoChips)) {
+                        chipsToBreak.add(chipToCheck);
+                    }
                 }
             }
         }

@@ -34,11 +34,14 @@ public class LudoBoardController {
     public static final Integer SEGUNDO_DADO_5=1;
     public static final Integer SUMA_DADOS_5=2;
     public static final Integer DOS_DADOS_5=3;
-    private static final String ALLPLAYERCHIPS ="0123";
+    private static final String ALL_CHIPS_OF_A_PLAYER ="0123";
     private int[] dicesToCheck = new int[3];
-    public static final Integer NO_OPERATION=0;
+
     public static final Integer ATE_CHIP=1;
     public static final Integer LANDED_FINAL=2;
+    public static final Integer GOT_BLOCKED=3;
+    public static final Integer BLOCKED_AND_ATE=4;
+    public static final Integer ENDED_THE_GAME=5;
 
 
     @Autowired
@@ -62,7 +65,7 @@ public class LudoBoardController {
     }
 
     @GetMapping(value="/ludoInGame/dicesRolled")
-    public String ludoDicesRolled(HttpSession session, Map<String, Object> model){
+    public String ludoDicesRolled(HttpSession session, ModelMap model){
         Boolean logged = userService.isAuthenticated();
         if(logged==true){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -72,11 +75,9 @@ public class LudoBoardController {
             List<LudoChip> ludoChips = new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
             PlayerLudoStats inGamePlayerStats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(
                 authenticatedUser.getUsername(), matchId).get();
-            Integer nextInGameId = (inGamePlayerStats.getInGameId()+1)%(ludoChips.size()/4);
-            PlayerLudoStats nextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
+
             //putting things in the model
             model.put("dicesRolled", 1);
-            //model.put("diceIndex", 0);
             populateModel(model, matchId, dicesToShow);
             dicesToCheck[INDICE_PRIMER_DADO] = dicesToShow[INDICE_PRIMER_DADO];
             dicesToCheck[INDICE_SEGUNDO_DADO] = dicesToShow[INDICE_SEGUNDO_DADO];
@@ -84,8 +85,17 @@ public class LudoBoardController {
             boolean flagDobles = dicesToCheck[INDICE_PRIMER_DADO] == dicesToCheck[INDICE_SEGUNDO_DADO];
             session.setAttribute("flagDobles", flagDobles);
             Integer inGameId = inGamePlayerStats.getInGameId();
+
+            if (session.getAttribute("especial") != null) {
+                String mensaje = session.getAttribute("especial").toString();
+                model.put("message", mensaje);
+                session.setAttribute("especial", null);
+            }
+
+            //Checks if this is the third time in a turn they roll double dices
             if(ludoBoardService.checkGreedy(inGamePlayerStats,flagDobles)){
                 ludoChipService.ManageGreedy(inGamePlayerStats);
+                model.put("message", "You managed to roll doubles THREE TIMES? Preposterous, go back home.");
             }
             for(LudoChip lc : ludoChips){
                 //To check that the chip belongs to the player
@@ -97,7 +107,7 @@ public class LudoBoardController {
                         dicesToCheck[INDICE_SUMA_DADOS] == 5) {
                         Integer diceCode = ludoChipService.manageFives(inGameId,matchId, dicesToCheck[INDICE_PRIMER_DADO], dicesToCheck[INDICE_SEGUNDO_DADO]);
                         model.put("diceCode", diceCode);
-                        responseToFives(diceCode, inGamePlayerStats, nextInGameStats);
+                        responseToFives(diceCode, inGamePlayerStats, matchId, model);
                         if(diceCode == SUMA_DADOS_5 || diceCode == DOS_DADOS_5) {
                             return "redirect:/ludoMatches/" + matchId;
                         }
@@ -108,18 +118,22 @@ public class LudoBoardController {
             if(ludoChipService.noChipsOutOfHome(ludoChips,inGameId)){
                 if(!flagDobles) {
                     dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
-                    passTurn(inGamePlayerStats, nextInGameStats);
+                    passTurn(inGamePlayerStats, matchId);
                 }
                 return "redirect:/ludoMatches/" + matchId;
             }
             //Comprueba los bloqueos, fuerza a romperlos si has sacado dobles
-            List<LudoChip>  chipsToBreak = ludoChipService.breakBlocks(ludoChips, inGameId);
-            if(chipsToBreak.size() != 0) {
-                return "redirect:/ludoInGame/chooseChip/0";
+            if(flagDobles) {
+                List<LudoChip>  chipsToBreak = ludoChipService.breakBlocks(ludoChips, inGameId);
+                if(chipsToBreak.size() != 0) {
+                    return "redirect:/ludoInGame/chooseChip/0";
+                } else {
+                    session.setAttribute("especial","You got a double roll!! You can roll the dice again");
+                }
             }
             //Ya no te quedan movimientos, tu turno ha terminado
             if(!checkDicesLeft()) {
-                passTurn(inGamePlayerStats, nextInGameStats);
+                passTurn(inGamePlayerStats, matchId);
                 return "redirect:/ludoMatches/" + matchId;
             }
             return "matches/ludoMatch";
@@ -141,10 +155,17 @@ public class LudoBoardController {
             List<LudoChip> ludoChips = new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
             PlayerLudoStats inGamePlayerStats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(
                 authenticatedUser.getUsername(), matchId).get();
-            List<LudoChip>  chipsToBreak=ludoChipService.breakBlocks(ludoChips,inGamePlayerStats.getInGameId());
 
+            Boolean flagDobles = (Boolean) session.getAttribute("flagDobles");
+            List<LudoChip>  chipsToBreak = new ArrayList<>();
+            if(flagDobles) {
+                chipsToBreak=ludoChipService.breakBlocks(ludoChips,inGamePlayerStats.getInGameId());
+            }
             if(dicesToCheck[diceIndex]==20){
-                model.addAttribute("message","You ate a chip so you get another free 20 movements on the house");
+                model.addAttribute("message","You ate a chip so you get another free 20 movements, on the house.");
+            }
+            if(dicesToCheck[diceIndex]==10){
+                model.addAttribute("message","You scored one of your chips so you get another free 10 moves!");
             }
             if(chipsToBreak.size() != 0) {
                 model.put("breakBlock", true);
@@ -156,7 +177,7 @@ public class LudoBoardController {
                 model.put("chipsToMove",chipsToMove);
             }
             else{
-                model.put("chipsToMove",ALLPLAYERCHIPS);
+                model.put("chipsToMove", ALL_CHIPS_OF_A_PLAYER);
             }
             int[] dicesToShow = (int[])session.getAttribute("dices");
             model.addAttribute("diceIndex", diceIndex);
@@ -185,16 +206,18 @@ public class LudoBoardController {
             List<LudoChip> chips =new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
             LudoChip chip=ludoChipService.findConcreteChip(matchId,inGameChipId,inGamePlayerId).get();
             Integer moveCode = ludoChipService.move(chip,dicesToCheck[diceIndex],chips,pls, matchId);
-            Integer nextInGameId = (inGamePlayerId+1)%(chips.size()/4);
-            PlayerLudoStats nextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
             dicesToCheck[diceIndex]=0;
 
-            if(moveCode==ATE_CHIP){
+            if(moveCode==ATE_CHIP || moveCode==BLOCKED_AND_ATE){
                 dicesToCheck[diceIndex]=20;
                 return "redirect:/ludoInGame/chooseChip/"+diceIndex;
             }else if(moveCode==LANDED_FINAL){
                 dicesToCheck[diceIndex]=10;
                 return "redirect:/ludoInGame/chooseChip/"+diceIndex;
+            }else if(moveCode==GOT_BLOCKED) {
+                session.setAttribute("especial", "You got blocked, so your chip landed tight before the block");
+            }else if(moveCode==ENDED_THE_GAME) {
+                return "redirect:/ludoMatches/"+matchId;
             }
             else if(checkDicesLeft()){
                 return "redirect:/ludoInGame/chooseChip/"+Integer.toString((diceIndex+1)%2);
@@ -203,12 +226,11 @@ public class LudoBoardController {
                 return "redirect:/ludoMatches/"+matchId;
             }
             else{
-                passTurn(pls, nextInGameStats);
+                passTurn(pls, matchId);
                 return "redirect:/ludoMatches/"+matchId;
             }
-        } else {
-            return "redirect:/";
         }
+        return "redirect:/";
     }
 
     private boolean checkDicesLeft(){
@@ -216,24 +238,32 @@ public class LudoBoardController {
     }
 
     //Resetea los dados usados y muestra los mensajes pertinentes
-    private void responseToFives(Integer diceCode, PlayerLudoStats inGamePlayerStats, PlayerLudoStats nextInGameStats) {
+    private void responseToFives(Integer diceCode, PlayerLudoStats inGamePlayerStats, Integer matchId, ModelMap model) {
         if(diceCode==PRIMER_DADO_5){
             dicesToCheck[INDICE_PRIMER_DADO]=0;
+            model.addAttribute("message", "You rolled  5, so one of your chips got taken out");
         }
         else if(diceCode==SEGUNDO_DADO_5){
             dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+            model.addAttribute("message", "You rolled  5, so one of your chips got taken out");
         }
         else if(diceCode==SUMA_DADOS_5){
             dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
-            passTurn(inGamePlayerStats, nextInGameStats);
+            passTurn(inGamePlayerStats, matchId);
+            model.addAttribute("message", "Your roll sums 5, so one of your chips got taken out");
         } else if(diceCode == DOS_DADOS_5){
             dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+            model.addAttribute("message", "You rolled 5 on both dices, so two of your chips got taken out");
         }
     }
 
-    private void passTurn(PlayerLudoStats inGamePlayerStats, PlayerLudoStats nextInGameStats) {
+    private void passTurn(PlayerLudoStats inGamePlayerStats, Integer matchId) {
+        Integer numberOfPlayers = ludoChipService.findChipsByMatchId(matchId).size()/4;
+        Integer nextInGameId = (inGamePlayerStats.getInGameId()+1)%numberOfPlayers;
+        PlayerLudoStats nextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
         nextInGameStats.setHasTurn(1);
         inGamePlayerStats.setHasTurn(0);
+        inGamePlayerStats.setTurnDoubleRolls(0);
         playerLudoStatsService.saveStats(inGamePlayerStats);
         playerLudoStatsService.saveStats(nextInGameStats);
     }
