@@ -11,9 +11,12 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 
 @Service
+@Slf4j
 public class GooseMatchService {
 
     private GooseMatchRepository gooseMatchRepository;
@@ -28,6 +31,7 @@ public class GooseMatchService {
     }
 
     public Boolean findEveryoneExceptOneLeft(GooseMatch gooseMatch){
+    	log.debug("Finding everyone in a Goose match except the one that left");
         Integer numberOfAfkPlayers = 0;
         Boolean res = false;
 
@@ -49,61 +53,73 @@ public class GooseMatchService {
 
     @Transactional(readOnly = true)
     public Optional<GooseMatch> findGooseMatchByMatchCode(String matchCode) throws DataAccessException{
+    	log.debug("Finding Goose match with code '{}'", matchCode);
         return gooseMatchRepository.findMatchByMatchCode(matchCode);
     }
 
     @Transactional(readOnly = true)
     public Optional<GooseMatch> findGooseMatchById(int id) throws DataAccessException {
+    	log.debug("Finding Goose match with id '{}'", id);
         return gooseMatchRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
     public Collection<GooseMatch> findAll() throws DataAccessException{
+    	log.debug("Finding all Goose matches");
         return gooseMatchRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Slice<GooseMatch> findAllPaging(Pageable pageable) throws DataAccessException {
+    	log.debug("Finding all Goose matches with page size {}", pageable.getPageSize());
         return gooseMatchRepository.findAll(pageable);
     }
 
     @Transactional(readOnly=true)
     public Optional<GooseMatch> findLobbyByUsername(String username) throws DataAccessException{
+    	log.debug("Finding lobby with player '{}'", username);
         return gooseMatchRepository.findLobbyByUsername(username);
     }
 
     @Transactional(readOnly=true)
     public Collection<GooseMatch> findEndedGooseMatches() throws DataAccessException{
+    	log.debug("Finding all finished Goose matches");
         return gooseMatchRepository.findEndedGooseMatches();
     }
 
     @Transactional(readOnly=true)
     public Collection<GooseMatch> findMatchesByUsername(String username) throws DataAccessException{
+    	log.debug("Finding all {}'s Goose matches", username);
         return gooseMatchRepository.findMatchesByUsername(username);
     }
 
     @Transactional(readOnly=true)
     public Slice<GooseMatch> findMatchesByUsernameWithPaging(String username, Pageable pageable) throws DataAccessException{
+    	log.debug("Finding all {}'s Goose matches with page size {} and page number {}", username,pageable.getPageSize(), pageable.getPageNumber());
         return gooseMatchRepository.findMatchesByUsernameWithPaging(username, pageable);
     }
 
     @Transactional(readOnly=true)
     public Page<GooseMatch> findMatchesByStartDate(Date date, Pageable pageable) throws DataAccessException{
+    	log.debug("Finding all Goose matches that started on '{}' with page size {} and page number {}", date.toString(), pageable.getPageSize(), pageable.getPageNumber());
         return gooseMatchRepository.findGooseMatchByStartDate(date, pageable);
     }
 
     @Transactional(readOnly=true)
     public Page<GooseMatch> findMatchesByEndDate(Date date, Pageable pageable) throws DataAccessException{
+    	log.debug("Finding all Goose matches that ended on '{}' with page size {} and page number {}", date.toString(), pageable.getPageSize(), pageable.getPageNumber());
         return gooseMatchRepository.findGooseMatchByEndDate(date, pageable);
     }
 
     @Transactional
     public GooseMatch save(GooseMatch gooseMatch) throws DataAccessException {
+    	log.debug("Saving Goose match with match code '{}'",gooseMatch.getMatchCode() );
         return gooseMatchRepository.save(gooseMatch);
     }
 
     @Transactional
     public GooseMatch saveGooseMatchWithPlayer(GooseMatch gooseMatch, Player player, Boolean isOwner) throws DataAccessException {
+    	log.debug("Saving Goose match with code '{}' and player '{}'", gooseMatch.getMatchCode(), player.getUser().getUsername());
         //Saves the match
         GooseMatch gooseMatchDB = gooseMatchRepository.save(gooseMatch);
 
