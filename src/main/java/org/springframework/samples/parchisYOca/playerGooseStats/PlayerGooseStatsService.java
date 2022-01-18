@@ -8,9 +8,12 @@ import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsSe
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 
 @Service
+@Slf4j
 public class PlayerGooseStatsService {
 
     private PlayerGooseStatsRepository playerGooseStatsRepository;
@@ -22,6 +25,7 @@ public class PlayerGooseStatsService {
 
     //Used to show stats in profile
     public PlayerGooseStats sumStats(Collection<PlayerGooseStats> statsList){
+    	log.debug("Calculating the sum of all Goose stats");
         PlayerGooseStats stats = new PlayerGooseStats();
         for(PlayerGooseStats pgs : statsList){
             stats.setDoubleRolls(pgs.getDoubleRolls() + stats.getDoubleRolls());
@@ -40,6 +44,7 @@ public class PlayerGooseStatsService {
 
     //Used to show rankings
     private Map<String, PlayerGooseStats> sumStatsByPlayer(Collection<PlayerGooseStats> statsList){
+    	log.debug("Calculating the sum of all Goose stats by player");
         Map<String, PlayerGooseStats> map = new HashMap<>();
         for(PlayerGooseStats pgs : statsList){
             String username = pgs.getPlayer().getUser().getUsername();
@@ -58,6 +63,7 @@ public class PlayerGooseStatsService {
 
     //Used to show rankings
     public List<PlayerGooseStats> top3MostGooseWins(Set<PlayerGooseStats> setGooseStats, String statToCheck){
+    	log.debug("Getting the top 3 of Goose");
         Map<String, PlayerGooseStats> gooseStatsByPlayer = sumStatsByPlayer(setGooseStats);
         PlayerGooseStats most = new PlayerGooseStats();
         PlayerGooseStats secondMost = new PlayerGooseStats();
@@ -96,37 +102,44 @@ public class PlayerGooseStatsService {
 
     @Transactional(readOnly = true)
     public Iterable<PlayerGooseStats> findAll() throws DataAccessException {
+    	log.debug("Getting all PlayerGooseStats");
         return playerGooseStatsRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Optional<PlayerGooseStats> findGooseStatsByUsernamedAndMatchId(String username, Integer matchId) throws DataAccessException {
+    	log.debug("Getting the stats of {} in the Goose match with id {}", username, matchId);
         return playerGooseStatsRepository.findPlayerGooseStatsByUsernamedAndMatchId(username, matchId);
     }
 
     @Transactional(readOnly = true)
     public Optional<PlayerGooseStats> findPlayerGooseStatsByInGameIdAndMatchId(Integer inGameId, Integer matchId) throws DataAccessException {
+    	log.debug("Finding PlayerGooseStats of player with inGameId '{}' in Goose match with id '{}'",inGameId,matchId);
         return playerGooseStatsRepository.findPlayerGooseStatsByInGameIdAndMatchId(inGameId, matchId);
     }
 
     @Transactional(readOnly = true)
     public Collection<PlayerGooseStats> findPlayerGooseStatsByUsername(String username) throws DataAccessException {
+    	log.debug("Finding {}'s PlayerGooseStats", username);
         return playerGooseStatsRepository.findPlayerGooseStatsByUsername(username);
     }
 
 
     @Transactional
     public PlayerGooseStats saveStats(PlayerGooseStats playerGooseStats) throws DataAccessException {
+    	log.debug("Saving {}'s PlayerGooseStats", playerGooseStats.getPlayer().getUser().getUsername());
         return playerGooseStatsRepository.save(playerGooseStats);
     }
 
     @Transactional
     public void removeGooseStatsFromGame(Integer statsId, Integer gooseMatchId) throws DataAccessException {
+    	log.debug("Deleting PlayerGooseStats with id '{}' and matchId '{}'",statsId,gooseMatchId);
         playerGooseStatsRepository.deletePlayerFromGame(statsId, gooseMatchId);
     }
 
     @Transactional
     public void removeAllGooseStatsFromGame(Integer gooseMatchId) throws DataAccessException {
+    	log.debug("Removing all PlayerGooseStats from match with id '{}'", gooseMatchId);
         playerGooseStatsRepository.deleteStatsFromGame(gooseMatchId);
     }
 
