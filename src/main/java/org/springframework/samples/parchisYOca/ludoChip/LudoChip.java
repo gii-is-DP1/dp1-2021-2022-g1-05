@@ -27,6 +27,11 @@ public class LudoChip  extends BaseEntity {
 	private static final Integer X_HOME_R= 633;
 	private static final Integer Y_HOME_T = 53;
 	private static final Integer Y_HOME_B = 633;
+	private static final Integer GREEN_X_FINISH = 353;
+	private static final Integer BLUE_X_FINISH = 504;
+	private static final Integer RED_Y_FINISH = 353;
+	private static final Integer YELLOW_Y_FINISH = 504;
+	private static final Integer END_DISP = 20;
 	private static final Pair<List<Integer>, Integer> row1 = Pair.of(Arrays.asList(32, 33, 34), 14);
 	private static final Pair<List<Integer>, Integer> row2 = Pair.of(Arrays.asList(31, 35), 53);
 	private static final Pair<List<Integer>, Integer> row3 = Pair.of(Arrays.asList(30, 36), 95);
@@ -117,33 +122,33 @@ public class LudoChip  extends BaseEntity {
 
     }
     public static Integer getX(Color color,Integer chipId,GameState gameState,
-    		Boolean isNotAlone, Integer position) {
+    		Boolean oneToDisplace, Integer position) {
     	Integer x = null;
     	switch(gameState) {
     	case earlyGame:
     		x = getXHome(color, chipId);
     		break;
     	case midGame:
-    		x = getXMidgame(position, isNotAlone);
+    		x = getXMidgame(position, oneToDisplace);
     		break;
     	case endGame:
-    		x = getXEndGame(position, color);
+    		x = getXEndGame(position, color, chipId);
     		break;
     	}
     	return x;
     }
     public static Integer getY(Color color,Integer chipId,GameState gameState,
-    		Boolean isNotAlone, Integer position) {
+    		Boolean oneToDsplace, Integer position) {
     	Integer y = null;
     	switch(gameState) {
     	case earlyGame:
     		y = getYHome(color, chipId);
     		break;
     	case midGame:
-    		y = getYMidgame(position, isNotAlone);
+    		y = getYMidgame(position, oneToDsplace);
     		break;
     	case endGame:
-    		y = getYEndGame(position, color);
+    		y = getYEndGame(position, color, chipId);
 		break;
 	}
     	return y;
@@ -206,7 +211,7 @@ public class LudoChip  extends BaseEntity {
     	}
     	return homeY + disp;
     }
-    public static Integer getXMidgame(Integer position, Boolean isNotAlone) {
+    public static Integer getXMidgame(Integer position, Boolean oneToDisplace) {
     	Integer x = null;
     	Integer disp = 0;
     	if(col1.getFirst().contains(position)) {x = col1.getSecond();}
@@ -216,9 +221,9 @@ public class LudoChip  extends BaseEntity {
     	if(col5.getFirst().contains(position)) {x = col5.getSecond();}
     	if(col6.getFirst().contains(position)) {x = col6.getSecond();}
     	if(col7.getFirst().contains(position)) {x = col7.getSecond();}
-    	if(col8.getFirst().contains(position)) {x = col8.getSecond();if(isNotAlone) {disp = DISPLACEMENT;}}
-    	if(col9.getFirst().contains(position)) {x = col9.getSecond();if(isNotAlone) {disp = DISPLACEMENT;}}
-    	if(col10.getFirst().contains(position)) {x = col10.getSecond();if(isNotAlone) {disp = DISPLACEMENT;}}
+    	if(col8.getFirst().contains(position)) {x = col8.getSecond();if(oneToDisplace) {disp = DISPLACEMENT;}}
+    	if(col9.getFirst().contains(position)) {x = col9.getSecond();if(oneToDisplace) {disp = DISPLACEMENT;}}
+    	if(col10.getFirst().contains(position)) {x = col10.getSecond();if(oneToDisplace) {disp = DISPLACEMENT;}}
     	if(col11.getFirst().contains(position)) {x = col11.getSecond();}
     	if(col12.getFirst().contains(position)) {x = col12.getSecond();}
     	if(col13.getFirst().contains(position)) {x = col13.getSecond();}
@@ -230,7 +235,7 @@ public class LudoChip  extends BaseEntity {
     	if(corsX824.getFirst().contains(position)) {x = corsX824.getSecond();}
     	return x + disp;
     }
-    public static Integer getYMidgame(Integer position, Boolean isNotAlone) {
+    public static Integer getYMidgame(Integer position, Boolean oneToDisplace) {
     	Integer y = null;
     	Integer disp = 0;
     	if(row1.getFirst().contains(position)) {y = row1.getSecond();}
@@ -240,9 +245,9 @@ public class LudoChip  extends BaseEntity {
     	if(row5.getFirst().contains(position)) {y = row5.getSecond();}
     	if(row6.getFirst().contains(position)) {y = row6.getSecond();}
     	if(row7.getFirst().contains(position)) {y = row7.getSecond();}
-    	if(row8.getFirst().contains(position)) {y = row8.getSecond(); if(isNotAlone) {disp = DISPLACEMENT;}}
-    	if(row9.getFirst().contains(position)) {y = row9.getSecond(); if(isNotAlone) {disp = DISPLACEMENT;}}
-    	if(row10.getFirst().contains(position)) {y = row10.getSecond(); if(isNotAlone) {disp = DISPLACEMENT;}}
+    	if(row8.getFirst().contains(position)) {y = row8.getSecond(); if(oneToDisplace) {disp = DISPLACEMENT;}}
+    	if(row9.getFirst().contains(position)) {y = row9.getSecond(); if(oneToDisplace) {disp = DISPLACEMENT;}}
+    	if(row10.getFirst().contains(position)) {y = row10.getSecond(); if(oneToDisplace) {disp = DISPLACEMENT;}}
     	if(row11.getFirst().contains(position)) {y = row11.getSecond();}
     	if(row12.getFirst().contains(position)) {y = row12.getSecond();}
     	if(row13.getFirst().contains(position)) {y = row13.getSecond();}
@@ -254,11 +259,11 @@ public class LudoChip  extends BaseEntity {
     	if(corsY597.getFirst().contains(position)) {y = corsY597.getSecond();}
     	return y + disp;
     }
-    public static Integer getXEndGame(Integer position, Color color) {
+    public static Integer getXEndGame(Integer position, Color color, Integer inGameChipId) {
     	Integer x = null;
     	switch(color) {
     	case Red:
-    		x = col9.getSecond();
+    		x = col9.getSecond()+inGameChipId*END_DISP;
     		break;
     	case Green:
     		x = getXEndGameGreen(position);
@@ -267,23 +272,23 @@ public class LudoChip  extends BaseEntity {
     		x = getXEndGameBlue(position);
     		break;
     	case Yellow:
-    		x = col9.getSecond();
+    		x = col9.getSecond()+inGameChipId*END_DISP;
     		break;
     	
     	}
     	return x;
     }
-    public static Integer getYEndGame(Integer position, Color color) {
+    public static Integer getYEndGame(Integer position, Color color, Integer inGameChipId) {
     	Integer y = null;
     	switch(color) {
     	case Red:
     		y = getYEndGameRed(position);
     		break;
     	case Green:
-    		y = row9.getSecond();
+    		y = row9.getSecond()+inGameChipId*END_DISP;
     		break;
     	case Blue:
-    		y = row9.getSecond();
+    		y = row9.getSecond()+inGameChipId*END_DISP;
     		break;
     	case Yellow:
     		y = getYEndGameYellow(position);
@@ -294,18 +299,122 @@ public class LudoChip  extends BaseEntity {
     }
     public static Integer getXEndGameGreen(Integer position) {
     	Integer x = null;
+    	switch(position) {
+    	case 0:
+    		x =  col2.getSecond();
+    		break;
+    	case 1:
+    		x =  col3.getSecond();
+    		break;
+    	case 2:
+    		x =  col4.getSecond();
+    		break;
+    	case 3:
+    		x =  col5.getSecond();
+    		break;
+    	case 4:
+    		x =  col6.getSecond();
+    		break;
+    	case 5:
+    		x =  col7.getSecond();
+    		break;
+    	case 6:
+    		x =  col8.getSecond();
+    		break;
+    	case 7:
+    		x = GREEN_X_FINISH;
+    		break;
+    	}
     	return x;
     }
     public static Integer getXEndGameBlue(Integer position) {
     	Integer x = null;
+    	switch(position) {
+    	case 0:
+    		x = col16.getSecond();
+    		break;
+    	case 1:
+    		x = col15.getSecond();
+    		break;
+    	case 2:
+    		x = col14.getSecond();
+    		break;
+    	case 3:
+    		x = col13.getSecond();
+    		break;
+    	case 4:
+    		x = col12.getSecond();
+    		break;
+    	case 5:
+    		x = col11.getSecond();
+    		break;
+    	case 6:
+    		x = col10.getSecond();
+    		break;
+    	case 7:
+    		x = BLUE_X_FINISH;
+    		break;
+    	}
     	return x;
     }
     public static Integer getYEndGameRed(Integer position) {
     	Integer y = null;
+    	switch(position) {
+    	case 0:
+    		y = row2.getSecond();
+    		break;
+    	case 1:
+    		y = row3.getSecond();
+    		break;
+    	case 2:
+    		y = row4.getSecond();
+    		break;
+    	case 3:
+    		y = row5.getSecond();
+    		break;
+    	case 4:
+    		y = row6.getSecond();
+    		break;
+    	case 5:
+    		y = row7.getSecond();
+    		break;
+    	case 6:
+    		y = row8.getSecond();
+    		break;
+    	case 7:
+    		y = RED_Y_FINISH;
+    		break;
+    	}
     	return y;
     }
     public static Integer getYEndGameYellow(Integer position) {
     	Integer y = null;
+    	switch(position) {
+    	case 0:
+    		y = row16.getSecond();
+    		break;
+    	case 1:
+    		y = row15.getSecond();
+    		break;
+    	case 2:
+    		y = row14.getSecond();
+    		break;
+    	case 3:
+    		y = row13.getSecond();
+    		break;
+    	case 4:
+    		y = row12.getSecond();
+    		break;
+    	case 5:
+    		y = row11.getSecond();
+    		break;
+    	case 6:
+    		y = row10.getSecond();
+    		break;
+    	case 7:
+    		y = YELLOW_Y_FINISH;
+    		break;
+    	}
     	return y;
     }
 }
