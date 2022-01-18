@@ -88,60 +88,60 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th>Times where you have landed on one of the geese squares</th>
-                        <td><c:out value="${gooseStats.landedGeese}"/></td>
-                        <th>Number of tokens you ate</th>
-                        <td><c:out value="${ludoStats.eatenTokens}"/></td>
-                    </tr>
-                    <tr>
-                        <th>Times where you have landed on one of the dice squares</th>
-                        <td><c:out value="${gooseStats.landedDice}"/></td>
-                        <th>Number of double rolls</th>
-                        <td><c:out value="${ludoStats.doubleRolls}"/></td>
-                    </tr>
-                    <tr>
-                        <th>Times where you have landed on one of the bridge squares</th>
-                        <td><c:out value="${gooseStats.landedBridges}"/></td>
-                        <th>Number of greedy rolls</th>
-                        <td><c:out value="${ludoStats.greedyRolls}"/></td>
-                    </tr>
-                    <tr>
-                        <th>Times where you have landed on the jail square</th>
-                        <td><c:out value="${gooseStats.landedJails}"/></td>
-                        <th>Numbers of blocks you created</th>
-                        <td><c:out value="${ludoStats.createdBlocks}"/></td>
-                    </tr>
-                    <tr>
-                        <th>Times where you have landed on the inn square</th>
-                        <td><c:out value="${gooseStats.landedInn}"/></td>
-                        <th>Number of tokens you scored</th>
-                        <td><c:out value="${ludoStats.scoredTokens}"/></td>
-                    </tr>
-                    <tr>
-                        <th>Times where you have landed on the maze square</th>
-                        <td><c:out value="${gooseStats.landedMaze}"/></td>
-                        <th>Number of take outs</th>
-                        <td><c:out value="${ludoStats.takeOuts}"/></td>
-                    </tr>
-                    <tr>
-                        <th>Times where you have landed on the death square</th>
-                        <td><c:out value="${gooseStats.landedDeath}"/></td>
-                        <th>Number of squares walked</th>
-                        <td><c:out value="${ludoStats.walkedSquares}"/></td>
-                    </tr>
-                    <tr>
-                        <th>Number of double rolls</th>
-                        <td><c:out value="${gooseStats.doubleRolls}"/></td>
-                        <th>Number of ludo games won</th>
-                        <td><c:out value="${ludoStats.hasWon}"/></td>
-                    </tr>
-                    <tr>
-                        <th>Number of goose games won</th>
-                        <td><c:out value="${gooseStats.hasWon}"/></td>
-                        <th style="background-color: lightblue">Total number of games won</th>
-                        <td style="background-color: lightblue"><c:out value="${gooseStats.hasWon + ludoStats.hasWon}"/></td>
-                    </tr>
+                <tr>
+                    <th>Number of goose games won</th>
+                    <td><c:out value="${gooseStats.hasWon}"/></td>
+                    <th>Number of ludo games won</th>
+                    <td><c:out value="${ludoStats.hasWon}"/></td>
+                </tr>
+                <tr>
+                    <th>Number of double rolls</th>
+                    <td><c:out value="${gooseStats.doubleRolls}"/></td>
+                    <th>Number of double rolls</th>
+                    <td><c:out value="${ludoStats.doubleRolls}"/></td>
+                </tr>
+                <tr>
+                    <th>Times where players have landed on one of the geese squares</th>
+                    <td><c:out value="${gooseStats.landedGeese}"/></td>
+                    <th>Number of greedy rolls</th>
+                    <td><c:out value="${ludoStats.greedyRolls}"/></td>
+                </tr>
+                <tr>
+                    <th>Times where players have landed on the jail square</th>
+                    <td><c:out value="${gooseStats.landedJails}"/></td>
+                    <th>Number of tokens players ate</th>
+                    <td><c:out value="${ludoStats.eatenTokens}"/></td>
+                </tr>
+                <tr>
+                    <th>Times where players have landed on the inn square</th>
+                    <td><c:out value="${gooseStats.landedInn}"/></td>
+                    <th>Number of take outs</th>
+                    <td><c:out value="${ludoStats.takeOuts}"/></td>
+                </tr>
+                <tr>
+                    <th>Times where you players landed on the maze square</th>
+                    <td><c:out value="${gooseStats.landedMaze}"/></td>
+                    <th>Number of squares walked</th>
+                    <td><c:out value="${ludoStats.walkedSquares}"/></td>
+                </tr>
+                <tr>
+                    <th>Times where players have landed on the death square</th>
+                    <td><c:out value="${gooseStats.landedDeath}"/></td>
+                    <th>Number of tokens players scored</th>
+                    <td><c:out value="${ludoStats.scoredTokens}"/></td>
+                </tr>
+                <tr>
+                    <th>Times where players have landed on one of the dice squares</th>
+                    <td><c:out value="${gooseStats.landedDice}"/></td>
+                    <th></th>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>Times where players landed on one of the bridge squares</th>
+                    <td><c:out value="${gooseStats.landedBridges}"/></td>
+                    <th style="background-color: lightblue">Total number of games won</th>
+                    <td style="background-color: lightblue"><c:out value="${gooseStats.hasWon + ludoStats.hasWon}"/></td>
+                </tr>
                 </tbody>
             </table>
 
@@ -156,7 +156,7 @@
 
             <br>
 
-            <spring:url value="{playerId}/ludoMatchesPlayedpage=0" var="editUrl">
+            <spring:url value="{playerId}/ludoMatchesPlayed?page=0" var="editUrl">
                 <spring:param name="playerId" value="${player.id}"/>
             </spring:url>
             <a style="display: inline-block; margin: 0;" href="${fn:escapeXml(editUrl)}" class="btn btn-default">Ludo matches</a>

@@ -73,8 +73,6 @@
 
                         <td><c:out value="${stats.greedyRolls}"/></td>
 
-                        <td><c:out value="${stats.createdBlocks}"/></td>
-
                         <td><c:out value="${stats.scoredTokens}"/></td>
 
                         <td><c:out value="${stats.takeOuts}"/></td>
