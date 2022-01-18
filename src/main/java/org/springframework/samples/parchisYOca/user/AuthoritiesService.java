@@ -38,9 +38,13 @@ public class AuthoritiesService {
         this.userService = userService;
     }
 
+    @Transactional
+    public Optional<Authorities> findById(Integer id) throws DataAccessException{
+        return authoritiesRepository.findById(id);
+    }
 
     @Transactional
-    public void saveAuthorities(String username, String role) throws DataAccessException {
+    public Authorities saveAuthorities(String username, String role) throws DataAccessException {
         Authorities authority = new Authorities();
         log.debug("Saving authority {} for user {}", role, username);
         Optional<User> user = userService.findUserByUsername(username);
@@ -53,6 +57,7 @@ public class AuthoritiesService {
         	log.debug("User {} not found", username);
             throw new DataAccessException("User '"+username+"' not found!") {};
         }
+        return authority;
     }
 
 

@@ -33,7 +33,6 @@ public class UserService {
     @Transactional
     public void saveUser(User user) throws DataAccessException {
     	log.debug("Saving user: {}", user.getUsername());
-        user.setEnabled(true);
         userRepository.save(user);
     }
 

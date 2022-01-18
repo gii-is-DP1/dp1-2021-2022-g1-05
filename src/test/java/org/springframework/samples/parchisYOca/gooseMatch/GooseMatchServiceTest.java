@@ -2,10 +2,14 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -15,10 +19,7 @@ import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import java.util.*;
 
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
@@ -26,6 +27,11 @@ public class GooseMatchServiceTest {
 
     protected final Integer MATCH_CODE_LENGTH = 6;
     protected final Integer INVALID_CODE_LENGTH = 5;
+    protected final String USERNAME = "ManuK";
+    protected final String MATCH_CODE_1 = "09yupo";
+    protected final String MATCH_CODE_2 = "JANORL";
+    protected final String MATCH_CODE_3 = "123456";
+    protected final String MATCH_CODE_4 = "9floep";
 
     @Autowired
     protected GooseMatchService gooseMatchService;
@@ -34,15 +40,47 @@ public class GooseMatchServiceTest {
     @Autowired
     protected PlayerGooseStatsService playerGooseStatsService;
 
+    @BeforeEach
+    public void addMatchesWithDates(){
+        GooseMatch newMatch1 = new GooseMatch();
+        String matchCode1 = MATCH_CODE_1;
+        newMatch1.setMatchCode(matchCode1);
+        newMatch1.setStartDate(new Date());
+        gooseMatchService.save(newMatch1);
+        GooseMatch newMatch2 = new GooseMatch();
+        String matchCode2 = MATCH_CODE_2;
+        newMatch2.setMatchCode(matchCode2);
+        newMatch2.setEndDate(new Date());
+        gooseMatchService.save(newMatch2);
+        GooseMatch newMatch3 = new GooseMatch();
+        String matchCode3 = MATCH_CODE_3;
+        newMatch3.setMatchCode(matchCode3);
+        Date date1 = new GregorianCalendar(2020, Calendar.FEBRUARY, 11).getTime();
+        newMatch3.setStartDate(date1);
+        gooseMatchService.save(newMatch3);
+        GooseMatch newMatch4 = new GooseMatch();
+        String matchCode4 = MATCH_CODE_4;
+        newMatch4.setMatchCode(matchCode4);
+        Date date2 = new GregorianCalendar(2021, Calendar.MAY, 23).getTime();
+        newMatch4.setEndDate(date2);
+        gooseMatchService.save(newMatch4);
+    }
+
+
     @Test
     @Transactional
-    public void getWithMatchCode(){
-        Assertions.assertThat(gooseMatchService.findGooseMatchByMatchCode("111111").isPresent());
+    public void testGetWithMatchCode(){
+        GooseMatch newMatch = new GooseMatch();
+        String matchCode = "abcdef";
+        newMatch.setMatchCode(matchCode);
+        GooseMatch addedMatch = gooseMatchService.save(newMatch);
+        Assertions.assertThat(gooseMatchService.findGooseMatchByMatchCode(matchCode).isPresent());
+        Assertions.assertThat(gooseMatchService.findGooseMatchByMatchCode(matchCode).get()).isEqualTo(addedMatch);
     }
 
     @Test
     @Transactional
-    public void getWithWrongMatchCode(){
+    public void testGetWithWrongMatchCode(){
         Assertions.assertThat(gooseMatchService.findGooseMatchByMatchCode("").isEmpty());
     }
 
@@ -152,6 +190,77 @@ public class GooseMatchServiceTest {
         pgs.setHasTurn(Integer.MIN_VALUE);
         playerGooseStatsService.saveStats(pgs);
         Assertions.assertThat(gooseMatchService.findEveryoneExceptOneLeft(addedMatch2)).isEqualTo(true);
+    }
+
+    @Test
+    public void testFindEndedGooseMatches() {
+        Integer numberOfEndedMatches = 2;
+        Assertions.assertThat(gooseMatchService.findEndedGooseMatches().size()).isEqualTo(numberOfEndedMatches);
+    }
+
+    @Test
+    public void testFindGooseMatchesOfPlayer() {
+        Assertions.assertThat(playerService.findPlayerByUsername(USERNAME).isPresent());
+        Player player = playerService.findPlayerByUsername(USERNAME).get();
+        GooseMatch gooseMatch = new GooseMatch();
+        gooseMatch.setMatchCode("abcdef");
+        gooseMatchService.save(gooseMatch);
+        PlayerGooseStats pgs1 = new PlayerGooseStats();
+        pgs1.setPlayer(player);
+        pgs1.setGooseMatch(gooseMatch);
+        playerGooseStatsService.saveStats(pgs1);
+
+        Assertions.assertThat(gooseMatchService.findMatchesByUsername(USERNAME).size()).isEqualTo(1);
+        Assertions.assertThat(gooseMatchService.findMatchesByUsername("").size()).isEqualTo(0);
+        Assertions.assertThat(gooseMatchService.findEndedGooseMatches().contains(gooseMatch));
+    }
+
+    @Test
+    public void testFindGooseMatchesByUsernameWithPaging() {
+        Assertions.assertThat(playerService.findPlayerByUsername(USERNAME).isPresent());
+        Player player = playerService.findPlayerByUsername(USERNAME).get();
+        GooseMatch gooseMatch1 = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_1).get();
+        GooseMatch gooseMatch2 = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_2).get();
+        GooseMatch gooseMatch3 = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_3).get();
+        PlayerGooseStats pgs1 = new PlayerGooseStats();
+        pgs1.setPlayer(player);
+        pgs1.setGooseMatch(gooseMatch1);
+        playerGooseStatsService.saveStats(pgs1);
+        PlayerGooseStats pgs2 = new PlayerGooseStats();
+        pgs2.setPlayer(player);
+        pgs2.setGooseMatch(gooseMatch2);
+        playerGooseStatsService.saveStats(pgs2);
+        PlayerGooseStats pgs3 = new PlayerGooseStats();
+        pgs3.setPlayer(player);
+        pgs3.setGooseMatch(gooseMatch3);
+        playerGooseStatsService.saveStats(pgs3);
+        Pageable pageable = PageRequest.of(0,2);
+
+        Assertions.assertThat(gooseMatchService.findMatchesByUsernameWithPaging(USERNAME, pageable).getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(gooseMatchService.findMatchesByUsernameWithPaging(USERNAME, pageable).getContent().contains(gooseMatch1));
+        Assertions.assertThat(gooseMatchService.findMatchesByUsernameWithPaging("", pageable).getNumberOfElements()).isEqualTo(0);
+    }
+
+    @Test
+    public void testFindByStartDate() {
+        Date date1 = new GregorianCalendar(2020, Calendar.FEBRUARY, 10).getTime();
+        Date date2 = new GregorianCalendar(2020, Calendar.MAY, 10).getTime();
+
+        Assertions.assertThat(gooseMatchService.findMatchesByStartDate(date1, Pageable.unpaged()).getTotalElements()).isEqualTo(2);
+        Assertions.assertThat(gooseMatchService.findMatchesByStartDate(date2, Pageable.unpaged()).getTotalElements()).isEqualTo(1);
+        Assertions.assertThat(gooseMatchService.findMatchesByStartDate(date1, PageRequest.of(0,1)).getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(gooseMatchService.findMatchesByStartDate(date1, PageRequest.of(0,1)).getTotalElements()).isEqualTo(2);
+    }
+
+    @Test
+    public void testFindByEndDate() {
+        Date date1 = new GregorianCalendar(2021, Calendar.MAY, 22).getTime();
+        Date date2 = new GregorianCalendar(2021, Calendar.AUGUST, 10).getTime();
+
+        Assertions.assertThat(gooseMatchService.findMatchesByEndDate(date1, Pageable.unpaged()).getTotalElements()).isEqualTo(2);
+        Assertions.assertThat(gooseMatchService.findMatchesByEndDate(date2, Pageable.unpaged()).getTotalElements()).isEqualTo(1);
+        Assertions.assertThat(gooseMatchService.findMatchesByEndDate(date1, PageRequest.of(0,1)).getNumberOfElements()).isEqualTo(1);
+        Assertions.assertThat(gooseMatchService.findMatchesByEndDate(date1, PageRequest.of(0,1)).getTotalElements()).isEqualTo(2);
     }
 
 
