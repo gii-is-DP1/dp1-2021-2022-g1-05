@@ -17,4 +17,6 @@ public interface PlayerGooseStatsRepository extends CrudRepository<PlayerGooseSt
     @Query(value = "SELECT DISTINCT playerGooseStats FROM PlayerGooseStats playerGooseStats WHERE playerGooseStats.player.user.username = :username")
     Collection<PlayerGooseStats> findPlayerGooseStatsByUsername(String username);
 
+    Collection<PlayerGooseStats> findAll();
+
 }

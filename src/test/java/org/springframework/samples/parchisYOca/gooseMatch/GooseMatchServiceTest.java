@@ -18,12 +18,14 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.util.RandomStringGenerator;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class GooseMatchServiceTest {
 
     protected final Integer MATCH_CODE_LENGTH = 6;
@@ -43,11 +45,11 @@ public class GooseMatchServiceTest {
 
     @BeforeEach
     public void addMatchesWithDates(){
+        //Populate with matches
         GooseMatch newMatch1 = new GooseMatch();
         String matchCode1 = MATCH_CODE_1;
         newMatch1.setMatchCode(matchCode1);
         newMatch1.setStartDate(new Date());
-        gooseMatchService.save(newMatch1);
         GooseMatch newMatch2 = new GooseMatch();
         String matchCode2 = MATCH_CODE_2;
         newMatch2.setMatchCode(matchCode2);
@@ -65,6 +67,33 @@ public class GooseMatchServiceTest {
         Date date2 = new GregorianCalendar(2021, Calendar.MAY, 23).getTime();
         newMatch4.setEndDate(date2);
         gooseMatchService.save(newMatch4);
+
+        //Populate stats
+        Player player = playerService.findPlayerByUsername(USERNAME).get();
+        PlayerGooseStats pgs1 = new PlayerGooseStats();
+        pgs1.setPlayer(player);
+        pgs1.setHasWon(1);
+        pgs1.setLandedGeese(20);
+        pgs1.setLandedDice(30);
+        pgs1.setInGameId(1);
+        playerGooseStatsService.saveStats(pgs1);
+        PlayerGooseStats pgs2 = new PlayerGooseStats();
+        pgs2.setPlayer(player);
+        pgs2.setHasWon(1);
+        pgs2.setInGameId(3);
+        playerGooseStatsService.saveStats(pgs2);
+        PlayerGooseStats pgs3 = new PlayerGooseStats();
+        pgs3.setPlayer(player);
+        pgs3.setLandedDeath(2);
+        pgs3.setLandedGeese(50);
+        pgs3.setLandedDice(80);
+        pgs3.setInGameId(1);
+        playerGooseStatsService.saveStats(pgs3);
+
+        Set<PlayerGooseStats> statsOfGame1 = Set.of(pgs1, pgs2, pgs3);
+        newMatch1.setStats(statsOfGame1);
+        gooseMatchService.save(newMatch1);
+
     }
 
 
@@ -207,37 +236,38 @@ public class GooseMatchServiceTest {
         gooseMatch.setMatchCode("abcdef");
         PlayerGooseStats pgs1 = new PlayerGooseStats();
         pgs1.setPlayer(player);
-        playerGooseStatsService.saveStats(pgs1);
-        Set<PlayerGooseStats> statsSet = gooseMatch.getStats();
-        statsSet.add(pgs1);
+        PlayerGooseStats savedStats = playerGooseStatsService.saveStats(pgs1);
+        Set<PlayerGooseStats> statsSet = Set.of(savedStats);
         gooseMatch.setStats(statsSet);
         gooseMatchService.save(gooseMatch);
 
-        Assertions.assertThat(gooseMatchService.findMatchesByUsername(USERNAME).size()).isEqualTo(1);
+        Assertions.assertThat(gooseMatchService.findMatchesByUsername(USERNAME).size()).isEqualTo(2);
         Assertions.assertThat(gooseMatchService.findMatchesByUsername("").size()).isEqualTo(0);
         Assertions.assertThat(gooseMatchService.findEndedGooseMatches().contains(gooseMatch));
     }
 
-   /* @Test
+   @Test
     public void testFindGooseMatchesByUsernameWithPaging() {
         Assertions.assertThat(playerService.findPlayerByUsername(USERNAME).isPresent());
         Player player = playerService.findPlayerByUsername(USERNAME).get();
         GooseMatch gooseMatch1 = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_1).get();
         GooseMatch gooseMatch2 = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_2).get();
         GooseMatch gooseMatch3 = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_3).get();
-        PlayerGooseStats pgs1 = new PlayerGooseStats();
-        pgs1.setPlayer(player);
-        pgs1.setGooseMatch(gooseMatch1);
-        playerGooseStatsService.saveStats(pgs1);
         PlayerGooseStats pgs2 = new PlayerGooseStats();
         pgs2.setPlayer(player);
-        pgs2.setGooseMatch(gooseMatch2);
-        playerGooseStatsService.saveStats(pgs2);
+        PlayerGooseStats savedStats2 = playerGooseStatsService.saveStats(pgs2);
         PlayerGooseStats pgs3 = new PlayerGooseStats();
         pgs3.setPlayer(player);
-        pgs3.setGooseMatch(gooseMatch3);
-        playerGooseStatsService.saveStats(pgs3);
+        PlayerGooseStats savedStats3 = playerGooseStatsService.saveStats(pgs3);
         Pageable pageable = PageRequest.of(0,2);
+       Set<PlayerGooseStats> statsSet2 = new HashSet<>();
+       statsSet2.add(savedStats2);
+       Set<PlayerGooseStats> statsSet3 = new HashSet<>();
+       statsSet3.add(savedStats3);
+       gooseMatch2.setStats(statsSet2);
+       gooseMatch3.setStats(statsSet3);
+       gooseMatchService.save(gooseMatch2);
+       gooseMatchService.save(gooseMatch3);
 
         Assertions.assertThat(gooseMatchService.findMatchesByUsernameWithPaging(USERNAME, pageable).getNumberOfElements()).isEqualTo(2);
         Assertions.assertThat(gooseMatchService.findMatchesByUsernameWithPaging(USERNAME, pageable).getContent().contains(gooseMatch1));
@@ -266,5 +296,23 @@ public class GooseMatchServiceTest {
         Assertions.assertThat(gooseMatchService.findMatchesByEndDate(date1, PageRequest.of(0,1)).getTotalElements()).isEqualTo(2);
     }
 
-*/
+    @Test
+    @Transactional
+    public void testRemoveGooseStatsFromGame() {
+        Integer statsToRemoveId = 1;
+        GooseMatch gm = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_1).get();
+        Assertions.assertThat(gm.getStats().size()).isEqualTo(3);
+        gooseMatchService.removeGooseStatsFromGame(playerGooseStatsService.findById(statsToRemoveId).get(),gm.getId());
+        Assertions.assertThat(gm.getStats().size()).isEqualTo(2);
+    }
+
+    @Test
+    @Transactional
+    public void testRemoveAllGooseStatsFromGame() {
+        GooseMatch gm = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_1).get();
+        Assertions.assertThat(gm.getStats().size()).isEqualTo(3);
+        gooseMatchService.removeAllGooseStatsFromGame(gm.getId());
+        Assertions.assertThat(gm.getStats().size()).isEqualTo(0);
+    }
+
 }

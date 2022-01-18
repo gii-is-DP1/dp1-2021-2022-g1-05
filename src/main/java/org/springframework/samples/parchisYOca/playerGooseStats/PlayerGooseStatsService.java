@@ -18,7 +18,7 @@ import java.util.*;
 @Slf4j
 public class PlayerGooseStatsService {
 
-    private PlayerGooseStatsRepository playerGooseStatsRepository;
+    private PlayerGooseStatsRepository  playerGooseStatsRepository;
 
     @Autowired
     public PlayerGooseStatsService(PlayerGooseStatsRepository playerGooseStatsRepository){
@@ -103,7 +103,7 @@ public class PlayerGooseStatsService {
     }
 
     @Transactional(readOnly = true)
-    public Iterable<PlayerGooseStats> findAll() throws DataAccessException {
+    public Collection<PlayerGooseStats> findAll() throws DataAccessException {
     	log.debug("Getting all PlayerGooseStats");
         return playerGooseStatsRepository.findAll();
     }

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ConstraintViolationException;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -171,7 +172,7 @@ public class PlayerServiceTests {
         gooseMatch.setStartDate(new Date());
         gooseMatch.setEndDate(new Date());
         gooseMatch.setMatchCode(TEST_MATCHCODE);
-        Set<PlayerGooseStats> statsOfGame = gooseMatch.getStats();
+        Set<PlayerGooseStats> statsOfGame = new HashSet<>();
         statsOfGame.add(playerGooseStats);
         gooseMatch.setStats(statsOfGame);
         gooseMatchService.save(gooseMatch);
@@ -193,7 +194,7 @@ public class PlayerServiceTests {
         ludoMatch.setStartDate(new Date());
         ludoMatch.setEndDate(new Date());
         ludoMatch.setMatchCode(TEST_MATCHCODE);
-        Set<PlayerLudoStats> statsOfGame = ludoMatch.getStats();
+        Set<PlayerLudoStats> statsOfGame = new HashSet<>();
         statsOfGame.add(playerLudoStats);
         ludoMatch.setStats(statsOfGame);
         ludoMatchService.save(ludoMatch);
