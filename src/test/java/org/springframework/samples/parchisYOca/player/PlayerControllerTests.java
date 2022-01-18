@@ -107,12 +107,12 @@ public class PlayerControllerTests {
     	Juan.setId(ID);
     	PlayerGooseStats juanGStats = new PlayerGooseStats();
     	juanGStats.setHasWon(WINNER);
-    	juanGStats.setGooseMatch(gMatch);
+    	//juanGStats.setGooseMatch(gMatch);
     	Optional<PlayerGooseStats> oJuanGStats = Optional.of(juanGStats);
     	Set<PlayerGooseStats> setGStats = Set.of(juanGStats);
     	PlayerLudoStats juanLStats = new PlayerLudoStats();
     	juanLStats.setHasWon(WINNER);
-    	juanLStats.setLudoMatch(lMatch);
+    	//juanLStats.setLudoMatch(lMatch);
     	Optional<PlayerLudoStats> oJuanLStats = Optional.of(juanLStats);
     	Set<PlayerLudoStats> setLStats = Set.of(juanLStats);
     	Optional<Player> oJuan = Optional.of(Juan);
