@@ -6,15 +6,19 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 
 @Service
+@Slf4j
 public class PlayerLudoStatsService {
 
     private PlayerLudoStatsRepository playerLudoStatsRepository;
 
     //Used to show stats in profile
     public PlayerLudoStats sumStats(Collection<PlayerLudoStats> statsList){
+    	log.info("Calculating the sum of all Ludo stats");
         PlayerLudoStats stats = new PlayerLudoStats();
         for(PlayerLudoStats pls : statsList){
             stats.setDoubleRolls(pls.getDoubleRolls() + stats.getDoubleRolls());

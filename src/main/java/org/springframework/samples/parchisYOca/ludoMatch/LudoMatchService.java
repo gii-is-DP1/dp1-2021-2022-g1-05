@@ -11,9 +11,12 @@ import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsSe
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 
 @Service
+@Slf4j
 public class LudoMatchService {
 
     private LudoMatchRepository ludoMatchRepository;
@@ -27,61 +30,73 @@ public class LudoMatchService {
 
     @Transactional(readOnly = true)
     public Optional<LudoMatch> findludoMatchByMatchCode(String matchCode) throws DataAccessException{
+    	log.debug("Finding Ludo match with code '{}'",matchCode );
         return ludoMatchRepository.findMatchByMatchCode(matchCode);
     }
 
     @Transactional(readOnly = true)
     public Optional<LudoMatch> findludoMatchById(int id) throws DataAccessException {
+    	log.debug("Finding Ludo match with id '{}'",id );
         return ludoMatchRepository.findById(id);
     }
 
     @Transactional(readOnly = true)
     public Collection<LudoMatch> findAll() throws DataAccessException{
+    	log.debug("Finding all Ludo matches");
         return ludoMatchRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Page<LudoMatch> findAllPaging(Pageable pageable) throws DataAccessException{
+    	log.debug("Finding all Ludo matches with page size '{}'", pageable);
         return ludoMatchRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
     public Optional<LudoMatch> findLobbyByUsername(String username) throws DataAccessException{
+    	log.debug("Finding lobby with player '{}'", username);
         return ludoMatchRepository.findLobbyByUsername(username);
     }
 
     @Transactional(readOnly = true)
     public Collection<LudoMatch> findEndedLudoMatches() throws DataAccessException{
+    	log.debug("Finding all finished Ludo matches");
         return ludoMatchRepository.findEndedLudoMatches();
     }
 
     @Transactional(readOnly = true)
     public Collection<LudoMatch> findMatchesByUsername(String username) throws DataAccessException{
+    	log.debug("Finding all {}'s Ludo matches", username);
         return ludoMatchRepository.findMatchesByUsername(username);
     }
 
     @Transactional(readOnly = true)
     public Slice<LudoMatch> findMatchesByUsernameWithPaging(String username, Pageable pageable) throws DataAccessException{
+    	log.debug("Finding all {}'s Ludo matches with page size '{}'", username,pageable);
         return ludoMatchRepository.findMatchesByUsernameWithPaging(username, pageable);
     }
 
     @Transactional(readOnly=true)
     public Page<LudoMatch> findMatchesByStartDate(Date date, Pageable pageable) throws DataAccessException{
+    	log.debug("Finding all Ludo matches that started on '{}' with page size '{}'", date.toString(),pageable);
         return ludoMatchRepository.findLudoMatchByStartDate(date, pageable);
     }
 
     @Transactional(readOnly=true)
     public Page<LudoMatch> findMatchesByEndDate(Date date, Pageable pageable) throws DataAccessException{
+    	log.debug("Finding all Ludo matches that ended on '{}' with page size '{}'", date.toString(),pageable);
         return ludoMatchRepository.findLudoMatchByEndDate(date, pageable);
     }
 
     @Transactional
     public LudoMatch save(LudoMatch ludoMatch) throws DataAccessException {
+    	log.debug("Saving Ludo Match with match code '{}'", ludoMatch.getMatchCode());
         return ludoMatchRepository.save(ludoMatch);
     }
 
     @Transactional
     public LudoMatch saveludoMatchWithPlayer(LudoMatch ludoMatch, Player player, Boolean isOwner) throws DataAccessException {
+    	log.debug("Saving Ludo match with code '{}' and player '{}'", ludoMatch.getMatchCode(), player.getUser().getUsername());
         //Saves the match
         LudoMatch ludoMatchDB = ludoMatchRepository.save(ludoMatch);
 
@@ -112,6 +127,7 @@ public class LudoMatchService {
     }
 
     public boolean findEveryoneExceptOneLeft(LudoMatch ludoMatch) {
+    	log.debug("Finding everyone in a Ludo match except the one that left");
         Integer numberOfAfkPlayers = 0;
         Boolean res = false;
 
@@ -124,6 +140,7 @@ public class LudoMatchService {
         if(numberOfAfkPlayers == ludoMatch.getStats().size()-1){
             res = true;
             if(ludoMatch.getEndDate() == null){
+            	log.debug("There's no one left so the match has ended");
                 ludoMatch.setEndDate(new Date());
             }
         }
