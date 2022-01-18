@@ -15,5 +15,6 @@ public interface LudoChipRepository extends CrudRepository<LudoChip,Integer> {
         " AND ludoChip.inGameChipId = :inGameChipId AND ludoChip.inGamePlayerId = :inGamePlayerId")
     Optional<LudoChip> findChip(Integer matchId, Integer inGameChipId, Integer inGamePlayerId);
 
-
+    @Query(value="SELECT DISTINCT ludoChip FROM LudoChip  ludoChip WHERE ludoChip.inGamePlayerId=:inGamePlayerId")
+    Collection<LudoChip> findChipsByInGamePlayerId(Integer inGamePlayerId);
 }

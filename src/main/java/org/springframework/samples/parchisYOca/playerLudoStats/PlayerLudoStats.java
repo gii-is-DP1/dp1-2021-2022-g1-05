@@ -27,9 +27,13 @@ public class PlayerLudoStats extends BaseEntity {
     private Integer walkedSquares = 0;
     private Integer isOwner = 0;
     private Integer inGameId = 0;
+
+    //Flags de control
     private Integer hasWon = 0;
     private Integer hasTurn = 0;
     private Integer playerLeft = 0;
+    private Integer turnDoubleRolls = 0;
+    private Integer lastChipMovedId = 0;
 
     @ManyToOne
     Player player;
