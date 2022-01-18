@@ -36,6 +36,9 @@ public class LudoBoardController {
     public static final Integer DOS_DADOS_5=3;
     private static final String ALLPLAYERCHIPS ="0123";
     private int[] dicesToCheck = new int[3];
+    public static final Integer NO_OPERATION=0;
+    public static final Integer ATE_CHIP=1;
+    public static final Integer LANDED_FINAL=2;
 
 
     @Autowired
@@ -94,50 +97,29 @@ public class LudoBoardController {
                         dicesToCheck[INDICE_SUMA_DADOS] == 5) {
                         Integer diceCode = ludoChipService.manageFives(inGameId,matchId, dicesToCheck[INDICE_PRIMER_DADO], dicesToCheck[INDICE_SEGUNDO_DADO]);
                         model.put("diceCode", diceCode);
-                        if(diceCode==PRIMER_DADO_5){
-                            dicesToCheck[INDICE_PRIMER_DADO]=0;
-
-                        }
-                        else if(diceCode==SEGUNDO_DADO_5){
-                            dicesToCheck[INDICE_SEGUNDO_DADO]=0;
-
-                        }
-                        else if(diceCode==SUMA_DADOS_5){
-                            dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
-                            nextInGameStats.setHasTurn(1);
-                            inGamePlayerStats.setHasTurn(0);
-                            playerLudoStatsService.saveStats(inGamePlayerStats);
-                            playerLudoStatsService.saveStats(nextInGameStats);
-                            return "redirect:/ludoMatches/" + matchId;
-                        } else if(diceCode == DOS_DADOS_5){
-                            dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+                        responseToFives(diceCode, inGamePlayerStats, nextInGameStats);
+                        if(diceCode == SUMA_DADOS_5 || diceCode == DOS_DADOS_5) {
                             return "redirect:/ludoMatches/" + matchId;
                         }
                     }
                 }
             }
-            //No te puedes mover todas en casa
+            //Si todas las fichas en casa no puedes mover, tu turno ha terminado
             if(ludoChipService.noChipsOutOfHome(ludoChips,inGameId)){
                 if(!flagDobles) {
                     dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
-                    nextInGameStats.setHasTurn(1);
-                    inGamePlayerStats.setHasTurn(0);
-                    playerLudoStatsService.saveStats(inGamePlayerStats);
-                    playerLudoStatsService.saveStats(nextInGameStats);
+                    passTurn(inGamePlayerStats, nextInGameStats);
                 }
                 return "redirect:/ludoMatches/" + matchId;
             }
-            //Comprueba los bloqueos
+            //Comprueba los bloqueos, fuerza a romperlos si has sacado dobles
             List<LudoChip>  chipsToBreak = ludoChipService.breakBlocks(ludoChips, inGameId);
             if(chipsToBreak.size() != 0) {
                 return "redirect:/ludoInGame/chooseChip/0";
             }
-            //Ya no te quedan movimientos
-            if(dicesToCheck[INDICE_PRIMER_DADO] == 0 && dicesToCheck[INDICE_SEGUNDO_DADO] == 0) {
-                nextInGameStats.setHasTurn(1);
-                inGamePlayerStats.setHasTurn(0);
-                playerLudoStatsService.saveStats(inGamePlayerStats);
-                playerLudoStatsService.saveStats(nextInGameStats);
+            //Ya no te quedan movimientos, tu turno ha terminado
+            if(!checkDicesLeft()) {
+                passTurn(inGamePlayerStats, nextInGameStats);
                 return "redirect:/ludoMatches/" + matchId;
             }
             return "matches/ludoMatch";
@@ -145,6 +127,7 @@ public class LudoBoardController {
             return "redirect:/";
         }
     }
+
 
     @GetMapping(value = "/ludoInGame/chooseChip/{diceIndex}")
     public String ludoChooseChip(@PathVariable("diceIndex") Integer diceIndex, ModelMap model, HttpSession session) {
@@ -201,15 +184,18 @@ public class LudoBoardController {
             Integer inGamePlayerId=pls.getInGameId();
             List<LudoChip> chips =new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
             LudoChip chip=ludoChipService.findConcreteChip(matchId,inGameChipId,inGamePlayerId).get();
-            boolean hasEaten=ludoChipService.move(chip,dicesToCheck[diceIndex],chips,pls, matchId);
+            Integer moveCode = ludoChipService.move(chip,dicesToCheck[diceIndex],chips,pls, matchId);
             Integer nextInGameId = (inGamePlayerId+1)%(chips.size()/4);
             PlayerLudoStats nextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
             dicesToCheck[diceIndex]=0;
-            if(hasEaten){
+
+            if(moveCode==ATE_CHIP){
                 dicesToCheck[diceIndex]=20;
-                model.addAttribute("message", "hola jaj");
                 return "redirect:/ludoInGame/chooseChip/"+diceIndex;
-            }//TODO si ha llegado al final
+            }else if(moveCode==LANDED_FINAL){
+                dicesToCheck[diceIndex]=10;
+                return "redirect:/ludoInGame/chooseChip/"+diceIndex;
+            }
             else if(checkDicesLeft()){
                 return "redirect:/ludoInGame/chooseChip/"+Integer.toString((diceIndex+1)%2);
             }
@@ -217,10 +203,7 @@ public class LudoBoardController {
                 return "redirect:/ludoMatches/"+matchId;
             }
             else{
-                pls.setHasTurn(0);
-                nextInGameStats.setHasTurn(1);
-                playerLudoStatsService.saveStats(pls);
-                playerLudoStatsService.saveStats(nextInGameStats);
+                passTurn(pls, nextInGameStats);
                 return "redirect:/ludoMatches/"+matchId;
             }
         } else {
@@ -228,8 +211,31 @@ public class LudoBoardController {
         }
     }
 
-    public boolean checkDicesLeft(){
+    private boolean checkDicesLeft(){
         return dicesToCheck[INDICE_PRIMER_DADO]>0 || dicesToCheck[INDICE_SEGUNDO_DADO]>0;
+    }
+
+    //Resetea los dados usados y muestra los mensajes pertinentes
+    private void responseToFives(Integer diceCode, PlayerLudoStats inGamePlayerStats, PlayerLudoStats nextInGameStats) {
+        if(diceCode==PRIMER_DADO_5){
+            dicesToCheck[INDICE_PRIMER_DADO]=0;
+        }
+        else if(diceCode==SEGUNDO_DADO_5){
+            dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+        }
+        else if(diceCode==SUMA_DADOS_5){
+            dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+            passTurn(inGamePlayerStats, nextInGameStats);
+        } else if(diceCode == DOS_DADOS_5){
+            dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+        }
+    }
+
+    private void passTurn(PlayerLudoStats inGamePlayerStats, PlayerLudoStats nextInGameStats) {
+        nextInGameStats.setHasTurn(1);
+        inGamePlayerStats.setHasTurn(0);
+        playerLudoStatsService.saveStats(inGamePlayerStats);
+        playerLudoStatsService.saveStats(nextInGameStats);
     }
 
 
