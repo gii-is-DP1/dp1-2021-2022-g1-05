@@ -21,6 +21,7 @@ public class LudoChip  extends BaseEntity {
 	private static final Integer NARROW_TILE = 42;
 	private static final Integer WIDE_TILE = 90;
 	private static final Integer BORDER_WIDTH=14;
+	private static final Integer DISPLACEMENT = 55;
 	private static final Integer HOME_DISPLACEMENT=170;
 	private static final Integer X_HOME_L = 53;
 	private static final Integer X_HOME_R= 633;
@@ -126,6 +127,7 @@ public class LudoChip  extends BaseEntity {
     		x = getXMidgame(position, isNotAlone);
     		break;
     	case endGame:
+    		x = getXEndGame(position, color);
     		break;
     	}
     	return x;
@@ -141,6 +143,7 @@ public class LudoChip  extends BaseEntity {
     		y = getYMidgame(position, isNotAlone);
     		break;
     	case endGame:
+    		y = getYEndGame(position, color);
 		break;
 	}
     	return y;
@@ -205,6 +208,7 @@ public class LudoChip  extends BaseEntity {
     }
     public static Integer getXMidgame(Integer position, Boolean isNotAlone) {
     	Integer x = null;
+    	Integer disp = 0;
     	if(col1.getFirst().contains(position)) {x = col1.getSecond();}
     	if(col2.getFirst().contains(position)) {x = col2.getSecond();}
     	if(col3.getFirst().contains(position)) {x = col3.getSecond();}
@@ -212,9 +216,9 @@ public class LudoChip  extends BaseEntity {
     	if(col5.getFirst().contains(position)) {x = col5.getSecond();}
     	if(col6.getFirst().contains(position)) {x = col6.getSecond();}
     	if(col7.getFirst().contains(position)) {x = col7.getSecond();}
-    	if(col8.getFirst().contains(position)) {x = col8.getSecond();}
-    	if(col9.getFirst().contains(position)) {x = col9.getSecond();}
-    	if(col10.getFirst().contains(position)) {x = col10.getSecond();}
+    	if(col8.getFirst().contains(position)) {x = col8.getSecond();if(isNotAlone) {disp = DISPLACEMENT;}}
+    	if(col9.getFirst().contains(position)) {x = col9.getSecond();if(isNotAlone) {disp = DISPLACEMENT;}}
+    	if(col10.getFirst().contains(position)) {x = col10.getSecond();if(isNotAlone) {disp = DISPLACEMENT;}}
     	if(col11.getFirst().contains(position)) {x = col11.getSecond();}
     	if(col12.getFirst().contains(position)) {x = col12.getSecond();}
     	if(col13.getFirst().contains(position)) {x = col13.getSecond();}
@@ -224,10 +228,11 @@ public class LudoChip  extends BaseEntity {
     	if(col17.getFirst().contains(position)) {x = col17.getSecond();}
     	if(corsX4159.getFirst().contains(position)) {x = corsX4159.getSecond();}
     	if(corsX824.getFirst().contains(position)) {x = corsX824.getSecond();}
-    	return x;
+    	return x + disp;
     }
     public static Integer getYMidgame(Integer position, Boolean isNotAlone) {
     	Integer y = null;
+    	Integer disp = 0;
     	if(row1.getFirst().contains(position)) {y = row1.getSecond();}
     	if(row2.getFirst().contains(position)) {y = row2.getSecond();}
     	if(row3.getFirst().contains(position)) {y = row3.getSecond();}
@@ -235,9 +240,9 @@ public class LudoChip  extends BaseEntity {
     	if(row5.getFirst().contains(position)) {y = row5.getSecond();}
     	if(row6.getFirst().contains(position)) {y = row6.getSecond();}
     	if(row7.getFirst().contains(position)) {y = row7.getSecond();}
-    	if(row8.getFirst().contains(position)) {y = row8.getSecond();}
-    	if(row9.getFirst().contains(position)) {y = row9.getSecond();}
-    	if(row10.getFirst().contains(position)) {y = row10.getSecond();}
+    	if(row8.getFirst().contains(position)) {y = row8.getSecond(); if(isNotAlone) {disp = DISPLACEMENT;}}
+    	if(row9.getFirst().contains(position)) {y = row9.getSecond(); if(isNotAlone) {disp = DISPLACEMENT;}}
+    	if(row10.getFirst().contains(position)) {y = row10.getSecond(); if(isNotAlone) {disp = DISPLACEMENT;}}
     	if(row11.getFirst().contains(position)) {y = row11.getSecond();}
     	if(row12.getFirst().contains(position)) {y = row12.getSecond();}
     	if(row13.getFirst().contains(position)) {y = row13.getSecond();}
@@ -247,6 +252,60 @@ public class LudoChip  extends BaseEntity {
     	if(row17.getFirst().contains(position)) {y = row17.getSecond();}
     	if(corsY2442.getFirst().contains(position)) {y = corsY2442.getSecond();}
     	if(corsY597.getFirst().contains(position)) {y = corsY597.getSecond();}
+    	return y + disp;
+    }
+    public static Integer getXEndGame(Integer position, Color color) {
+    	Integer x = null;
+    	switch(color) {
+    	case Red:
+    		x = col9.getSecond();
+    		break;
+    	case Green:
+    		x = getXEndGameGreen(position);
+    		break;
+    	case Blue:
+    		x = getXEndGameBlue(position);
+    		break;
+    	case Yellow:
+    		x = col9.getSecond();
+    		break;
+    	
+    	}
+    	return x;
+    }
+    public static Integer getYEndGame(Integer position, Color color) {
+    	Integer y = null;
+    	switch(color) {
+    	case Red:
+    		y = getYEndGameRed(position);
+    		break;
+    	case Green:
+    		y = row9.getSecond();
+    		break;
+    	case Blue:
+    		y = row9.getSecond();
+    		break;
+    	case Yellow:
+    		y = getYEndGameYellow(position);
+    		break;
+    	
+    	}
+    	return y;
+    }
+    public static Integer getXEndGameGreen(Integer position) {
+    	Integer x = null;
+    	return x;
+    }
+    public static Integer getXEndGameBlue(Integer position) {
+    	Integer x = null;
+    	return x;
+    }
+    public static Integer getYEndGameRed(Integer position) {
+    	Integer y = null;
+    	return y;
+    }
+    public static Integer getYEndGameYellow(Integer position) {
+    	Integer y = null;
     	return y;
     }
 }
