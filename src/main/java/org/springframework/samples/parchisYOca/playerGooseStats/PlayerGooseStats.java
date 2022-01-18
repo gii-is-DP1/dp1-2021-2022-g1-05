@@ -35,6 +35,4 @@ public class PlayerGooseStats extends BaseEntity {
 
     @ManyToOne
     Player player;
-    @ManyToOne
-    GooseMatch gooseMatch;
 }

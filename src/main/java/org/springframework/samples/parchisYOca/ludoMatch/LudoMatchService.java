@@ -5,7 +5,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.stereotype.Service;
@@ -95,6 +97,12 @@ public class LudoMatchService {
     }
 
     @Transactional
+    public Optional<LudoMatch> findMatchByPlayerLudoStats(PlayerLudoStats pls) throws DataAccessException {
+        log.debug("Finding Ludo Match with stats '{}'", pls.toString());
+        return ludoMatchRepository.findMatchByPlayerLudoStats(pls);
+    }
+
+    @Transactional
     public LudoMatch saveludoMatchWithPlayer(LudoMatch ludoMatch, Player player, Boolean isOwner) throws DataAccessException {
     	log.debug("Saving Ludo match with code '{}' and player '{}'", ludoMatch.getMatchCode(), player.getUser().getUsername());
         //Saves the match
@@ -103,7 +111,6 @@ public class LudoMatchService {
         //Saves the relation between player and match
         PlayerLudoStats playerStats = new PlayerLudoStats();
         playerStats.setPlayer(player);
-        playerStats.setLudoMatch(ludoMatchDB);
         Set<PlayerLudoStats> statsSet = new HashSet<>();
 
         //To assign the in game id
@@ -146,5 +153,24 @@ public class LudoMatchService {
         }
 
         return res;
+    }
+
+    @Transactional
+    public void removeLudoStatsFromGame(PlayerLudoStats pls, Integer ludoMatchId) throws DataAccessException {
+        log.debug("Deleting PlayerLudoStats '{}' from matchId '{}'",pls.toString(),ludoMatchId);
+        LudoMatch lm = ludoMatchRepository.findById(ludoMatchId).get();
+        Set<PlayerLudoStats> statsOfGame = lm.getStats();
+        statsOfGame.remove(pls);
+        lm.setStats(statsOfGame);
+        ludoMatchRepository.save(lm);
+    }
+
+    @Transactional
+    public void removeAllLudoStatsFromGame(Integer ludoMatchId) throws DataAccessException {
+        log.debug("Removing all PlayerLudoStats from match with id '{}'", ludoMatchId);
+        LudoMatch lm = ludoMatchRepository.findById(ludoMatchId).get();
+        Set<PlayerLudoStats> emptyStats = new HashSet<>();
+        lm.setStats(emptyStats);
+        ludoMatchRepository.save(lm);
     }
 }

@@ -210,7 +210,7 @@ public class GooseMatchController {
     @GetMapping(value = "/gooseMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
                             HttpServletRequest request, HttpSession session, HttpServletResponse response) throws InvalidPlayerNumberException {
-    	
+
         response.addHeader("Refresh", REFRESH_RATE_MATCH);
         Boolean logged = userService.isAuthenticated();
         log.debug("Checking if user is authenticated");
@@ -372,12 +372,12 @@ public class GooseMatchController {
             PlayerGooseStats pgs = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), userMatch.getId()).get();
 
             if (pgs.getIsOwner() == 1 && userMatch.getStartDate() == null) {
-                playerGooseStatsService.removeAllGooseStatsFromGame(userMatch.getId());
+                gooseMatchService.removeAllGooseStatsFromGame(userMatch.getId());
                 userMatch.setClosedLobby(1);
                 gooseMatchService.save(userMatch);
                 mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
             } else if (userMatch.getStartDate() == null) {
-                playerGooseStatsService.removeGooseStatsFromGame(pgs.getInGameId(), userMatch.getId());
+                gooseMatchService.removeGooseStatsFromGame(pgs, userMatch.getId());
                 mav.addObject("message", "You left the lobby");
             } else {
                 pgs.setPlayerLeft(1);

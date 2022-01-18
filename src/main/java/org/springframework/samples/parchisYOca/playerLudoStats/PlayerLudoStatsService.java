@@ -119,14 +119,4 @@ public class PlayerLudoStatsService {
         return playerLudoStatsRepository.save(playerLudoStats);
     }
 
-    @Transactional
-    public void removeLudoStatsFromGame(Integer statsId, Integer ludoMatchId) throws DataAccessException {
-        playerLudoStatsRepository.deletePlayerFromGame(statsId, ludoMatchId);
-    }
-
-    @Transactional
-    public void removeAllLudoStatsFromGame(Integer ludoMatchId) throws DataAccessException {
-        playerLudoStatsRepository.deleteStatsFromGame(ludoMatchId);
-    }
-
 }

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ConstraintViolationException;
 
 import java.util.Date;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -162,16 +163,19 @@ public class PlayerServiceTests {
     public void testFindWinnerByGooseMatch(){
         assertThat(playerService.findPlayerById(ID_TO_TEST).isPresent());
         Player player = playerService.findPlayerById(ID_TO_TEST).get();
+        PlayerGooseStats playerGooseStats = new PlayerGooseStats();
+        playerGooseStats.setPlayer(player);
+        playerGooseStats.setHasWon(1);
+        playerGooseStatsService.saveStats(playerGooseStats);
         GooseMatch gooseMatch =  new GooseMatch();
         gooseMatch.setStartDate(new Date());
         gooseMatch.setEndDate(new Date());
         gooseMatch.setMatchCode(TEST_MATCHCODE);
+        Set<PlayerGooseStats> statsOfGame = gooseMatch.getStats();
+        statsOfGame.add(playerGooseStats);
+        gooseMatch.setStats(statsOfGame);
         gooseMatchService.save(gooseMatch);
-        PlayerGooseStats playerGooseStats = new PlayerGooseStats();
-        playerGooseStats.setPlayer(player);
-        playerGooseStats.setHasWon(1);
-        playerGooseStats.setGooseMatch(gooseMatch);
-        playerGooseStatsService.saveStats(playerGooseStats);
+
 
         assertThat(playerService.findWinnerByGooseMatchCode(TEST_MATCHCODE).get()).isEqualTo(player);
     }
@@ -181,16 +185,19 @@ public class PlayerServiceTests {
     public void testFindWinnerByLudoMatch(){
         assertThat(playerService.findPlayerById(ID_TO_TEST).isPresent());
         Player player = playerService.findPlayerById(ID_TO_TEST).get();
+        PlayerLudoStats playerLudoStats = new PlayerLudoStats();
+        playerLudoStats.setPlayer(player);
+        playerLudoStats.setHasWon(1);
+        playerLudoStatsService.saveStats(playerLudoStats);
         LudoMatch ludoMatch =  new LudoMatch();
         ludoMatch.setStartDate(new Date());
         ludoMatch.setEndDate(new Date());
         ludoMatch.setMatchCode(TEST_MATCHCODE);
+        Set<PlayerLudoStats> statsOfGame = ludoMatch.getStats();
+        statsOfGame.add(playerLudoStats);
+        ludoMatch.setStats(statsOfGame);
         ludoMatchService.save(ludoMatch);
-        PlayerLudoStats playerLudoStats = new PlayerLudoStats();
-        playerLudoStats.setPlayer(player);
-        playerLudoStats.setHasWon(1);
-        playerLudoStats.setLudoMatch(ludoMatch);
-        playerLudoStatsService.saveStats(playerLudoStats);
+
 
         assertThat(playerService.findWinnerByLudoMatchCode(TEST_MATCHCODE).get()).isEqualTo(player);
     }
