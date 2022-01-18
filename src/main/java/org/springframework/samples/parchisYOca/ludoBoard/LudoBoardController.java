@@ -26,7 +26,7 @@ public class LudoBoardController {
     private final PlayerLudoStatsService playerLudoStatsService;
     private final LudoChipService ludoChipService;
     private final LudoMatchService ludoMatchService;
-
+    private final LudoBoardService ludoBoardService;
     public static final Integer INDICE_PRIMER_DADO = 0;
     public static final Integer INDICE_SEGUNDO_DADO = 1;
     public static final Integer INDICE_SUMA_DADOS = 2;
@@ -34,16 +34,18 @@ public class LudoBoardController {
     public static final Integer SEGUNDO_DADO_5=1;
     public static final Integer SUMA_DADOS_5=2;
     public static final Integer DOS_DADOS_5=3;
-
+    private static final String ALLPLAYERCHIPS ="0123";
     private int[] dicesToCheck = new int[3];
+
 
     @Autowired
     public LudoBoardController(UserService userService, PlayerLudoStatsService playerLudoStatsService, LudoChipService ludoChipService,
-                                LudoMatchService ludoMatchService){
+                               LudoMatchService ludoMatchService, LudoBoardService ludoBoardService){
         this.userService=userService;
         this.playerLudoStatsService = playerLudoStatsService;
         this.ludoChipService = ludoChipService;
         this.ludoMatchService = ludoMatchService;
+        this.ludoBoardService = ludoBoardService;
     }
 
     public void populateModel(Map<String, Object> model, Integer matchId, int[] dicesToShow) {
@@ -59,33 +61,29 @@ public class LudoBoardController {
     @GetMapping(value="/ludoInGame/dicesRolled")
     public String ludoDicesRolled(HttpSession session, Map<String, Object> model){
         Boolean logged = userService.isAuthenticated();
-
         if(logged==true){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-
             Integer matchId = (Integer) session.getAttribute("matchId");
             int[] dicesToShow = (int[])session.getAttribute("dices");
             List<LudoChip> ludoChips = new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
-
             PlayerLudoStats inGamePlayerStats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(
                 authenticatedUser.getUsername(), matchId).get();
             Integer nextInGameId = (inGamePlayerStats.getInGameId()+1)%(ludoChips.size()/4);
             PlayerLudoStats nextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
-
             //putting things in the model
             model.put("dicesRolled", 1);
             //model.put("diceIndex", 0);
             populateModel(model, matchId, dicesToShow);
-
             dicesToCheck[INDICE_PRIMER_DADO] = dicesToShow[INDICE_PRIMER_DADO];
             dicesToCheck[INDICE_SEGUNDO_DADO] = dicesToShow[INDICE_SEGUNDO_DADO];
             dicesToCheck[INDICE_SUMA_DADOS] = dicesToShow[INDICE_SUMA_DADOS];
-
             boolean flagDobles = dicesToCheck[INDICE_PRIMER_DADO] == dicesToCheck[INDICE_SEGUNDO_DADO];
             session.setAttribute("flagDobles", flagDobles);
-
             Integer inGameId = inGamePlayerStats.getInGameId();
+            if(ludoBoardService.checkGreedy(inGamePlayerStats,flagDobles)){
+                ludoChipService.ManageGreedy(inGamePlayerStats);
+            }
             for(LudoChip lc : ludoChips){
                 //To check that the chip belongs to the player
                 if(lc.getInGamePlayerId() == inGameId){
@@ -118,6 +116,7 @@ public class LudoBoardController {
                     }
                 }
             }
+            //No te puedes mover todas en casa
             if(ludoChipService.noChipsOutOfHome(ludoChips,inGameId)){
                 if(!flagDobles) {
                     dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
@@ -125,25 +124,22 @@ public class LudoBoardController {
                     inGamePlayerStats.setHasTurn(0);
                     playerLudoStatsService.saveStats(inGamePlayerStats);
                     playerLudoStatsService.saveStats(nextInGameStats);
-                } else {
-                    List<LudoChip> positionsToBreak = ludoChipService.breakBlocks(ludoChips, inGameId);
-                    if(positionsToBreak.size() != 0) {
-                        model.put("breakBlock", true);
-                        model.put("message", "You got doubles so you must break a block!");
-                        return "redirect:/ludoInGame/chooseChip/0";
-                    }
                 }
-
                 return "redirect:/ludoMatches/" + matchId;
             }
-            else if(dicesToCheck[INDICE_PRIMER_DADO] == 0 && dicesToCheck[INDICE_SEGUNDO_DADO] == 0){
+            //Comprueba los bloqueos
+            List<LudoChip>  chipsToBreak = ludoChipService.breakBlocks(ludoChips, inGameId);
+            if(chipsToBreak.size() != 0) {
+                return "redirect:/ludoInGame/chooseChip/0";
+            }
+            //Ya no te quedan movimientos
+            if(dicesToCheck[INDICE_PRIMER_DADO] == 0 && dicesToCheck[INDICE_SEGUNDO_DADO] == 0) {
                 nextInGameStats.setHasTurn(1);
                 inGamePlayerStats.setHasTurn(0);
                 playerLudoStatsService.saveStats(inGamePlayerStats);
                 playerLudoStatsService.saveStats(nextInGameStats);
                 return "redirect:/ludoMatches/" + matchId;
             }
-
             return "matches/ludoMatch";
         }else{
             return "redirect:/";
@@ -155,19 +151,34 @@ public class LudoBoardController {
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true){
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
+            Integer matchId = (Integer) session.getAttribute("matchId");
+            List<LudoChip> ludoChips = new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
+            PlayerLudoStats inGamePlayerStats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(
+                authenticatedUser.getUsername(), matchId).get();
+            List<LudoChip>  chipsToBreak=ludoChipService.breakBlocks(ludoChips,inGamePlayerStats.getInGameId());
+
             if(dicesToCheck[diceIndex]==20){
                 model.addAttribute("message","You ate a chip so you get another free 20 movements on the house");
             }
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
-
-            Integer matchId = (Integer) session.getAttribute("matchId");
+            if(chipsToBreak.size() != 0) {
+                model.put("breakBlock", true);
+                model.put("message", "You got doubles so you must break a block!");
+                String chipsToMove="";
+                for(LudoChip chip:chipsToBreak){
+                    chipsToMove+=chip.getInGameChipId();
+                }
+                model.put("chipsToMove",chipsToMove);
+            }
+            else{
+                model.put("chipsToMove",ALLPLAYERCHIPS);
+            }
             int[] dicesToShow = (int[])session.getAttribute("dices");
-
             model.addAttribute("diceIndex", diceIndex);
             LudoMatch match = ludoMatchService.findludoMatchById(matchId).get();
             model.put("thisPlayerStats", playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(),matchId).get());
-
             populateModel(model, matchId, dicesToShow);
             return "matches/ludoMatch";
         } else {
@@ -188,15 +199,9 @@ public class LudoBoardController {
 
             PlayerLudoStats pls=playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(),matchId).get();
             Integer inGamePlayerId=pls.getInGameId();
-
-
-
             List<LudoChip> chips =new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
-
             LudoChip chip=ludoChipService.findConcreteChip(matchId,inGameChipId,inGamePlayerId).get();
-            boolean hasEaten=ludoChipService.move(chip,dicesToCheck[diceIndex],chips,inGamePlayerId, matchId);
-
-
+            boolean hasEaten=ludoChipService.move(chip,dicesToCheck[diceIndex],chips,pls, matchId);
             Integer nextInGameId = (inGamePlayerId+1)%(chips.size()/4);
             PlayerLudoStats nextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
             dicesToCheck[diceIndex]=0;

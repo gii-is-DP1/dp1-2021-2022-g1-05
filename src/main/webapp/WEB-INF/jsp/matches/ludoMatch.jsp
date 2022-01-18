@@ -21,9 +21,9 @@
                                             <c:when test="${chip.position eq null}">
                                                 <c:out value="${chip.getColor()}-> ${stat.player.user.username}: EN CASA"/>
                                             </c:when>
-                                            <c:when test="${breakBlock ne null and diceIndex ne null and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
+                                            <c:when test="${diceIndex ne null and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
                                                 <c:choose>
-                                                    <c:when test="${fn:contains(listString, id)}">
+                                                    <c:when test="${fn:contains(chipsToMove, chip.inGameChipId)}">
                                                         <spring:url value="/ludoInGame/sumDice/{diceIndex}/{inGameChipId}" var="sumDiceURL">
                                                             <spring:param name="diceIndex" value="${diceIndex}"/>
                                                             <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
@@ -36,15 +36,6 @@
                                                         <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
                                                     </c:otherwise>
                                                 </c:choose>
-                                            </c:when>
-                                            <c:when test="${diceIndex ne null and thisPlayerStats.inGameId eq chip.inGamePlayerId}">
-                                                <spring:url value="/ludoInGame/sumDice/{diceIndex}/{inGameChipId}" var="sumDiceURL">
-                                                    <spring:param name="diceIndex" value="${diceIndex}"/>
-                                                    <spring:param name="inGameChipId" value="${chip.inGameChipId}"/>
-                                                </spring:url>
-                                                <a href="${fn:escapeXml(sumDiceURL)}">
-                                                    <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>
-                                                </a>
                                             </c:when>
                                             <c:otherwise>
                                                 <c:out value="${chip.getColor()}-> ${stat.player.user.username}: ${chip.position+1}"/>

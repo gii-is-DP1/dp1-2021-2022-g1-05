@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChipRepository;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +16,13 @@ import java.util.Set;
 public class LudoBoardService {
     private LudoBoardRepository ludoBoardRepository;
     private LudoChipRepository ludoChipRepository;
+    private PlayerLudoStatsService playerLudoStatsService;
 
     @Autowired
-    public LudoBoardService(LudoBoardRepository ludoBoardRepository,LudoChipRepository ludoChipRepository){
+    public LudoBoardService(LudoBoardRepository ludoBoardRepository, LudoChipRepository ludoChipRepository, PlayerLudoStatsService playerLudoStatsService){
         this.ludoBoardRepository=ludoBoardRepository;
         this.ludoChipRepository=ludoChipRepository;
+        this.playerLudoStatsService = playerLudoStatsService;
     }
 
     @Transactional(readOnly = true)
@@ -47,4 +50,18 @@ public class LudoBoardService {
     }
 
 
+    public boolean checkGreedy(PlayerLudoStats inGamePlayerStats, boolean flagDobles) {
+        if(flagDobles){
+            inGamePlayerStats.setTurnDoubleRolls(inGamePlayerStats.getTurnDoubleRolls()+1);
+            playerLudoStatsService.saveStats(inGamePlayerStats);
+        }
+        if(inGamePlayerStats.getTurnDoubleRolls()==3){
+            inGamePlayerStats.setHasTurn(0);
+            inGamePlayerStats.setTurnDoubleRolls(0);
+            inGamePlayerStats.setGreedyRolls(inGamePlayerStats.getGreedyRolls()+1);
+            playerLudoStatsService.saveStats(inGamePlayerStats);
+            return true;
+        }
+        return false;
+    }
 }
