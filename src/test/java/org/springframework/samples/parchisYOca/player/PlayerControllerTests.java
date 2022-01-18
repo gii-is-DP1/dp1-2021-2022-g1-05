@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -60,6 +61,7 @@ public class PlayerControllerTests {
     private static final Integer WINNER = 1;
     private static final Integer MATCH_ID = 1;
     private static final Pageable PAGEABLE= PageRequest.of(PAGE_NUMBER, NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("user.username")));
+    private static final Pageable PAGEABLE_2= PageRequest.of(PAGE_NUMBER, NUMBER_OF_ELEMENTS_PER_PAGE,  Sort.by(Sort.Order.desc("startDate")));
     private static final String PAGE_URL = "?page=0";
 
 
@@ -107,16 +109,14 @@ public class PlayerControllerTests {
     	Juan.setId(ID);
     	PlayerGooseStats juanGStats = new PlayerGooseStats();
     	juanGStats.setHasWon(WINNER);
-    	juanGStats.setGooseMatch(gMatch);
+    	//juanGStats.setGooseMatch(gMatch);
     	Optional<PlayerGooseStats> oJuanGStats = Optional.of(juanGStats);
     	Set<PlayerGooseStats> setGStats = Set.of(juanGStats);
     	PlayerLudoStats juanLStats = new PlayerLudoStats();
     	juanLStats.setHasWon(WINNER);
-    	juanLStats.setLudoMatch(lMatch);
+    	//juanLStats.setLudoMatch(lMatch);
     	Optional<PlayerLudoStats> oJuanLStats = Optional.of(juanLStats);
     	Set<PlayerLudoStats> setLStats = Set.of(juanLStats);
-    	Juan.setGooseStats(setGStats);
-    	Juan.setLudoStats(setLStats);
     	Optional<Player> oJuan = Optional.of(Juan);
     	List<Player> playerSet = List.of(Juan);
     	gMatch.setStats(setGStats);
@@ -150,8 +150,9 @@ public class PlayerControllerTests {
     	given(this.pLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(USERNAME, MATCH_ID))
     	.willReturn(oJuanLStats);
     	given(this.playerService.findAllPaging(PAGEABLE)).willReturn(sPlayers);
-    	given(this.gooseMatchService.findMatchesByUsernameWithPaging(USERNAME, PAGEABLE)).willReturn(sGMatches);
-    	given(this.ludoMatchService.findMatchesByUsernameWithPaging(USERNAME, PAGEABLE)).willReturn(sLMatches);
+    	given(this.gooseMatchService.findMatchesByUsernameWithPaging(USERNAME, PAGEABLE_2)).willReturn(sGMatches);
+    	given(this.ludoMatchService.findMatchesByUsernameWithPaging(USERNAME, PAGEABLE_2)).willReturn(sLMatches);
+    	
     }
     @WithMockUser(value = USERNAME)
     @Test
@@ -225,16 +226,16 @@ public class PlayerControllerTests {
     	.andExpect(view().name("welcome"))
     	.andExpect(model().attribute("message", MESSAGE3));
     }
-    @WithMockUser(value = "spring")
+    @WithMockUser(value = USERNAME)
     @Test
     void testLudoMatchesOfPlayer() throws Exception {
-    	mockMvc.perform(get("/players/"+ID+"/ludoMatchesPlayed"))
+    	mockMvc.perform(get("/players/"+ID+"/ludoMatchesPlayed").param("page", String.valueOf(PAGE_NUMBER)))
     	.andExpect(status().isOk())
     	.andExpect(view().name("matches/listMatchesInProfile"))
     	.andExpect(model().attributeExists("playerId"))
     	.andExpect(model().attributeExists("matches"));
     }
-    @WithMockUser(value = "spring")
+    @WithMockUser(value = USERNAME)
     @Test
     void testGooseMatchesOfPlayer() throws Exception {
     	mockMvc.perform(get("/players/"+ID+"/gooseMatchesPlayed").param("page", String.valueOf(PAGE_NUMBER)))
