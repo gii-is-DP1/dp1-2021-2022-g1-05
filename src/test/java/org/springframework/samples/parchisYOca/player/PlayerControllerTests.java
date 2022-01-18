@@ -8,7 +8,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
@@ -23,6 +27,7 @@ import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,8 +44,10 @@ classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class PlayerControllerTests {
+	private static final Integer NUMBER_OF_ELEMENTS_PER_PAGE = 6;
     private static final int ID = 1;
     private static final String PASSWORD = "1234567";
+    private static final Integer PAGE_NUMBER = 0;
     private static final String USERNAME = "Juan";
     private static final String EMAIL = "Juant@gmail.com";
     private static final String AUTH = "admin";
@@ -52,7 +59,8 @@ public class PlayerControllerTests {
     private static final String MATCH_CODE = "ABCdef";
     private static final Integer WINNER = 1;
     private static final Integer MATCH_ID = 1;
-
+    private static final Pageable PAGEABLE= PageRequest.of(PAGE_NUMBER, NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("user.username")));
+    private static final String PAGE_URL = "?page=0";
 
 
     @Autowired
@@ -76,9 +84,13 @@ public class PlayerControllerTests {
     	GooseMatch gMatch = new GooseMatch();
     	gMatch.setMatchCode(MATCH_CODE);
     	gMatch.setId(MATCH_ID);
+    	gMatch.setStartDate(new Date());
+    	gMatch.setEndDate(null);
     	LudoMatch lMatch = new LudoMatch();
     	lMatch.setMatchCode(MATCH_CODE);
     	lMatch.setId(MATCH_ID);
+    	lMatch.setStartDate(new Date());
+    	lMatch.setEndDate(null);
     	Player Juan = new Player();
     	User userJuan = new User();
     	Authorities authJuan = new Authorities();
@@ -95,10 +107,12 @@ public class PlayerControllerTests {
     	Juan.setId(ID);
     	PlayerGooseStats juanGStats = new PlayerGooseStats();
     	juanGStats.setHasWon(WINNER);
+    	juanGStats.setGooseMatch(gMatch);
     	Optional<PlayerGooseStats> oJuanGStats = Optional.of(juanGStats);
     	Set<PlayerGooseStats> setGStats = Set.of(juanGStats);
     	PlayerLudoStats juanLStats = new PlayerLudoStats();
     	juanLStats.setHasWon(WINNER);
+    	juanLStats.setLudoMatch(lMatch);
     	Optional<PlayerLudoStats> oJuanLStats = Optional.of(juanLStats);
     	Set<PlayerLudoStats> setLStats = Set.of(juanLStats);
     	Juan.setGooseStats(setGStats);
@@ -111,6 +125,11 @@ public class PlayerControllerTests {
     	lMatch.setStats(setLStats);
     	Optional<LudoMatch> oLudoMatch = Optional.of(lMatch);
     	Set<LudoMatch> setLudoM = Set.of(lMatch);
+    	Slice<Player> sPlayers =new SliceImpl<Player>(playerSet);
+    	List<GooseMatch> lGMatch = List.of(gMatch);
+    	List<LudoMatch> lLMatch = List.of(lMatch);
+    	Slice<GooseMatch> sGMatches =new SliceImpl<GooseMatch>(lGMatch);
+    	Slice<LudoMatch> sLMatches = new SliceImpl<LudoMatch>(lLMatch);
     	given(this.userService.isAuthenticated()).willReturn(true);
     	given(this.playerService.findPlayerByUsername(USERNAME)).willReturn(oJuan);
     	given(this.pGooseStatsService.findPlayerGooseStatsByUsername(USERNAME)).willReturn(setGStats);
@@ -121,7 +140,7 @@ public class PlayerControllerTests {
     	given(this.playerService.findAll()).willReturn(playerSet);
     	given(this.gooseMatchService.findLobbyByUsername(USERNAME)).willReturn(oGooseMatch);
     	given(this.ludoMatchService.findLobbyByUsername(USERNAME)).willReturn(oLudoMatch);
-    	given(this.playerService.findAllFilteringByUsername(USERNAME, Pageable.unpaged()).getContent()).willReturn(playerSet);
+    	given(this.playerService.findAllFilteringByUsername(USERNAME, PAGEABLE)).willReturn(sPlayers);
     	given(this.ludoMatchService.findMatchesByUsername(USERNAME)).willReturn(setLudoM);
     	given(this.gooseMatchService.findMatchesByUsername(USERNAME)).willReturn(setGooseM);
     	given(this.gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE)).willReturn(oGooseMatch);
@@ -130,6 +149,9 @@ public class PlayerControllerTests {
     	.willReturn(oJuanGStats);
     	given(this.pLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(USERNAME, MATCH_ID))
     	.willReturn(oJuanLStats);
+    	given(this.playerService.findAllPaging(PAGEABLE)).willReturn(sPlayers);
+    	given(this.gooseMatchService.findMatchesByUsernameWithPaging(USERNAME, PAGEABLE)).willReturn(sGMatches);
+    	given(this.ludoMatchService.findMatchesByUsernameWithPaging(USERNAME, PAGEABLE)).willReturn(sLMatches);
     }
     @WithMockUser(value = USERNAME)
     @Test
@@ -147,26 +169,19 @@ public class PlayerControllerTests {
         	.andExpect(status().isOk());
     }
 
-    @WithMockUser(value = "spring")
-    @Test
-    void testListPlayers() throws Exception {
-        mockMvc.perform(get("/players"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("players/listPlayers"))
-            .andExpect(model().attributeExists("players"));
-    }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testShowAllPlayers() throws Exception {
-    	mockMvc.perform(get("/players"))
+    	mockMvc.perform(get("/players").param("page", String.valueOf(PAGE_NUMBER)))
     	.andExpect(status().isOk())
     	.andExpect(view().name("players/listPlayers"))
     	.andExpect(model().attributeExists("playersInGame"));
     }
-    @WithMockUser(value = "spring")
+    @WithMockUser(value = USERNAME)
     @Test
     void testFilterPlayers() throws Exception {
-    	mockMvc.perform(post("/players").param("Username", USERNAME))
+    	mockMvc.perform(post("/players").param("page", String.valueOf(PAGE_NUMBER)).param("Username", USERNAME))
     	.andExpect(status().isOk())
     	.andExpect(view().name("players/listPlayers"))
     	.andExpect(model().attributeExists("players"));
@@ -192,17 +207,15 @@ public class PlayerControllerTests {
     @Test
     void testDisablePlayer() throws Exception {
     	mockMvc.perform(get("/players/disable/"+ID))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("players/listPlayers"))
-    	.andExpect(model().attribute("message", MESSAGE));
+    	.andExpect(status().is3xxRedirection())
+    	.andExpect(redirectedUrl("/players?page=0"));
     }
     @WithMockUser(value = "spring")
     @Test
     void testEnablePlayer() throws Exception {
     	mockMvc.perform(get("/players/enable/"+ID))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("players/listPlayers"))
-    	.andExpect(model().attribute("message", MESSAGE2));
+    	.andExpect(status().is3xxRedirection())
+    	.andExpect(redirectedUrl("/players?page=0"));
     }
     @WithMockUser(value = USERNAME)
     @Test
@@ -224,7 +237,7 @@ public class PlayerControllerTests {
     @WithMockUser(value = "spring")
     @Test
     void testGooseMatchesOfPlayer() throws Exception {
-    	mockMvc.perform(get("/players/"+ID+"/gooseMatchesPlayed"))
+    	mockMvc.perform(get("/players/"+ID+"/gooseMatchesPlayed").param("page", String.valueOf(PAGE_NUMBER)))
     	.andExpect(status().isOk())
     	.andExpect(view().name("matches/listMatchesInProfile"))
     	.andExpect(model().attributeExists("playerId"))
