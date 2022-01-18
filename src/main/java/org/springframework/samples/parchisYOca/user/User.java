@@ -30,7 +30,7 @@ public class User implements Serializable { //Implementing serializable to fix a
     @Pattern(regexp = ".*[0-9].*")
     private String password;
 
-    boolean enabled;
+    boolean enabled = true;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Authorities> Authorities;
