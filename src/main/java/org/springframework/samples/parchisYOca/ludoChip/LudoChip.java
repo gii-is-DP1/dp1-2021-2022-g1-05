@@ -76,6 +76,8 @@ public class LudoChip  extends BaseEntity {
 	private static final Pair<List<Integer>, Integer> corsX824 = Pair.of(Arrays.asList(8,24), 546);
 
 
+    public static final Integer FINAL_TILE=7;
+
 	private Integer position;
     private Color color;
     @Range(min=0, max=3)
@@ -117,6 +119,10 @@ public class LudoChip  extends BaseEntity {
     		break;
     	case endGame:
     		//ver como posicionar la ficha en esta parte del juego
+            if(position>FINAL_TILE){
+                Integer diff = position - FINAL_TILE;
+                position = FINAL_TILE - diff;
+            }
     		this.position = position;
     	}
 
@@ -274,7 +280,7 @@ public class LudoChip  extends BaseEntity {
     	case Yellow:
     		x = col9.getSecond()+inGameChipId*END_DISP;
     		break;
-    	
+
     	}
     	return x;
     }
@@ -293,7 +299,7 @@ public class LudoChip  extends BaseEntity {
     	case Yellow:
     		y = getYEndGameYellow(position);
     		break;
-    	
+
     	}
     	return y;
     }

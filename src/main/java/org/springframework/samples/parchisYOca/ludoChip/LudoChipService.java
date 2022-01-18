@@ -27,6 +27,7 @@ public class LudoChipService {
     public static final Integer SEGUNDO_DADO_5=1;
     public static final Integer SUMA_DADOS_5=2;
     public static final Integer DOS_DADOS_5=3;
+    public static final Integer FINAL_TILE=7;
 
 
     private LudoChipRepository ludoChipRepository;
@@ -144,18 +145,30 @@ public class LudoChipService {
         }
         return new Pair(false,null);
     }
+    public Boolean checkFinalTiles(Integer square, LudoChip chip){
+        log.debug("Checking if tile number '{}' is the start of that colors endgame", square);
+        return square==LAST_TILES.get(chip.getColor());
+    }
 
-//  todo gestionar los 20 extra por comer en el controlador
+
     public boolean move(LudoChip chip,Integer movements,List<LudoChip> chips,PlayerLudoStats pls, Integer matchId){
         Integer inGamePlayerId=pls.getInGameId();
         pls.setLastChipMovedId(chip.getInGameChipId());
         for(int i=1;i<=movements;i++){
-            if(checkCasilla(chip.getPosition()+i,chips).getFirst()) {
+            if(checkCasilla(chip.getPosition()+i,chips).getFirst()){
                 chip.setPosition(checkCasilla(chip.getPosition()+i,chips).getSecond()-1);
                 save(chip);
                 pls.setWalkedSquares(pls.getWalkedSquares()+ i - 1);
                 playerLudoStatsService.saveStats(pls);
                 return eat(chip.getPosition(),chips,inGamePlayerId, matchId);
+            }
+            else if(checkFinalTiles(chip.getPosition()+i,chip)){
+                chip.setGameState(GameState.endGame);
+                chip.setPosition(0+movements-i-1);
+                save(chip);
+                pls.setWalkedSquares(pls.getWalkedSquares()+movements);
+                playerLudoStatsService.saveStats(pls);
+                return false;
             }
         }
         chip.setPosition(chip.getPosition()+movements);
