@@ -23,7 +23,6 @@ public class PlayerLudoStatsService {
         for(PlayerLudoStats pls : statsList){
             stats.setDoubleRolls(pls.getDoubleRolls() + stats.getDoubleRolls());
             stats.setEatenTokens(pls.getEatenTokens() + stats.getEatenTokens());
-            stats.setCreatedBlocks(pls.getCreatedBlocks() + stats.getCreatedBlocks());
             stats.setTakeOuts(pls.getTakeOuts() + stats.getTakeOuts());
             stats.setGreedyRolls(pls.getGreedyRolls() + stats.getGreedyRolls());
             stats.setScoredTokens(pls.getScoredTokens() + stats.getScoredTokens());

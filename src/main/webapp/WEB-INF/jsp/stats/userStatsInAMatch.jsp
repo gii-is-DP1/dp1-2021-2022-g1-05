@@ -58,10 +58,6 @@
                     <td><c:out value="${ludoStats.greedyRolls}"/></td>
                 </tr>
                 <tr>
-                    <th>Numbers of blocks you created</th>
-                    <td><c:out value="${ludoStats.createdBlocks}"/></td>
-                </tr>
-                <tr>
                     <th>Number of tokens you scored</th>
                     <td><c:out value="${ludoStats.scoredTokens}"/></td>
                 </tr>
