@@ -1,7 +1,14 @@
 package testDataGenerator;
 
+import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
+import org.springframework.samples.parchisYOca.player.Player;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.user.User;
+
+import java.util.Date;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 public class TestDataGenerator {
@@ -32,5 +39,34 @@ public class TestDataGenerator {
 		u.setUsername(name);
 		u.setPassword(psswrd);
 		return u;
+	}
+	public static GooseMatch generateGooseLobby(String code) {
+		GooseBoard board = new GooseBoard();
+		GooseMatch match = new GooseMatch();
+		match.setBoard(board);
+		match.setStartDate(new Date());
+		match.setMatchCode(code);
+		return match;
+	}
+	public static Player generatePlayer(User user) {
+		Player player = new Player();
+		player.setUser(user);
+		return player;
+	}
+	public static PlayerGooseStats generateGooseStats(Player player) {
+		PlayerGooseStats stats = new PlayerGooseStats();
+		stats.setPlayer(player);
+		return stats;
+	}
+	public static GooseMatch generateGooseMatch(String code, Set<PlayerGooseStats> playerStats, Integer id) {
+		GooseBoard board = new GooseBoard();
+		GooseMatch match = new GooseMatch();
+		match.setBoard(board);
+		match.setClosedLobby(1);
+		match.setStartDate(new Date());
+		match.setMatchCode(code);
+		match.setStats(null);
+		match.setId(id);
+		return match;
 	}
 }
