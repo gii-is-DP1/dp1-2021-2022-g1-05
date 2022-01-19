@@ -92,7 +92,7 @@ public class LudoChip  extends BaseEntity {
     private GameState gameState = GameState.earlyGame;
 
     @ManyToOne
-    LudoBoard board;
+    private LudoBoard board;
 
     public Color getColor() {
         if(this.color==null){
