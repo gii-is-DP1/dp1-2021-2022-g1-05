@@ -1,14 +1,17 @@
 package org.springframework.samples.parchisYOca.gooseBoard;
 
+import org.hibernate.envers.internal.tools.Triple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
+import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
@@ -16,7 +19,9 @@ import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
+import org.springframework.samples.parchisYOca.user.Authorities;
 import org.springframework.samples.parchisYOca.user.User;
+import org.springframework.samples.parchisYOca.user.UserController;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,18 +30,19 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @WebMvcTest(controllers = GooseBoardController.class,
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
 classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class GooseBoardControllerTest {
-	@Autowired
+
+    @Autowired
     private MockMvc mockMvc;
 	@Autowired
 	private WebApplicationContext context;
@@ -53,8 +59,12 @@ public class GooseBoardControllerTest {
 	@MockBean
     private UserService userService;
 
-
+    private static final Integer JAIL=-2;
+    private static final int NOTURN = 0;
+    private static final int ID = 1;
+    private static final String AUTH = "admin";
 	private static final Boolean LOGGED_IN =true;
+    private static final Boolean NOT_LOGGED=false;
 	private static final Boolean TRUE =true;
 	private static final Integer JAIME_ID = 5;
 	private static final Integer JAIME_INGAMEID = 0;
@@ -71,12 +81,38 @@ public class GooseBoardControllerTest {
 	private static final String LAURA = "Laura";
 	private static final String CARMEN = "Carmen";
 	private static final Integer MATCH_ID = 1;
+    private static final Integer HASTURN=1;
 	private static final int[] DICES = {1,2,3};
+    private static final int[] DOUBLE_DICES = {3,3,6};
+    private static final boolean DOUBLES=true;
 	private Player Jaime;
 	private Player Paco;
 	private Player Laura;
 	private Player Carmen;
 	private GooseMatch match;
+    private List<GooseChip> chips;
+    private static GooseChip chip1 = new GooseChip();
+    private static GooseChip chip2 = new GooseChip();
+    private static GooseChip chip3 = new GooseChip();
+    private static GooseChip chip4 = new GooseChip();
+    public static final int INDICE_SUMA_DADOS = 2;
+
+    private static final String DEATH_MESSAGE = "Death";
+    private static final String NORMAL_MOVE_MESSAGE = "NoDobles";
+    private static final String GOOSE_MESSAGE = "Goose";
+    private static final String MAZE_MESSAGE = "Maze";
+    private static final String JAIL_MESSAGE = "Jail";
+    private static final String DOUBLE_ROLL_MESSAGE = "Double roll";
+
+    private static final Integer RANDOM_POSITION = 13;
+    private static final Integer RANDOM_GOOSE = 14 ;
+    private static final Integer JAIL_POSITION = 56 ;
+    private static final Integer END_MAZE = 30 ;
+    private static final Integer START_POSITION= 0 ;
+
+
+    private static final boolean NO_DOUBLES = false;
+
 	private PlayerGooseStats jaimeStats;
 	private PlayerGooseStats pacoStats;
 	private PlayerGooseStats lauraStats;
@@ -96,6 +132,11 @@ public class GooseBoardControllerTest {
 		Jaime.setId(JAIME_ID);
 		jaimeStats = new PlayerGooseStats();
 		jaimeStats.setPlayer(Jaime);
+        jaimeStats.setHasTurn(HASTURN);
+        Authorities authJaime = new Authorities();
+        authJaime.setAuthority(AUTH);
+        authJaime.setId(ID);
+
 		Paco = new Player();
 		User userPaco = new User();
 		userPaco.setUsername(PACO);
@@ -107,6 +148,7 @@ public class GooseBoardControllerTest {
 		pacoStats = new PlayerGooseStats();
 		pacoStats.setPlayer(Paco);
 		pacoStats.setIsOwner(IS_OWNER);
+        pacoStats.setHasTurn(-1);
 		Laura = new Player();
 		User userLaura = new User();
 		userLaura.setUsername(LAURA);
@@ -117,6 +159,7 @@ public class GooseBoardControllerTest {
 		Laura.setId(LAURA_ID);
 		lauraStats = new PlayerGooseStats();
 		lauraStats.setPlayer(Laura);
+        lauraStats.setHasTurn(-1);
 		Carmen = new Player();
 		User userCarmen = new User();
 		userCarmen.setUsername(CARMEN);
@@ -127,6 +170,18 @@ public class GooseBoardControllerTest {
 		Carmen.setId(CARMEN_ID);
 		carmenStats = new PlayerGooseStats();
 		carmenStats.setPlayer(Carmen);
+        carmenStats.setHasTurn(-1);
+
+        chips=new ArrayList<>();
+        chip1.setInGameId(JAIME_INGAMEID);
+        chip2.setInGameId(PACO_INGAMEID);
+        chip3.setInGameId(LAURA_INGAMEID);
+        chip4.setInGameId(CARMEN_INGAMEID);
+        chips.add(chip1);
+        chips.add(chip2);
+        chips.add(chip3);
+        chips.add(chip4);
+
 		Set<PlayerGooseStats> players = new HashSet<PlayerGooseStats>();
 		players.add(jaimeStats);
 		players.add(pacoStats);
@@ -138,6 +193,8 @@ public class GooseBoardControllerTest {
 		Optional<PlayerGooseStats> oJaimeStats = Optional.of(jaimeStats);
 		Optional<PlayerGooseStats> oLauraStats = Optional.of(lauraStats);
 		Optional<PlayerGooseStats> oCarmenStats = Optional.of(carmenStats);
+        Optional<List<GooseChip>> oChips=Optional.of(chips);
+
 		given(this.playerService.findPlayerById(JAIME_ID)).willReturn(oJaime);
 		given(this.playerService.findPlayerById(PACO_ID)).willReturn(oPaco);
 		given(this.playerService.findPlayerByUsername(JAIME)).willReturn(oJaime);
@@ -159,23 +216,157 @@ public class GooseBoardControllerTest {
 		.willReturn(oCarmenStats);
 		given(this.playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(JAIME, MATCH_ID))
 		.willReturn(oJaimeStats);
+        given(this.gooseChipService.findChipsByMatchId(MATCH_ID))
+        .willReturn(oChips.get());
+
+
 		match = new GooseMatch();
 		match.setMatchCode(MATCH_CODE);
 		match.setId(MATCH_ID);
 		match.setStats(players);
 
 	}
+
+
+    @WithMockUser(value = JAIME)
+    @Test
+    void testGooseDicesRolled() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("dices", DICES);
+        session.setAttribute("fromGoose",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        int[] rolledDices = (int[])session.getAttribute("dices");
+        boolean flagDobles=NO_DOUBLES;
+        given(gooseChipService.checkSpecials(JAIME,
+            chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(RANDOM_POSITION,HASTURN,NORMAL_MOVE_MESSAGE));
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/gooseInGame/dicesRolled")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+    }
+
 	@WithMockUser(value = JAIME)
 	@Test
-	void testGooseDicesRolled() throws Exception {
+	void testGooseDicesRolledGoose() throws Exception {
 		MockHttpSession session = new MockHttpSession();
 		session.setAttribute("dices", DICES);
 		session.setAttribute("fromGoose",TRUE);
 		session.setAttribute("matchId", MATCH_ID);
+        int[] rolledDices = (int[])session.getAttribute("dices");
+        boolean flagDobles=NO_DOUBLES;
+        given(gooseChipService.checkSpecials(JAIME,
+            chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(RANDOM_GOOSE,HASTURN,GOOSE_MESSAGE));
+
 		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/gooseInGame/dicesRolled")
                 .session(session);
 		mockMvc.perform(builder)
-		.andExpect(status().is3xxRedirection());
+		.andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
 	}
+    @WithMockUser(value = JAIME)
+    @Test
+    void testGooseDicesRolledDiceJail() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("dices", DICES);
+        session.setAttribute("fromGoose",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        int[] rolledDices = (int[])session.getAttribute("dices");
+        boolean flagDobles=NO_DOUBLES;
+        given(gooseChipService.checkSpecials(JAIME,
+            chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(JAIL_POSITION,JAIL,JAIL_MESSAGE));
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/gooseInGame/dicesRolled")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+    }
+
+    @WithMockUser(value = JAIME)
+    @Test
+    void testGooseDicesRolledDiceMaze() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("dices", DICES);
+        session.setAttribute("fromGoose",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        int[] rolledDices = (int[])session.getAttribute("dices");
+        boolean flagDobles=NO_DOUBLES;
+        given(gooseChipService.checkSpecials(JAIME,
+            chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(END_MAZE,NOTURN ,MAZE_MESSAGE));
+        pacoStats.setHasTurn(0);
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/gooseInGame/dicesRolled")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+    }
+    @WithMockUser(value = JAIME)
+    @Test
+    void testGooseDicesRolledDoubles() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("dices", DOUBLE_DICES);
+        session.setAttribute("fromGoose",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        int[] rolledDices = (int[])session.getAttribute("dices");
+        boolean flagDobles=DOUBLES;
+        given(gooseChipService.checkSpecials(JAIME,
+            chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(RANDOM_POSITION,HASTURN,DOUBLE_ROLL_MESSAGE));
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/gooseInGame/dicesRolled")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+    }
+    @WithMockUser(value = JAIME)
+    @Test
+    void testGooseDicesRolledDeath() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("dices", DICES);
+        session.setAttribute("fromGoose",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        int[] rolledDices = (int[])session.getAttribute("dices");
+        boolean flagDobles=NO_DOUBLES;
+        given(gooseChipService.checkSpecials(JAIME,
+            chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(START_POSITION,NOTURN,DEATH_MESSAGE));
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/gooseInGame/dicesRolled")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+    }
+    @WithMockUser(value = PACO)
+    @Test
+    void testGooseDicesRolledNoTurn() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("dices", DICES);
+        session.setAttribute("fromGoose",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        int[] rolledDices = (int[])session.getAttribute("dices");
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/gooseInGame/dicesRolled")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+    }
+    @WithMockUser(value = JAIME)
+    @Test
+    void testGooseDicesRolledDiceNotAuthenticated() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("dices", DICES);
+        session.setAttribute("fromGoose",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        given(this.userService.isAuthenticated()).willReturn(NOT_LOGGED);
+                MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/gooseInGame/dicesRolled")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/"));
+    }
 
 }
