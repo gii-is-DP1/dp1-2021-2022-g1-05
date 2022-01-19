@@ -13,6 +13,7 @@ import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.user.UserService;
@@ -26,7 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -56,9 +57,11 @@ public class SessionControllerTest {
 	private static final Integer LAURA_ID = 7;
 	private static final String MATCH_CODE = "abcdfe";
 	private static final Integer HAS_TURN = 1;
+	private static final Integer DOESNT_HAVE_TURN = 0;
 	private Player Laura;
 	private GooseMatch match;
-	private PlayerGooseStats lauraStats;
+	private PlayerGooseStats lauraGooseStats;
+	private PlayerLudoStats lauraLudoStats;
 	@BeforeEach
 	void setup() {
 		Laura = new Player();
@@ -69,25 +72,26 @@ public class SessionControllerTest {
 		Laura.setUser(userLaura);
 		Laura.setEmail("jaime@domain.com");
 		Laura.setId(LAURA_ID);
-		lauraStats = new PlayerGooseStats();
-		lauraStats.setPlayer(Laura);
-		lauraStats.setHasTurn(HAS_TURN);
 		Set<PlayerGooseStats> players = new HashSet<PlayerGooseStats>();
-		players.add(lauraStats);
-		Optional<PlayerGooseStats> oLauraStats = Optional.of(lauraStats);
+		players.add(lauraGooseStats);
 		match = new GooseMatch();
 		match.setMatchCode(MATCH_CODE);
 		match.setId(MATCH_ID);
 		match.setStats(players);
-		given(this.userService.isAuthenticated()).willReturn(TRUE);
-		given(this.playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(LAURA, MATCH_ID))
-		.willReturn(oLauraStats);
+		
 		
 	}
 	
 	@WithMockUser(value = LAURA)
 	@Test
 	void testRollDicesGoose() throws Exception {
+		given(this.userService.isAuthenticated()).willReturn(TRUE);
+		lauraGooseStats = new PlayerGooseStats();
+		lauraGooseStats.setPlayer(Laura);
+		lauraGooseStats.setHasTurn(HAS_TURN);
+		Optional<PlayerGooseStats> oLauraGooseStats = Optional.of(lauraGooseStats);
+		given(this.playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(LAURA, MATCH_ID))
+		.willReturn(oLauraGooseStats);
 		MockHttpSession sessionGoose = new MockHttpSession();
 		sessionGoose.setAttribute("fromGoose",FROMGOOSE);
 		sessionGoose.setAttribute("matchId", MATCH_ID);
@@ -96,6 +100,106 @@ public class SessionControllerTest {
 		mockMvc.perform(builder)
 		.andExpect(status().is3xxRedirection())
 		.andExpect(redirectedUrl("/gooseInGame/dicesRolled"));
+		assertThat(sessionGoose.getAttribute("dices")).isNotNull();
+	}
+	@WithMockUser(value = LAURA)
+	@Test
+	void testRollDicesLudo() throws Exception {
+		given(this.userService.isAuthenticated()).willReturn(TRUE);
+		lauraLudoStats = new PlayerLudoStats();
+		lauraLudoStats.setPlayer(Laura);
+		lauraLudoStats.setHasTurn(HAS_TURN);
+		Optional<PlayerLudoStats> oLauraLudoStats = Optional.of(lauraLudoStats);
+		given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(LAURA, MATCH_ID))
+		.willReturn(oLauraLudoStats);
+		MockHttpSession sessionLudo = new MockHttpSession();
+		sessionLudo.setAttribute("fromLudo",FROMLUDO);
+		sessionLudo.setAttribute("matchId", MATCH_ID);
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/session/rolldices")
+                .session(sessionLudo);
+		mockMvc.perform(builder)
+		.andExpect(status().is3xxRedirection())
+		.andExpect(redirectedUrl("/ludoInGame/dicesRolled"));
+		assertThat(sessionLudo.getAttribute("dices")).isNotNull();
+		
+	}
+	@WithMockUser(value = LAURA)
+	@Test
+	void testRollDicesGooseNotLoggedIn() throws Exception {
+		lauraGooseStats = new PlayerGooseStats();
+		lauraGooseStats.setPlayer(Laura);
+		lauraGooseStats.setHasTurn(HAS_TURN);
+		Optional<PlayerGooseStats> oLauraGooseStats = Optional.of(lauraGooseStats);
+		given(this.playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(LAURA, MATCH_ID))
+		.willReturn(oLauraGooseStats);
+		MockHttpSession sessionGoose = new MockHttpSession();
+		sessionGoose.setAttribute("fromGoose",FROMGOOSE);
+		sessionGoose.setAttribute("matchId", MATCH_ID);
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/session/rolldices")
+                .session(sessionGoose);
+		mockMvc.perform(builder)
+		.andExpect(status().is3xxRedirection())
+		.andExpect(redirectedUrl("/"));
+		
+	}
+	@WithMockUser(value = LAURA)
+	@Test
+	void testRollDicesLudoNotLoggedIn() throws Exception {
+		lauraLudoStats = new PlayerLudoStats();
+		lauraLudoStats.setPlayer(Laura);
+		lauraLudoStats.setHasTurn(HAS_TURN);
+		Optional<PlayerLudoStats> oLauraLudoStats = Optional.of(lauraLudoStats);
+		given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(LAURA, MATCH_ID))
+		.willReturn(oLauraLudoStats);
+		MockHttpSession sessionLudo = new MockHttpSession();
+		sessionLudo.setAttribute("fromLudo",FROMLUDO);
+		sessionLudo.setAttribute("matchId", MATCH_ID);
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/session/rolldices")
+                .session(sessionLudo);
+		mockMvc.perform(builder)
+		.andExpect(status().is3xxRedirection())
+		.andExpect(redirectedUrl("/"));
+		
+	}
+	@WithMockUser(value = LAURA)
+	@Test
+	void testRollDicesGooseDoesntHaveTurn() throws Exception {
+		given(this.userService.isAuthenticated()).willReturn(TRUE);
+		lauraGooseStats = new PlayerGooseStats();
+		lauraGooseStats.setPlayer(Laura);
+		lauraGooseStats.setHasTurn(DOESNT_HAVE_TURN);
+		Optional<PlayerGooseStats> oLauraGooseStats = Optional.of(lauraGooseStats);
+		given(this.playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(LAURA, MATCH_ID))
+		.willReturn(oLauraGooseStats);
+		MockHttpSession sessionGoose = new MockHttpSession();
+		sessionGoose.setAttribute("fromGoose",FROMGOOSE);
+		sessionGoose.setAttribute("matchId", MATCH_ID);
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/session/rolldices")
+                .session(sessionGoose);
+		mockMvc.perform(builder)
+		.andExpect(status().is3xxRedirection())
+		.andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+		assertThat(sessionGoose.getAttribute("dices")).isNull();
+	}
+	@WithMockUser(value = LAURA)
+	@Test
+	void testRollDicesLudoDoesntHaveTurn() throws Exception {
+		given(this.userService.isAuthenticated()).willReturn(TRUE);
+		lauraLudoStats = new PlayerLudoStats();
+		lauraLudoStats.setPlayer(Laura);
+		lauraLudoStats.setHasTurn(DOESNT_HAVE_TURN);
+		Optional<PlayerLudoStats> oLauraLudoStats = Optional.of(lauraLudoStats);
+		given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(LAURA, MATCH_ID))
+		.willReturn(oLauraLudoStats);
+		MockHttpSession sessionLudo = new MockHttpSession();
+		sessionLudo.setAttribute("fromLudo",FROMLUDO);
+		sessionLudo.setAttribute("matchId", MATCH_ID);
+		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/session/rolldices")
+                .session(sessionLudo);
+		mockMvc.perform(builder)
+		.andExpect(status().is3xxRedirection())
+		.andExpect(redirectedUrl("/ludoMatches/"+MATCH_ID));
+		assertThat(sessionLudo.getAttribute("dices")).isNull();
 		
 	}
 }
