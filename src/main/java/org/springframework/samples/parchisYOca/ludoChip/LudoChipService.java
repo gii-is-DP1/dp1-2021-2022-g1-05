@@ -29,6 +29,7 @@ public class LudoChipService {
     public static final Integer SUMA_DADOS_5=2;
     public static final Integer DOS_DADOS_5=3;
     public static final Integer FINAL_TILE=7;
+    public static final Integer NUMBER_OF_CHIPS_BY_PLAYER=4;
 
     public static final Integer NO_OPERATION=0;
     public static final Integer ATE_CHIP=1;
@@ -180,9 +181,11 @@ public class LudoChipService {
                 playerLudoStatsService.saveStats(pls);
                 return GOT_BLOCKED + eat(chip.getPosition(),chips,inGamePlayerId, matchId);
             }
-            else if(checkFinalTiles(chip.getPosition()+i,chip)){
+        }
+        for(Integer j=0;j<=movements;j++) {
+            if(checkFinalTiles(chip.getPosition()+j,chip)){
                 chip.setGameState(GameState.endGame);
-                chip.setPosition(0+movements-i-1);
+                chip.setPosition(0+movements-j-1);
                 save(chip);
                 pls.setWalkedSquares(pls.getWalkedSquares()+movements);
                 playerLudoStatsService.saveStats(pls);
@@ -202,7 +205,7 @@ public class LudoChipService {
         chip.setPosition(chip.getPosition()+movements);
         save(chip);
         pls.setWalkedSquares(pls.getWalkedSquares()+movements);
-        if(chip.getPosition()==7) {
+        if(chip.getPosition()==FINAL_TILE) {
             pls.setScoredTokens(pls.getScoredTokens()+1);
         }
 
@@ -214,7 +217,7 @@ public class LudoChipService {
                 chipsInFinalTileAcum++;
             }
         }
-        if(chipsInFinalTileAcum==4) {
+        if(chipsInFinalTileAcum==NUMBER_OF_CHIPS_BY_PLAYER) {
             pls.setHasWon(1);
             LudoMatch ludoMatch = ludoMatchService.findMatchByPlayerLudoStats(pls).get();
             ludoMatch.setEndDate(new Date());
@@ -299,7 +302,7 @@ public class LudoChipService {
         List<LudoChip> chipsToBreak = new ArrayList<>();
         for(LudoChip chipToCheck: ludoChips) {
             if(chipToCheck.getInGamePlayerId() == inGameId) {
-                if (chipToCheck.getGameState().equals(GameState.midGame) || chipToCheck.getPosition() != LudoChip.FINAL_TILE) {
+                if (chipToCheck.getGameState().equals(GameState.midGame)) { // || chipToCheck.getPosition() != LudoChip.FINAL_TILE
                     if(checkCasilla(chipToCheck.getPosition(), ludoChips)) {
                         chipsToBreak.add(chipToCheck);
                     }
