@@ -235,7 +235,7 @@ public class LudoChipService {
             }
         }
         for(LudoChip enemyChip: otherPlayerChips){
-            if(enemyChip.getPosition()==square && !SAFE_TILES.contains(enemyChip.getPosition())){
+            if(enemyChip.getPosition()==square && !SAFE_TILES.contains(enemyChip.getPosition()) && enemyChip.getGameState().equals(GameState.midGame)){
                 enemyChip.setGameState(GameState.earlyGame);
                 save(enemyChip);
 
