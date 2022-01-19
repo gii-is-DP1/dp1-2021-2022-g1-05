@@ -1,13 +1,17 @@
 package org.springframework.samples.parchisYOca.achievement;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.*;
+import org.springframework.samples.parchisYOca.achievement.exceptions.AchievementAlreadyExists;
+import org.springframework.samples.parchisYOca.achievement.exceptions.NameAlreadyExists;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
@@ -21,12 +25,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = {AchievementController.class}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class), excludeAutoConfiguration = SecurityConfiguration.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class AchievementControllerTests {
 
     private static final int TEST_ACHIEVEMENT_ID = 1;
@@ -34,6 +42,11 @@ public class AchievementControllerTests {
     private static final String GAME_TO_CREATE_ACHIEVEMENT = "goose";
     private static final String PAGE_NUMBER = "0";
     private static final Integer NUMBER_OF_ELEMENTS_PER_PAGE = 5;
+    private static final String CORRECT_DESCRIPTION = "Number of ludo games won";
+    private static final String CORRECT_NAME = "Win 30 ludo games";
+    private static final String EMPTY_NAME = "";
+    private static final String WRONG_NUMBER_TO_BEAT = "ashbdaimkd";
+    private static final Integer CORRECT_NUMBER_TO_BEAT = 30;
 
     @Autowired
     private MockMvc mockMvc;
@@ -123,11 +136,75 @@ public class AchievementControllerTests {
     @WithMockUser(value = USERNAME)
     @Test
     void testCreateAchievement() throws Exception {
-        given(this.userService.isAuthenticated()).willReturn(false);
-        mockMvc.perform(post("/achievements/newAchievement/"+ GAME_TO_CREATE_ACHIEVEMENT))
+        given(this.userService.isAuthenticated()).willReturn(true);
+        mockMvc.perform(post("/achievements/newAchievement/" + GAME_TO_CREATE_ACHIEVEMENT)
+                .param("name", CORRECT_NAME)
+                .param("description", CORRECT_DESCRIPTION)
+                .param("numberToBeat", String.valueOf(CORRECT_NUMBER_TO_BEAT)))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/achievements?page=0"));
+    }
+
+    @WithMockUser(value = USERNAME)
+    @Test
+    void testCreateAchievementEmptyName() throws Exception {
+        given(this.userService.isAuthenticated()).willReturn(true);
+        mockMvc.perform(post("/achievements/newAchievement/" + GAME_TO_CREATE_ACHIEVEMENT)
+                .param("name", EMPTY_NAME)
+                .param("description", CORRECT_DESCRIPTION)
+                .param("numberToBeat", String.valueOf(CORRECT_NUMBER_TO_BEAT)))
             .andExpect(status().isOk())
-            .andExpect(view().name("achievements/createAchievement"))
+            .andExpect(model().attributeHasErrors("achievement"))
             .andExpect(model().attributeExists("descriptions"))
-            .andExpect(model().attributeExists("achievement"));
+            .andExpect(model().attributeExists("achievement"))
+            .andExpect(view().name("achievements/createAchievement"));
+    }
+
+    @WithMockUser(value = USERNAME)
+    @Test
+    void testCreateAchievementWrongName() throws Exception {
+        given(this.userService.isAuthenticated()).willReturn(true);
+        given(this.achievementService.save(any(Achievement.class))).willThrow(NumberFormatException.class);
+
+        mockMvc.perform(post("/achievements/newAchievement/" + GAME_TO_CREATE_ACHIEVEMENT)
+                .param("name", CORRECT_NAME)
+                .param("description", CORRECT_DESCRIPTION)
+                .param("numberToBeat", WRONG_NUMBER_TO_BEAT))
+            .andExpect(status().isOk())
+            .andExpect(model().attribute("message", "The number to beat must be a number"))
+            .andExpect(model().attributeExists("achievement"))
+            .andExpect(view().name("achievements/createAchievement"));
+    }
+
+    @WithMockUser(value = USERNAME)
+    @Test
+    void testCreateExistingAchievement() throws Exception {
+        given(this.userService.isAuthenticated()).willReturn(true);
+        given(this.achievementService.save(any(Achievement.class))).willThrow(AchievementAlreadyExists.class);
+
+        mockMvc.perform(post("/achievements/newAchievement/" + GAME_TO_CREATE_ACHIEVEMENT)
+                .param("name", CORRECT_NAME)
+                .param("description", CORRECT_DESCRIPTION)
+                .param("numberToBeat", String.valueOf(CORRECT_NUMBER_TO_BEAT)))
+            .andExpect(status().isOk())
+            .andExpect(model().attribute("message", "The achievement has the same description and number as another"))
+            .andExpect(model().attributeExists("achievement"))
+            .andExpect(view().name("achievements/createAchievement"));
+    }
+
+    @WithMockUser(value = USERNAME)
+    @Test
+    void testCreateExistingAchievementName() throws Exception {
+        given(this.userService.isAuthenticated()).willReturn(true);
+        given(this.achievementService.save(any(Achievement.class))).willThrow(NameAlreadyExists.class);
+
+        mockMvc.perform(post("/achievements/newAchievement/" + GAME_TO_CREATE_ACHIEVEMENT)
+                .param("name", CORRECT_NAME)
+                .param("description", CORRECT_DESCRIPTION)
+                .param("numberToBeat", String.valueOf(CORRECT_NUMBER_TO_BEAT)))
+            .andExpect(status().isOk())
+            .andExpect(model().attribute("message", "The name of the achievement already exists"))
+            .andExpect(model().attributeExists("achievement"))
+            .andExpect(view().name("achievements/createAchievement"));
     }
 }
