@@ -28,7 +28,7 @@ public class PlayerGooseStats extends BaseEntity {
     private Integer landedMaze = 0;
     private Integer landedDeath = 0;
     private Integer isOwner = 0;
-    private Integer hasWon = 0;
+    private Integer hasWon = 0; //This stat can pass the values [0..1] if used in the stats views to count total wins from player
     private Integer inGameId = 0;
     private Integer hasTurn = 0;
     private Integer playerLeft = 0;

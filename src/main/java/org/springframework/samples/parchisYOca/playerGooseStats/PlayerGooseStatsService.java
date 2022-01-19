@@ -45,7 +45,7 @@ public class PlayerGooseStatsService {
     }
 
     //Used to show rankings
-    private Map<String, PlayerGooseStats> sumStatsByPlayer(Collection<PlayerGooseStats> statsList){
+    public Map<String, PlayerGooseStats> sumStatsByPlayer(Collection<PlayerGooseStats> statsList){
     	log.debug("Calculating the sum of all Goose stats by player");
         Map<String, PlayerGooseStats> map = new HashMap<>();
         for(PlayerGooseStats pgs : statsList){

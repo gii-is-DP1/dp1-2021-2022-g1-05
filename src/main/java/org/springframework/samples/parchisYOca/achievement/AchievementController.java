@@ -23,7 +23,6 @@ import javax.validation.Valid;
 import java.util.*;
 
 @Controller
-@RequestMapping("/achievements")
 public class AchievementController {
 
     private final List<String> GOOSE_DESCRIPTIONS = List.of("Number of times landed on goose squares",
@@ -41,7 +40,7 @@ public class AchievementController {
     @Autowired
     private PlayerService playerService;
 
-    @GetMapping()
+    @GetMapping("/achievements")
     public String listadoLogros(@RequestParam String page, ModelMap modelMap){
         Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("name")));
         String vista = "achievements/listAchievements";
@@ -65,7 +64,7 @@ public class AchievementController {
         return vista;
     }
 
-    @GetMapping(path="/newAchievement/{game}")
+    @GetMapping(path="/achievements/newAchievement/{game}")
     public String crearLogro(@PathVariable("game") String game, ModelMap modelMap){
         String view = "achievements/createAchievement";
         if(game.equals("goose")){
@@ -77,7 +76,7 @@ public class AchievementController {
         return view;
     }
 
-    @PostMapping(path="/newAchievement/{game}")
+    @PostMapping(path="/achievements/newAchievement/{game}")
     public String salvarLogro(@PathVariable("game") String game,
                               @Valid Achievement achievement, BindingResult result, ModelMap modelMap){
         modelMap.addAttribute("achievement",achievement);
@@ -109,13 +108,12 @@ public class AchievementController {
         return "redirect:/achievements?page=0";
     }
 
-    @GetMapping(path="/delete/{achievementId}")
+    @GetMapping(path="/achievements/delete/{achievementId}")
     public String borrarLogro(@PathVariable("achievementId") int achievementId){
-        String view = "achievements/listAchievements";
         Optional<Achievement> achievement = achievementService.findAchievementById(achievementId);
         if(achievement.isPresent()){
             achievementService.delete(achievement.get());
         }
-        return view;
+        return "redirect:/achievements?page=0";
     }
 }
