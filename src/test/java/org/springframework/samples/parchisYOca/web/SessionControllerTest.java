@@ -63,6 +63,7 @@ public class SessionControllerTest {
 	private GooseMatch match;
 	private PlayerGooseStats lauraGooseStats;
 	private PlayerLudoStats lauraLudoStats;
+
 	@BeforeEach
 	void setup() {
 		Laura = new Player();
@@ -103,6 +104,7 @@ public class SessionControllerTest {
 		.andExpect(redirectedUrl("/gooseInGame/dicesRolled"));
 		assertThat(sessionGoose.getAttribute("dices")).isNotNull();
 	}
+
 	@WithMockUser(value = LAURA)
 	@Test
 	void testRollDicesLudo() throws Exception {
