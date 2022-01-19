@@ -45,8 +45,8 @@ public class WelcomeController {
 
           if(logged == true){
               User currentUser = (User) authentication.getPrincipal();
-              Player player = playerService.findPlayerByUsername(currentUser.getUsername()).get();
-              model.put("playerId", player.getId());
+              Optional<Player> player = playerService.findPlayerByUsername(currentUser.getUsername());
+              model.put("playerId", player.get().getId());
 
               if(session.getAttribute("ownerLeft") != null){
                   model.addAttribute("message", session.getAttribute("ownerLeft"));
