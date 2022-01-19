@@ -52,7 +52,7 @@ public class LudoBoardService {
     public boolean checkGreedy(PlayerLudoStats inGamePlayerStats, boolean flagDobles) {
         if(flagDobles){
             inGamePlayerStats.setTurnDoubleRolls(inGamePlayerStats.getTurnDoubleRolls()+1);
-            playerLudoStatsService.saveStats(inGamePlayerStats);
+            inGamePlayerStats = playerLudoStatsService.saveStats(inGamePlayerStats);
         }
         if(inGamePlayerStats.getTurnDoubleRolls()==3){
             inGamePlayerStats.setHasTurn(0);

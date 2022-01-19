@@ -85,17 +85,14 @@ public class LudoBoardController {
             boolean flagDobles = dicesToCheck[INDICE_PRIMER_DADO] == dicesToCheck[INDICE_SEGUNDO_DADO];
             session.setAttribute("flagDobles", flagDobles);
             Integer inGameId = inGamePlayerStats.getInGameId();
-
-            if (session.getAttribute("especial") != null) {
-                String mensaje = session.getAttribute("especial").toString();
-                model.put("message", mensaje);
-                session.setAttribute("especial", null);
-            }
+            session.setAttribute("especial", null);
 
             //Checks if this is the third time in a turn they roll double dices
             if(ludoBoardService.checkGreedy(inGamePlayerStats,flagDobles)){
                 ludoChipService.ManageGreedy(inGamePlayerStats);
-                model.put("message", "You managed to roll doubles THREE TIMES? Preposterous, go back home.");
+                session.setAttribute("especial", "You managed to roll doubles THREE TIMES? Preposterous, go back home.");
+                passTurn(inGamePlayerStats, matchId);
+                return "redirect:/ludoMatches/" + matchId;
             }
             for(LudoChip lc : ludoChips){
                 //To check that the chip belongs to the player
@@ -107,7 +104,7 @@ public class LudoBoardController {
                         dicesToCheck[INDICE_SUMA_DADOS] == 5) {
                         Integer diceCode = ludoChipService.manageFives(inGameId,matchId, dicesToCheck[INDICE_PRIMER_DADO], dicesToCheck[INDICE_SEGUNDO_DADO]);
                         model.put("diceCode", diceCode);
-                        responseToFives(diceCode, inGamePlayerStats, matchId, model);
+                        responseToFives(diceCode, inGamePlayerStats, matchId, model, session);
                         if(diceCode == SUMA_DADOS_5 || diceCode == DOS_DADOS_5) {
                             return "redirect:/ludoMatches/" + matchId;
                         }
@@ -119,6 +116,9 @@ public class LudoBoardController {
                 if(!flagDobles) {
                     dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
                     passTurn(inGamePlayerStats, matchId);
+                    session.setAttribute("especial", "You weren't able to take out any of your chips :(");
+                } else {
+                    session.setAttribute("especial", "You couldn't take out any chips, but you rolled double, sou you get an extra turn!");
                 }
                 return "redirect:/ludoMatches/" + matchId;
             }
@@ -128,7 +128,8 @@ public class LudoBoardController {
                 if(chipsToBreak.size() != 0) {
                     return "redirect:/ludoInGame/chooseChip/0";
                 } else {
-                    session.setAttribute("especial","You got a double roll!! You can roll the dice again");
+                    model.addAttribute("message","You got a double roll!! You will be able to roll again after this.");
+                    session.setAttribute("especial","You got a double roll!! You can roll the dice again.");
                 }
             }
             //Ya no te quedan movimientos, tu turno ha terminado
@@ -215,14 +216,15 @@ public class LudoBoardController {
                 dicesToCheck[diceIndex]=10;
                 return "redirect:/ludoInGame/chooseChip/"+diceIndex;
             }else if(moveCode==GOT_BLOCKED) {
-                session.setAttribute("especial", "You got blocked, so your chip landed tight before the block");
+                session.setAttribute("especial", "You got blocked, so your chip landed right before the block");
             }else if(moveCode==ENDED_THE_GAME) {
                 return "redirect:/ludoMatches/"+matchId;
             }
-            else if(checkDicesLeft()){
+            if(checkDicesLeft()){
                 return "redirect:/ludoInGame/chooseChip/"+Integer.toString((diceIndex+1)%2);
             }
             else if((boolean) session.getAttribute("flagDobles")){
+                session.setAttribute("especial","You got a double roll!! You can roll the dice again");
                 return "redirect:/ludoMatches/"+matchId;
             }
             else{
@@ -238,7 +240,7 @@ public class LudoBoardController {
     }
 
     //Resetea los dados usados y muestra los mensajes pertinentes
-    private void responseToFives(Integer diceCode, PlayerLudoStats inGamePlayerStats, Integer matchId, ModelMap model) {
+    private void responseToFives(Integer diceCode, PlayerLudoStats inGamePlayerStats, Integer matchId, ModelMap model, HttpSession session) {
         if(diceCode==PRIMER_DADO_5){
             dicesToCheck[INDICE_PRIMER_DADO]=0;
             model.addAttribute("message", "You rolled  5, so one of your chips got taken out");
@@ -250,10 +252,10 @@ public class LudoBoardController {
         else if(diceCode==SUMA_DADOS_5){
             dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
             passTurn(inGamePlayerStats, matchId);
-            model.addAttribute("message", "Your roll sums 5, so one of your chips got taken out");
+            session.setAttribute("especial", "Your roll sums 5, so one of your chips got taken out");
         } else if(diceCode == DOS_DADOS_5){
             dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
-            model.addAttribute("message", "You rolled 5 on both dices, so two of your chips got taken out");
+            session.setAttribute("especial", "You rolled 5 on both dices, so two of your chips got taken out");
         }
     }
 
