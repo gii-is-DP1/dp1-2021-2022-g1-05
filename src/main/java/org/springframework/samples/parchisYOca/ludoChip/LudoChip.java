@@ -107,6 +107,13 @@ public class LudoChip  extends BaseEntity {
         this.color = colores[inGamePlayerId];
     }
 
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+        if(gameState.equals(GameState.earlyGame)) {
+            this.position = null;
+        }
+    }
+
     public void setPosition(Integer position) {
 
     	switch(gameState) {
@@ -119,9 +126,14 @@ public class LudoChip  extends BaseEntity {
     		break;
     	case endGame:
     		//ver como posicionar la ficha en esta parte del juego
-            if(position>FINAL_TILE){
-                Integer diff = position - FINAL_TILE;
-                position = FINAL_TILE - diff;
+            while (position < 0 || position > FINAL_TILE) {
+                if(position>FINAL_TILE){
+                    Integer diff = position - FINAL_TILE;
+                    position = FINAL_TILE - diff;
+                }
+                if(position<0){
+                    position = Math.abs(position);
+                }
             }
     		this.position = position;
     	}
