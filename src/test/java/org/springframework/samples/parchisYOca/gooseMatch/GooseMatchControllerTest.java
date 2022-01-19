@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
 classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
-public class GooseMatchControllerTest {
+public class gooseMatchControllerTest {
 	@Autowired
     private MockMvc mockMvc;
 	@MockBean
