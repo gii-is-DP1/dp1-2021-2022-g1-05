@@ -93,7 +93,7 @@ public class PlayerLudoStatsService {
     }
 
     @Transactional(readOnly = true)
-    public Iterable<PlayerLudoStats> findAll() throws DataAccessException {
+    public Collection<PlayerLudoStats> findAll() throws DataAccessException {
         return playerLudoStatsRepository.findAll();
     }
 

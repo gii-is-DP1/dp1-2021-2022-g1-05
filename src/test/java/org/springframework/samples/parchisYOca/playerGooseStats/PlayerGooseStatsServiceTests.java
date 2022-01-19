@@ -178,11 +178,11 @@ public class PlayerGooseStatsServiceTests {
         Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).keySet().contains(USERNAME_3));
         Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).keySet().contains(USERNAME_2));
 
-        Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).get(USERNAME_2).getLandedDeath()).isEqualTo(10);
-        Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).get(USERNAME_2).getHasWon()).isEqualTo(1);
+        Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).get(USERNAME_2).getLandedDeath()).isEqualTo(pgsAfterSum1.getLandedDeath());
+        Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).get(USERNAME_2).getHasWon()).isEqualTo(pgsAfterSum1.getHasWon());
 
-        Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).get(USERNAME_3).getLandedDice()).isEqualTo(10);
-        Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).get(USERNAME_3).getLandedGeese()).isEqualTo(60);
+        Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).get(USERNAME_3).getLandedDice()).isEqualTo(pgsAfterSum2.getLandedDice());
+        Assertions.assertThat(playerGooseStatsService.sumStatsByPlayer(pgs1).get(USERNAME_3).getLandedGeese()).isEqualTo(pgsAfterSum2.getLandedGeese());
 
         assertThrows(NullPointerException.class, () ->{
             playerGooseStatsService.sumStats(null);
