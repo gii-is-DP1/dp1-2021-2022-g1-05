@@ -1,7 +1,6 @@
 package org.springframework.samples.parchisYOca.gooseChip;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -20,13 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-//TODO echar un vistazo a @BeforeEach
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class GooseChipServiceTest {
@@ -44,13 +41,27 @@ public class GooseChipServiceTest {
     protected final Integer INVALID_POSITION=-3;
     protected final Integer FIRST_GOOSE=5;
     protected final Integer SECOND_GOOSE=9;
+    protected final Integer THIRD_TO_LAST_GOOSE = 54;
+    protected final Integer SECOND_TO_LAST_GOOSE = 59;
+    protected final Integer LOSES_1_TURN=-1;
+    protected final Integer LOSES_2_TURNS=-2;
     protected final Integer LAST_GOOSE=63;
     protected final Boolean DOBLES_SI=true;
     protected final Boolean DOBLES_NO=false;
+    protected final Integer DEATH=58;
     protected final Integer JAIL=56;
     protected final Integer BRIDGE=6;
+    protected final Integer INN=19;
+    protected final Integer SECOND_BRIDGE=12;
     protected final Integer MAZE=42;
+    protected final Integer END_MAZE=30;
     protected final Integer DICE=26;
+    protected final Integer SECOND_DICE=53;
+    protected final Integer FIRST_SQUARE=0;
+    protected final Integer LAST_SQUARE=63;
+    protected final Integer NOT_ESPECIAL_SQUARE =2;
+    protected final Integer HAS_TURN =1;
+    protected final Integer BOUNCE_2 =65;
 
     @Test
     @Transactional
@@ -108,8 +119,6 @@ public class GooseChipServiceTest {
         });
     }
 
-    //TODO parece que el error lo da la autenticación
-    @Disabled
     @Test
     @Transactional
     public void testCheckSpecials() throws InvalidPlayerNumberException {
@@ -128,7 +137,6 @@ public class GooseChipServiceTest {
         player.setUser(user);
         Player addedPlayer = playerService.savePlayer(player);
 
-        //JUGADOR 2 PA TI MARIO
         Player player2 = new Player();
         player2.setEmail("carmeeeeen@domain.com");
         User user2 = new User();
@@ -140,23 +148,34 @@ public class GooseChipServiceTest {
 
 
         GooseMatch addedMatch = gooseMatchService.saveGooseMatchWithPlayer(newMatch, addedPlayer, true);
-        GooseMatch addedMatch2=gooseMatchService.saveGooseMatchWithPlayer(addedMatch, addedPlayer2, false);
+        GooseMatch addedMatch2 = gooseMatchService.saveGooseMatchWithPlayer(addedMatch, addedPlayer2, false);
         GooseBoard board = new GooseBoard();
+        board.setMatch(addedMatch2);
         GooseBoard savedBoard = gooseBoardService.save(board, addedMatch2.getStats().size());
         addedMatch2.setBoard(savedBoard);
         gooseMatchService.save(addedMatch2);
-        //A partir de aqui UwU
 
-        List<GooseChip> chips=new ArrayList<>(gooseChipService.findChipsByMatchId(addedMatch2.getId()));
-        GooseBoard tablero=gooseBoardService.findById(savedBoard.getId()).get();
-        GooseChip gc1=chips.get(0);
-        System.out.println(tablero.getChips());
-        System.out.println(addedMatch2.getBoard().getChips());
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        System.out.println(gc1.getBoard().getMatch());
+        List<GooseChip> chips = new ArrayList<>(gooseChipService.findChipsByMatchId(addedMatch2.getId()));
+        GooseChip gc1 = chips.get(0);
 
-        gooseChipService.checkSpecials(gc1,FIRST_GOOSE,DOBLES_NO);
-        Assertions.assertThat(gc1.getPosition()).isEqualTo(SECOND_GOOSE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,FIRST_GOOSE,DOBLES_NO).getFirst()).isEqualTo(SECOND_GOOSE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,THIRD_TO_LAST_GOOSE,DOBLES_NO).getFirst()).isEqualTo(SECOND_TO_LAST_GOOSE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,BRIDGE,DOBLES_NO).getFirst()).isEqualTo(SECOND_BRIDGE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,SECOND_BRIDGE,DOBLES_NO).getFirst()).isEqualTo(BRIDGE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,DICE,DOBLES_NO).getFirst()).isEqualTo(SECOND_DICE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,INN,DOBLES_NO).getFirst()).isEqualTo(INN);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,INN,DOBLES_NO).getSecond()).isEqualTo(LOSES_1_TURN);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,MAZE,DOBLES_NO).getFirst()).isEqualTo(END_MAZE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,JAIL,DOBLES_NO).getFirst()).isEqualTo(JAIL);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,JAIL,DOBLES_NO).getSecond()).isEqualTo(LOSES_2_TURNS);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,DEATH,DOBLES_NO).getFirst()).isEqualTo(FIRST_SQUARE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,LAST_GOOSE,DOBLES_NO).getFirst()).isEqualTo(LAST_SQUARE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,LAST_SQUARE,DOBLES_NO).getFirst()).isEqualTo(LAST_SQUARE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,BOUNCE_2,DOBLES_NO).getFirst()).isEqualTo(LAST_SQUARE-2);
+
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,NOT_ESPECIAL_SQUARE,DOBLES_NO).getFirst()).isEqualTo(NOT_ESPECIAL_SQUARE);
+        Assertions.assertThat(gooseChipService.checkSpecials("Carmen",gc1,NOT_ESPECIAL_SQUARE,DOBLES_SI).getSecond()).isEqualTo(HAS_TURN);
+
 
     }
 

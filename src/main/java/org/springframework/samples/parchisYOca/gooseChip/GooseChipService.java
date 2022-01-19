@@ -26,7 +26,6 @@ public class GooseChipService {
     public static final int LABERINTO = 42;
     public static final int FINAL_LABERINTO = 30;
     public static final int CARCEL = 56;
-    //public static final int CALAVERA = 58;
     public static final List<Integer> OCAS = List.of(5,9,14,18,23,27,32,36,41,45,50,54);
     public static final List<Integer> DADOS = List.of(26,53);
     public static final List<Integer> PUENTES = List.of(6,12);
@@ -62,11 +61,9 @@ public class GooseChipService {
     }
 
     @Transactional
-    public Triple<Integer,Integer,String> checkSpecials(GooseChip chip, Integer suma, Boolean flagDobles) throws DataAccessException{
+    public Triple<Integer,Integer,String> checkSpecials(String username, GooseChip chip, Integer suma, Boolean flagDobles) throws DataAccessException{
         Integer matchId = chip.getBoard().getMatch().getId();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        PlayerGooseStats stats = playerGooseStatsRepository.findPlayerGooseStatsByUsernamedAndMatchId(currentUser.getUsername(), matchId).get();
+        PlayerGooseStats stats = playerGooseStatsRepository.findPlayerGooseStatsByUsernamedAndMatchId(username, matchId).get();
         Integer nuevaPosicion = chip.getPosition()+suma;
 
         if(ESPECIALES.contains(nuevaPosicion)){

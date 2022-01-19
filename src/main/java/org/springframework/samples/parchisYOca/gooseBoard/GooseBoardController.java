@@ -72,7 +72,7 @@ public class GooseBoardController {
                     if(gc.getInGameId() == inGameId){
                         GooseChip loggedPlayerChip = gc;
                         boolean flagDobles = rolledDices[INDICE_PRIMER_DADO] == rolledDices[INDICE_SEGUNDO_DADO];
-                        Triple<Integer,Integer,String> resultadoTirada = gooseChipService.checkSpecials(
+                        Triple<Integer,Integer,String> resultadoTirada = gooseChipService.checkSpecials(authenticatedUser.getUsername(),
                             loggedPlayerChip, rolledDices[INDICE_SUMA_DADOS], flagDobles);
                         inGamePlayerStats.setHasTurn(resultadoTirada.getSecond());
 

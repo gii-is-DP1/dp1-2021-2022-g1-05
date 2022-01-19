@@ -41,9 +41,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
-@WebMvcTest(controllers = GooseBoardController.class, 
-excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
-classes = WebSecurityConfigurer.class), 
+@WebMvcTest(controllers = GooseBoardController.class,
+excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
 public class GooseBoardControllerTest {
 	@Autowired
@@ -62,8 +62,8 @@ public class GooseBoardControllerTest {
     private GooseChipService gooseChipService;
 	@MockBean
     private UserService userService;
-	
-	
+
+
 	private static final Boolean LOGGED_IN =true;
 	private static final Boolean TRUE =true;
 	private static final Integer JAIME_ID = 5;
@@ -91,10 +91,10 @@ public class GooseBoardControllerTest {
 	private PlayerGooseStats pacoStats;
 	private PlayerGooseStats lauraStats;
 	private PlayerGooseStats carmenStats;
-	
+
 	@BeforeEach
 	void setup() {
-		/*La mayor parte de esto es inutil pero no me apetece ver ahora 
+		/*La mayor parte de esto es inutil pero no me apetece ver ahora
 		 que sobra y que no*/
 		Jaime = new Player();
 		User userJaime = new User();
@@ -173,7 +173,7 @@ public class GooseBoardControllerTest {
 		match.setMatchCode(MATCH_CODE);
 		match.setId(MATCH_ID);
 		match.setStats(players);
-		
+
 	}
 	@WithMockUser(value = JAIME)
 	@Test
@@ -186,9 +186,6 @@ public class GooseBoardControllerTest {
                 .session(session);
 		mockMvc.perform(builder)
 		.andExpect(status().is3xxRedirection());
-		/*Me gustaria chekear los valores de session despues del get
-		 pero no se como hacerlo, por ahora solo se como pasarle los
-		 valores de sesion que yo necesito*/
 	}
 
 }
