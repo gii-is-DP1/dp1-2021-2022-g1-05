@@ -1,5 +1,19 @@
 package org.springframework.samples.parchisYOca.player;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,32 +36,23 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
-import org.springframework.samples.parchisYOca.user.*;
+import org.springframework.samples.parchisYOca.user.Authorities;
+import org.springframework.samples.parchisYOca.user.User;
+import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.BindingResultUtils;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = PlayerController.class,
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
 classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class PlayerControllerTests {
+public class PlayerControllerTest2 {
+	
 	private static final Integer NUMBER_OF_ELEMENTS_PER_PAGE = 6;
     private static final int ID = 1;
     private static final String PASSWORD = "1234567";
@@ -166,102 +171,47 @@ public class PlayerControllerTests {
     	given(this.playerService.findWinnerByLudoMatchCode(MATCH_CODE)).willReturn(oJuan);
     	
     }
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testRedirectToProfile() throws Exception {
-        mockMvc.perform(get("/players/ownProfile"))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/players/"+ID));
-    }
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testShowPlayer() throws Exception {
-        mockMvc.perform(get("/players/"+ID))
-        	.andExpect(model().attributeExists("gooseStats")) //Por no sacar los stats fuera
-        	.andExpect(model().attributeExists("ludoStats"))  //como static
-        	.andExpect(status().isOk());
-    }
 
-
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testShowAllPlayers() throws Exception {
-    	mockMvc.perform(get("/players").param("page", String.valueOf(PAGE_NUMBER)))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("players/listPlayers"))
-    	.andExpect(model().attributeExists("playersInGame"));
-    }
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testFilterPlayers() throws Exception {
-    	mockMvc.perform(post("/players").param("page", String.valueOf(PAGE_NUMBER)).param("Username", USERNAME))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("players/listPlayers"))
-    	.andExpect(model().attributeExists("players"));
-    }
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testInitUpdatePlayerForm() throws Exception {
-    	mockMvc.perform(get("/players/"+ ID +"/edit"))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("players/UpdatePlayerForm"))
-    	.andExpect(model().attributeExists("player"));
-    }
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testProcessUpdatePlayerForm() throws Exception {
-    	mockMvc.perform(post("/players/"+ ID +"/edit")
-    			.param("user.password",NEW_PASSWORD)
-    			.param("email", NEW_EMAIL))
-    	.andExpect(status().is3xxRedirection())
-    	.andExpect(redirectedUrl("/players/"+ID));
-    }
-    @WithMockUser(value = "spring")
-    @Test
-    void testDisablePlayer() throws Exception {
-    	mockMvc.perform(get("/players/disable/"+ID))
-    	.andExpect(status().is3xxRedirection())
-    	.andExpect(redirectedUrl("/players?page=0"));
-    }
-    @WithMockUser(value = "spring")
-    @Test
-    void testEnablePlayer() throws Exception {
-    	mockMvc.perform(get("/players/enable/"+ID))
-    	.andExpect(status().is3xxRedirection())
-    	.andExpect(redirectedUrl("/players?page=0"));
-    }
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testDeletePlayer() throws Exception {
-    	mockMvc.perform(get("/players/"+ ID +"/delete"))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("welcome"))
-    	.andExpect(model().attribute("message", MESSAGE3));
-    }
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testLudoMatchesOfPlayer() throws Exception {
-    	mockMvc.perform(get("/players/"+ID+"/ludoMatchesPlayed").param("page", String.valueOf(PAGE_NUMBER)))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("matches/listMatchesInProfile"))
-    	.andExpect(model().attributeExists("playerId"))
-    	.andExpect(model().attributeExists("matches"));
-    }
-    @WithMockUser(value = USERNAME)
-    @Test
-    void testGooseMatchesOfPlayer() throws Exception {
-    	mockMvc.perform(get("/players/"+ID+"/gooseMatchesPlayed").param("page", String.valueOf(PAGE_NUMBER)))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("matches/listMatchesInProfile"))
-    	.andExpect(model().attributeExists("playerId"))
-    	.andExpect(model().attributeExists("matches"));
-    }
-    @WithMockUser(value = "spring")
-    @Test
-    void testGooseMatchOfPlayer() throws Exception {
-    	mockMvc.perform(get("/players/"+ID+"/matchStats/"+MATCH_CODE))
-    	.andExpect(status().isOk())
-    	.andExpect(view().name("stats/userStatsInAMatch"))
-    	.andExpect(model().attributeExists("gooseStats"));
-    }
+	 @WithMockUser(value = USERNAME)
+	    @Test
+	    void testTotalStats() throws Exception {
+	    	mockMvc.perform(get("/stats"))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("stats/totalStats"))
+	    	.andExpect(model().attribute("numberOfLudoGames", 0))
+	    	.andExpect(model().attribute("numberOfGooseGames", 0));
+	    }
+	    
+	    @WithMockUser(value = USERNAME)
+	    @Test
+	    void testStatsOfPlayerInMatch() throws Exception {
+	    	mockMvc.perform(get("/players/"+ID+"/matchStats/"+MATCH_CODE))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("stats/userStatsInAMatch"))
+	    	.andExpect(model().attribute("gooseStats", juanGStats));
+	    }
+	    @WithMockUser(value = USERNAME)
+	    @Test
+	    void testGooseMatchesPlayed()  throws Exception {
+	    	mockMvc.perform(get("/players/"+ID+"/gooseMatchesPlayed").param("page", "0"))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("matches/listMatchesInProfile"))
+	    	.andExpect(model().attributeExists("matches"));
+	    }
+	    @WithMockUser(value = USERNAME)
+	    @Test
+	    void testLudoMatchesPlayed()  throws Exception {
+	    	mockMvc.perform(get("/players/"+ID+"/ludoMatchesPlayed").param("page", "0"))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("matches/listMatchesInProfile"))
+	    	.andExpect(model().attributeExists("matches"));
+	    }
+	    @WithMockUser(value = "spring")
+	    @Test
+	    void testProcessUpdatePlayerFormNegative() throws Exception {
+	    	mockMvc.perform(post("/players/"+ ID +"/edit"))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("players/UpdatePlayerForm"));
+	    }
 }
+
