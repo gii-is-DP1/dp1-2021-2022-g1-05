@@ -8,7 +8,9 @@ import org.springframework.samples.parchisYOca.gooseChip.GooseChipRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class GooseBoardService {
@@ -31,6 +33,7 @@ public class GooseBoardService {
     public GooseBoard save(GooseBoard gooseBoard, Integer numberOfPlayers) throws DataAccessException, InvalidPlayerNumberException {
 
         GooseBoard gooseBoardDB = gooseBoardRepository.save(gooseBoard);
+        Set<GooseChip> chips = new HashSet<>();
 
         if(numberOfPlayers>4||numberOfPlayers<=1){
             throw new InvalidPlayerNumberException();
@@ -39,9 +42,11 @@ public class GooseBoardService {
             GooseChip gooseChip = new GooseChip();
             gooseChip.setInGameId(i);
             gooseChip.setBoard(gooseBoardDB);
-            gooseChipRepository.save(gooseChip);
+            GooseChip gooseChipDb = gooseChipRepository.save(gooseChip);
+            chips.add(gooseChipDb);
         }
-
-        return gooseBoardDB;
+        gooseBoardDB.setChips(chips);
+        GooseBoard gooseBoardDbFinal = gooseBoardRepository.save(gooseBoardDB);
+        return gooseBoardDbFinal;
     }
 }

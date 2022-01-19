@@ -91,7 +91,6 @@ public class LudoMatchServiceTests {
         Set<PlayerLudoStats> statsOfGame1 = Set.of(pls1, pls2, pls3);
         newMatch1.setStats(statsOfGame1);
         ludoMatchService.save(newMatch1);
-
     }
 
     @Test

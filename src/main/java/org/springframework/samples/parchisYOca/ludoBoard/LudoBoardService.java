@@ -10,6 +10,8 @@ import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsSe
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -26,13 +28,14 @@ public class LudoBoardService {
     }
 
     @Transactional(readOnly = true)
-    public LudoBoard getLudoBoardById(Integer id) throws DataAccessException{
-        return ludoBoardRepository.findById(id).get();
+    public Optional<LudoBoard> findById(Integer id) throws DataAccessException{
+        return ludoBoardRepository.findById(id);
     }
 
     @Transactional(readOnly=true)
     public LudoBoard save(LudoBoard ludoBoard, Set<PlayerLudoStats> playerLudoStats) throws DataAccessException {
         LudoBoard ludoBoardDb=ludoBoardRepository.save(ludoBoard);
+        Set<LudoChip> chips = new HashSet<>();
         Integer playerNumber= playerLudoStats.size();
         for(Integer i =0;i<playerNumber;i++){
             //Crear las 4 fichas para cada jugador
@@ -42,10 +45,13 @@ public class LudoBoardService {
                 ludoChip.setInGamePlayerId(i);
                 ludoChip.setBoard(ludoBoardDb);
                 ludoChip.setColor();
-                ludoChipRepository.save(ludoChip);
+                LudoChip ludoChipDb = ludoChipRepository.save(ludoChip);
+                chips.add(ludoChipDb);
             }
         }
-        return ludoBoardDb;
+        ludoBoardDb.setChips(chips);
+        LudoBoard ludoBoardFinal = ludoBoardRepository.save(ludoBoardDb);
+        return ludoBoardFinal;
     }
 
     @Transactional
