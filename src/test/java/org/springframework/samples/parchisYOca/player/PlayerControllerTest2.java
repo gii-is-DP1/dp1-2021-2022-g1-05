@@ -125,7 +125,7 @@ public class PlayerControllerTest2 {
     	Slice<Player> sPlayers =new SliceImpl<Player>(playerSet);
     	List<GooseMatch> lGMatch = List.of(gMatch);
     	List<LudoMatch> lLMatch = List.of(lMatch);
-    	Slice<GooseMatch> sGMatches =new SliceImpl<GooseMatch>(lGMatch);
+    	Slice<GooseMatch> sGMatches = new SliceImpl<GooseMatch>(lGMatch);
     	Slice<LudoMatch> sLMatches = new SliceImpl<LudoMatch>(lLMatch);
     	given(this.userService.isAuthenticated()).willReturn(true);
     	given(this.playerService.findPlayerByUsername(USERNAME)).willReturn(oJuan);
