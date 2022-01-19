@@ -98,6 +98,11 @@ public class PlayerLudoStatsService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<PlayerLudoStats> findById(Integer id) throws DataAccessException {
+        return playerLudoStatsRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<PlayerLudoStats> findPlayerLudoStatsByUsernameAndMatchId(String username, Integer matchId) throws DataAccessException {
         return playerLudoStatsRepository.findPlayerLudoStatsByUsernameAndMatchId(username, matchId);
     }

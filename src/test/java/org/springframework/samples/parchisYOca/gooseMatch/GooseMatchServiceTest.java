@@ -244,6 +244,13 @@ public class GooseMatchServiceTest {
         Assertions.assertThat(gooseMatchService.findEndedGooseMatches().contains(gooseMatch));
     }
 
+    @Test
+    public void testFindMatchByStats() {
+        PlayerGooseStats stats = playerGooseStatsService.findById(1).get();
+        GooseMatch gooseMatch = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_1).get();
+        Assertions.assertThat(gooseMatchService.findMatchByPlayerGooseStats(stats).get()).isEqualTo(gooseMatch);
+    }
+
    @Test
     public void testFindGooseMatchesByUsernameWithPaging() {
         Assertions.assertThat(playerService.findPlayerByUsername(USERNAME).isPresent());

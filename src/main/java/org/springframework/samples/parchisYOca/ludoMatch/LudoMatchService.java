@@ -156,9 +156,9 @@ public class LudoMatchService {
     public void removeLudoStatsFromGame(PlayerLudoStats pls, Integer ludoMatchId) throws DataAccessException {
         log.debug("Deleting PlayerLudoStats '{}' from matchId '{}'",pls.toString(),ludoMatchId);
         LudoMatch lm = ludoMatchRepository.findById(ludoMatchId).get();
-        Set<PlayerLudoStats> statsOfGame = lm.getStats();
+        List<PlayerLudoStats> statsOfGame = new ArrayList<>(lm.getStats());
         statsOfGame.remove(pls);
-        lm.setStats(statsOfGame);
+        lm.setStats(new HashSet<>(statsOfGame));
         ludoMatchRepository.save(lm);
     }
 
