@@ -159,6 +159,7 @@ public class PlayerControllerTests {
     	given(this.playerService.findWinnerByLudoMatchCode(MATCH_CODE)).willReturn(oJuan);
 
     }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testRedirectToProfile() throws Exception {
@@ -166,6 +167,7 @@ public class PlayerControllerTests {
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/players/"+ID));
     }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testShowPlayer() throws Exception {
@@ -184,6 +186,7 @@ public class PlayerControllerTests {
     	.andExpect(view().name("players/listPlayers"))
     	.andExpect(model().attributeExists("playersInGame"));
     }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testFilterPlayers() throws Exception {
@@ -192,6 +195,7 @@ public class PlayerControllerTests {
     	.andExpect(view().name("players/listPlayers"))
     	.andExpect(model().attributeExists("players"));
     }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testInitUpdatePlayerForm() throws Exception {
@@ -200,6 +204,7 @@ public class PlayerControllerTests {
     	.andExpect(view().name("players/UpdatePlayerForm"))
     	.andExpect(model().attributeExists("player"));
     }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testProcessUpdatePlayerForm() throws Exception {
@@ -209,6 +214,7 @@ public class PlayerControllerTests {
     	.andExpect(status().is3xxRedirection())
     	.andExpect(redirectedUrl("/players/"+ID));
     }
+
     @WithMockUser(value = "spring")
     @Test
     void testDisablePlayer() throws Exception {
@@ -216,6 +222,7 @@ public class PlayerControllerTests {
     	.andExpect(status().is3xxRedirection())
     	.andExpect(redirectedUrl("/players?page=0"));
     }
+
     @WithMockUser(value = "spring")
     @Test
     void testEnablePlayer() throws Exception {
@@ -223,6 +230,7 @@ public class PlayerControllerTests {
     	.andExpect(status().is3xxRedirection())
     	.andExpect(redirectedUrl("/players?page=0"));
     }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testDeletePlayer() throws Exception {
@@ -231,6 +239,7 @@ public class PlayerControllerTests {
     	.andExpect(view().name("welcome"))
     	.andExpect(model().attribute("message", MESSAGE3));
     }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testLudoMatchesOfPlayer() throws Exception {
@@ -240,6 +249,7 @@ public class PlayerControllerTests {
     	.andExpect(model().attributeExists("playerId"))
     	.andExpect(model().attributeExists("matches"));
     }
+
     @WithMockUser(value = USERNAME)
     @Test
     void testGooseMatchesOfPlayer() throws Exception {
@@ -249,6 +259,7 @@ public class PlayerControllerTests {
     	.andExpect(model().attributeExists("playerId"))
     	.andExpect(model().attributeExists("matches"));
     }
+
     @WithMockUser(value = "spring")
     @Test
     void testGooseMatchOfPlayer() throws Exception {

@@ -47,14 +47,15 @@ public class AchievementController {
 
     @GetMapping("/achievements")
     public String listadoLogros(@RequestParam String page, ModelMap modelMap){
-        Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("name")));
-        String vista = "achievements/listAchievements";
-        Slice<Achievement> achievements = achievementService.findAllPaging(pageable);
-        modelMap.addAttribute("achievements",achievements.getContent());
-        modelMap.addAttribute("numberOfPages", Math.ceil(achievementService.findAll().size()/NUMBER_OF_ELEMENTS_PER_PAGE));
+        String vista = "welcome";
         Boolean logged = userService.isAuthenticated();
 
         if(logged==true) {
+            Pageable pageable = PageRequest.of(Integer.parseInt(page),NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("name")));
+            vista = "achievements/listAchievements";
+            Slice<Achievement> achievements = achievementService.findAllPaging(pageable);
+            modelMap.addAttribute("achievements",achievements.getContent());
+            modelMap.addAttribute("numberOfPages", Math.ceil(achievementService.findAll().size()/NUMBER_OF_ELEMENTS_PER_PAGE));
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
             List<GrantedAuthority> authorities = new ArrayList<>(authenticatedUser.getAuthorities());
