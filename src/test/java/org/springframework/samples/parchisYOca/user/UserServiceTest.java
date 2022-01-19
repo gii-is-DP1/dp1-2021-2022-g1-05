@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.DataAccessException;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+
+import javax.validation.ConstraintViolationException;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class UserServiceTest {
@@ -61,9 +64,7 @@ public class UserServiceTest {
 	public void testSaveFindAndDeleteUser() {
 		User u = new User();
 		u.setUsername(GOOD_UNAME);
-		assertThat(u.getUsername()).isEqualTo(GOOD_UNAME);
 		u.setPassword(GOOD_PSSWRD);
-		assertThat(u.getPassword()).isEqualTo(GOOD_PSSWRD);
 		uService.saveUser(u);
 		User u2 = uService.findUserByUsername(GOOD_UNAME).get();
 		assertThat(u.getUsername()).isEqualTo(u2.getUsername());
@@ -112,5 +113,29 @@ public class UserServiceTest {
 	public void testIsAuthenticatedNegativeUserWasNotLoggedIn() {
 		uService.saveUser(RAN_USER);
 		assertThat(uService.isAuthenticated()).isEqualTo(false);
+	}
+	
+	//Negative
+	@Test
+	@Transactional
+	public void testSaveUserNegative() {
+		User u = new User();
+		u.setUsername(BAD_UNAME);
+		assertThrows(ConstraintViolationException.class, 
+				()->{uService.saveUser(u);});
+		u.setUsername(GOOD_UNAME);
+		u.setPassword(BAD_LENGHT_PSSWRD);
+		assertThrows(ConstraintViolationException.class, 
+				()->{uService.saveUser(u);});
+		u.setPassword(NO_NUMBER_PSSWRD);
+		assertThrows(ConstraintViolationException.class, 
+				()->{uService.saveUser(u);});
+	}
+	@Test
+	@Transactional
+	public void testDeleteUserNegative() {
+		User u = new User();
+		assertThrows(DataAccessException.class, 
+				()->{uService.deleteUser(u);});
 	}
 }
