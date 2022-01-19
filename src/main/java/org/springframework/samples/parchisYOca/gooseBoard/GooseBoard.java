@@ -1,12 +1,9 @@
 package org.springframework.samples.parchisYOca.gooseBoard;
 
-import java.util.*;
-
-import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
-
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
 
 import javax.persistence.CascadeType;
@@ -15,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Getter
 @Setter

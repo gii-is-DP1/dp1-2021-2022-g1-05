@@ -3,10 +3,8 @@ package org.springframework.samples.parchisYOca.playerLudoStats;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.envers.Audited;
-import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
-import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
+import org.springframework.samples.parchisYOca.player.Player;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;

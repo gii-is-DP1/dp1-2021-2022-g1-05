@@ -1,8 +1,6 @@
 package org.springframework.samples.parchisYOca.web;
 
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
-import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.core.Authentication;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
-import java.util.Optional;
 
 @Controller
 public class SessionController {

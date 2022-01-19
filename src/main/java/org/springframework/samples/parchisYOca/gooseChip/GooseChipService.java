@@ -8,13 +8,13 @@ import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchRepository;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GooseChipService {

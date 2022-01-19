@@ -2,15 +2,13 @@ package org.springframework.samples.parchisYOca.gooseMatch;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import lombok.ToString;
-
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
+import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;

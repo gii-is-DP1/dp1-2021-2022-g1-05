@@ -11,7 +11,6 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchController;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
@@ -24,23 +23,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import javax.servlet.http.HttpSession;
-
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.servlet.http.HttpSession;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @WebMvcTest(controllers = GooseBoardController.class,
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
 classes = WebSecurityConfigurer.class),

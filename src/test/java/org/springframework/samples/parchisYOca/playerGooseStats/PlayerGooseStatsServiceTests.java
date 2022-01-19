@@ -2,7 +2,6 @@ package org.springframework.samples.parchisYOca.playerGooseStats;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -12,11 +11,12 @@ import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.stereotype.Service;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolationException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

@@ -2,20 +2,13 @@ package org.springframework.samples.parchisYOca.gooseBoard;
 
 
 import org.assertj.core.api.Assertions;
-
 import org.junit.jupiter.api.Test;
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-
 import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.ConstraintViolationException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

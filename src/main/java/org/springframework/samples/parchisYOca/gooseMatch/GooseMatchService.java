@@ -1,5 +1,6 @@
 package org.springframework.samples.parchisYOca.gooseMatch;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -10,8 +11,6 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 

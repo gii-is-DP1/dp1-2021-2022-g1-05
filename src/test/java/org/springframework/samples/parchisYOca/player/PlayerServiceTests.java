@@ -17,12 +17,10 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.User;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;

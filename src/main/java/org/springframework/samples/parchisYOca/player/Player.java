@@ -4,11 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.springframework.samples.parchisYOca.achievement.Achievement;
 import org.springframework.samples.parchisYOca.model.Person;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
-import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.user.User;
 
 import javax.persistence.*;
