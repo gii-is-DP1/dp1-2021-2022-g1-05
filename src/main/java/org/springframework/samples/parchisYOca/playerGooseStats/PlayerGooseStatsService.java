@@ -1,16 +1,10 @@
 package org.springframework.samples.parchisYOca.playerGooseStats;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
-import org.springframework.samples.parchisYOca.player.Player;
-import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
-import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 

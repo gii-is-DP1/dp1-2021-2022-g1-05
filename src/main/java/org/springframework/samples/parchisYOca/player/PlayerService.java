@@ -1,5 +1,6 @@
 package org.springframework.samples.parchisYOca.player;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -9,8 +10,6 @@ import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Optional;

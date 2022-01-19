@@ -1,18 +1,16 @@
 package org.springframework.samples.parchisYOca.gooseChip;
 
-import org.springframework.data.util.Pair;
-import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
-
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.samples.parchisYOca.util.Color;
+import org.springframework.data.util.Pair;
+import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.model.BaseEntity;
-
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.samples.parchisYOca.util.Color;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @Setter

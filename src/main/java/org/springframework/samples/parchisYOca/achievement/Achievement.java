@@ -2,15 +2,15 @@ package org.springframework.samples.parchisYOca.achievement;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.samples.parchisYOca.model.BaseEntity;
-import org.springframework.samples.parchisYOca.player.Player;
 import org.hibernate.envers.Audited;
+import org.springframework.samples.parchisYOca.model.BaseEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Set;
 
 @Getter
 @Setter

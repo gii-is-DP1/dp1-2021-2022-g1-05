@@ -1,7 +1,6 @@
 package org.springframework.samples.parchisYOca.ludoChip;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.envers.tools.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;

@@ -1,14 +1,9 @@
 package org.springframework.samples.parchisYOca.user;
 
-import org.hibernate.dialect.function.CastFunction;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,29 +13,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.samples.parchisYOca.user.Authorities;
 import testDataGenerator.TestDataGenerator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
-import javax.validation.ConstraintViolationException;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class UserServiceTest {
 	private static final Long USERS_IN_DB =7l;
 	private static final String GOOD_UNAME = "Benjamin";
-	private static final String BAD_UNAME = "";
 	private static final String GOOD_PSSWRD = "QII2222N";
-	private static final String NO_NUMBER_PSSWRD = "AAAAAAAAAA";
-	private static final String BAD_LENGHT_PSSWRD ="O";
 	private static final User RAN_USER = TestDataGenerator.generateUser(GOOD_UNAME, GOOD_PSSWRD);
 
 

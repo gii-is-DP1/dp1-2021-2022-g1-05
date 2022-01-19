@@ -17,24 +17,25 @@ import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.User;
 import org.springframework.samples.parchisYOca.user.UserService;
-import org.springframework.samples.parchisYOca.web.SessionController;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-@WebMvcTest(controllers = SessionController.class, 
-excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, 
-classes = WebSecurityConfigurer.class), 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(controllers = SessionController.class,
+excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
 public class SessionControllerTest {
 	@Autowired
@@ -47,7 +48,7 @@ public class SessionControllerTest {
     private PlayerGooseStatsService playerGooseStatsService;
 	@MockBean
     private PlayerLudoStatsService playerLudoStatsService;
-	
+
 	private static final Boolean FROMGOOSE = true;
 	private static final Boolean FROMLUDO = true;
 	private static final Boolean TRUE = true;
@@ -78,10 +79,10 @@ public class SessionControllerTest {
 		match.setMatchCode(MATCH_CODE);
 		match.setId(MATCH_ID);
 		match.setStats(players);
-		
-		
+
+
 	}
-	
+
 	@WithMockUser(value = LAURA)
 	@Test
 	void testRollDicesGoose() throws Exception {
@@ -121,7 +122,7 @@ public class SessionControllerTest {
 		.andExpect(status().is3xxRedirection())
 		.andExpect(redirectedUrl("/ludoInGame/dicesRolled"));
 		assertThat(sessionLudo.getAttribute("dices")).isNotNull();
-		
+
 	}
 	@WithMockUser(value = LAURA)
 	@Test
@@ -140,7 +141,7 @@ public class SessionControllerTest {
 		mockMvc.perform(builder)
 		.andExpect(status().is3xxRedirection())
 		.andExpect(redirectedUrl("/"));
-		
+
 	}
 	@WithMockUser(value = LAURA)
 	@Test
@@ -159,7 +160,7 @@ public class SessionControllerTest {
 		mockMvc.perform(builder)
 		.andExpect(status().is3xxRedirection())
 		.andExpect(redirectedUrl("/"));
-		
+
 	}
 	@WithMockUser(value = LAURA)
 	@Test
@@ -200,6 +201,6 @@ public class SessionControllerTest {
 		.andExpect(status().is3xxRedirection())
 		.andExpect(redirectedUrl("/ludoMatches/"+MATCH_ID));
 		assertThat(sessionLudo.getAttribute("dices")).isNull();
-		
+
 	}
 }

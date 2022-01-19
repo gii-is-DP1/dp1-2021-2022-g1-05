@@ -8,11 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
@@ -22,13 +18,12 @@ import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
-import org.springframework.samples.parchisYOca.user.*;
+import org.springframework.samples.parchisYOca.user.Authorities;
+import org.springframework.samples.parchisYOca.user.User;
+import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.BindingResultUtils;
-import org.springframework.validation.BindException;
 
 import java.util.Date;
 import java.util.List;
@@ -36,8 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -82,8 +75,8 @@ public class PlayerControllerTests {
     private GooseMatchService gooseMatchService;
     @MockBean
     private LudoMatchService ludoMatchService;
-    
-    
+
+
     private PlayerGooseStats juanGStats;
     private PlayerLudoStats juanLStats;
     private Player Juan;
@@ -164,7 +157,7 @@ public class PlayerControllerTests {
     	given(this.pLudoStatsService.sumStats(setLStats)).willReturn(juanLStats);
     	given(this.playerService.findWinnerByGooseMatchCode(MATCH_CODE)).willReturn(oJuan);
     	given(this.playerService.findWinnerByLudoMatchCode(MATCH_CODE)).willReturn(oJuan);
-    	
+
     }
     @WithMockUser(value = USERNAME)
     @Test
