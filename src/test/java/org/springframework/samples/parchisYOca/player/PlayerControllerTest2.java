@@ -52,7 +52,7 @@ classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration = SecurityConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class PlayerControllerTest2 {
-	
+
 	private static final Integer NUMBER_OF_ELEMENTS_PER_PAGE = 6;
     private static final int ID = 1;
     private static final String PASSWORD = "1234567";
@@ -60,17 +60,11 @@ public class PlayerControllerTest2 {
     private static final String USERNAME = "Juan";
     private static final String EMAIL = "Juant@gmail.com";
     private static final String AUTH = "admin";
-    private static final String NEW_PASSWORD = "ABCde34";
-    private static final String NEW_EMAIL = "jjjuan@domain.com";
-    private static final String MESSAGE = "Player successfully disabled!";
-    private static final String MESSAGE2 = "Player successfully enabled!";
-    private static final String MESSAGE3 = "Player successfully deleted!";
     private static final String MATCH_CODE = "ABCdef";
     private static final Integer WINNER = 1;
     private static final Integer MATCH_ID = 1;
     private static final Pageable PAGEABLE= PageRequest.of(PAGE_NUMBER, NUMBER_OF_ELEMENTS_PER_PAGE, Sort.by(Sort.Order.asc("user.username")));
     private static final Pageable PAGEABLE_2= PageRequest.of(PAGE_NUMBER, NUMBER_OF_ELEMENTS_PER_PAGE,  Sort.by(Sort.Order.desc("startDate")));
-    private static final String PAGE_URL = "?page=0";
 
 
     @Autowired
@@ -87,8 +81,8 @@ public class PlayerControllerTest2 {
     private GooseMatchService gooseMatchService;
     @MockBean
     private LudoMatchService ludoMatchService;
-    
-    
+
+
     private PlayerGooseStats juanGStats;
     private PlayerLudoStats juanLStats;
     private Player Juan;
@@ -169,7 +163,7 @@ public class PlayerControllerTest2 {
     	given(this.pLudoStatsService.sumStats(setLStats)).willReturn(juanLStats);
     	given(this.playerService.findWinnerByGooseMatchCode(MATCH_CODE)).willReturn(oJuan);
     	given(this.playerService.findWinnerByLudoMatchCode(MATCH_CODE)).willReturn(oJuan);
-    	
+
     }
 
 	 @WithMockUser(value = USERNAME)
@@ -181,7 +175,7 @@ public class PlayerControllerTest2 {
 	    	.andExpect(model().attribute("numberOfLudoGames", 0))
 	    	.andExpect(model().attribute("numberOfGooseGames", 0));
 	    }
-	    
+
 	    @WithMockUser(value = USERNAME)
 	    @Test
 	    void testStatsOfPlayerInMatch() throws Exception {

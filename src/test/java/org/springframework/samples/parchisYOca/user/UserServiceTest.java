@@ -42,13 +42,7 @@ public class UserServiceTest {
 	private static final String NO_NUMBER_PSSWRD = "AAAAAAAAAA";
 	private static final String BAD_LENGHT_PSSWRD ="O";
 	private static final User RAN_USER = TestDataGenerator.generateUser(GOOD_UNAME, GOOD_PSSWRD);
-	private static final String RAN_U_NAME = RAN_USER.getUsername();
-	private static final String RAN_U_PSSWRD = RAN_USER.getPassword();
 
-
-	/*private static SecurityContextHolder contextHolder = new SecurityContextHolder();
-	private static SecurityContext context;
-	private static Authentication auth;*/
 
 	@Autowired
 	private UserService uService;
@@ -114,28 +108,28 @@ public class UserServiceTest {
 		uService.saveUser(RAN_USER);
 		assertThat(uService.isAuthenticated()).isEqualTo(false);
 	}
-	
+
 	//Negative
 	@Test
 	@Transactional
 	public void testSaveUserNegative() {
 		User u = new User();
 		u.setUsername(BAD_UNAME);
-		assertThrows(ConstraintViolationException.class, 
+		assertThrows(ConstraintViolationException.class,
 				()->{uService.saveUser(u);});
 		u.setUsername(GOOD_UNAME);
 		u.setPassword(BAD_LENGHT_PSSWRD);
-		assertThrows(ConstraintViolationException.class, 
+		assertThrows(ConstraintViolationException.class,
 				()->{uService.saveUser(u);});
 		u.setPassword(NO_NUMBER_PSSWRD);
-		assertThrows(ConstraintViolationException.class, 
+		assertThrows(ConstraintViolationException.class,
 				()->{uService.saveUser(u);});
 	}
 	@Test
 	@Transactional
 	public void testDeleteUserNegative() {
 		User u = new User();
-		assertThrows(DataAccessException.class, 
+		assertThrows(DataAccessException.class,
 				()->{uService.deleteUser(u);});
 	}
 }
