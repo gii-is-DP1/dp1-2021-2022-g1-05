@@ -108,28 +108,4 @@ public class UserServiceTest {
 		uService.saveUser(RAN_USER);
 		assertThat(uService.isAuthenticated()).isEqualTo(false);
 	}
-
-	//Negative
-	@Test
-	@Transactional
-	public void testSaveUserNegative() {
-		User u = new User();
-		u.setUsername(BAD_UNAME);
-		assertThrows(ConstraintViolationException.class,
-				()->{uService.saveUser(u);});
-		u.setUsername(GOOD_UNAME);
-		u.setPassword(BAD_LENGHT_PSSWRD);
-		assertThrows(ConstraintViolationException.class,
-				()->{uService.saveUser(u);});
-		u.setPassword(NO_NUMBER_PSSWRD);
-		assertThrows(ConstraintViolationException.class,
-				()->{uService.saveUser(u);});
-	}
-	@Test
-	@Transactional
-	public void testDeleteUserNegative() {
-		User u = new User();
-		assertThrows(DataAccessException.class,
-				()->{uService.deleteUser(u);});
-	}
 }
