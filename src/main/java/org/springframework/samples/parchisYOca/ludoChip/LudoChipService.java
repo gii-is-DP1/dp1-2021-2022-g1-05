@@ -115,11 +115,12 @@ public class LudoChipService {
         return -1;
     }
 
+    @Transactional(readOnly = true)
     public Collection<LudoChip> getChipsByInGamePlayerId(Integer inGameId){
         return ludoChipRepository.findChipsByInGamePlayerId(inGameId);
     }
 
-    public Integer diceFlag(Integer firstDice, Integer secondDice) {
+    private Integer diceFlag(Integer firstDice, Integer secondDice) {
     	log.debug("Flaging the dices '{}','{}'", firstDice, secondDice);
         if(firstDice == FIVE) {
         	log.debug("First dice was 5");
@@ -151,7 +152,7 @@ public class LudoChipService {
         return false;
     }
 
-    public Boolean checkFinalTiles(Integer square, LudoChip chip){
+    private Boolean checkFinalTiles(Integer square, LudoChip chip){
         log.debug("Checking if tile number '{}' is the start of that colors endgame", square);
         return square==LAST_TILES.get(chip.getColor());
     }
@@ -167,7 +168,7 @@ public class LudoChipService {
     }
 
     @Transactional
-    public Integer moveMidGame(LudoChip chip,Integer movements,List<LudoChip> chips,PlayerLudoStats pls, Integer matchId){
+    protected Integer moveMidGame(LudoChip chip,Integer movements,List<LudoChip> chips,PlayerLudoStats pls, Integer matchId){
         Integer inGamePlayerId=pls.getInGameId();
         pls.setLastChipMovedId(chip.getInGameChipId());
         for(int i=1;i<=movements;i++){
@@ -195,7 +196,7 @@ public class LudoChipService {
     }
 
     @Transactional
-    public Integer moveEndGame(LudoChip chip,Integer movements,PlayerLudoStats pls){
+    protected Integer moveEndGame(LudoChip chip,Integer movements,PlayerLudoStats pls){
         pls.setLastChipMovedId(chip.getInGameChipId());
         chip.setPosition(chip.getPosition()+movements);
         save(chip);
@@ -225,7 +226,7 @@ public class LudoChipService {
     }
 
     @Transactional
-    public Integer eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId, Integer matchId){
+    protected Integer eat(Integer square, List<LudoChip> chips,Integer inGamePlayerId, Integer matchId){
         Integer result=NO_OPERATION;
         List<LudoChip> otherPlayerChips = new ArrayList<>();
         for(LudoChip chip: chips){
