@@ -201,6 +201,10 @@ public class LudoChipService {
         chip.setPosition(chip.getPosition()+movements);
         save(chip);
         pls.setWalkedSquares(pls.getWalkedSquares()+movements);
+        if(chip.getPosition()==7) {
+            pls.setScoredTokens(pls.getScoredTokens()+1);
+        }
+
         List<LudoChip> thisPlayerChips = new ArrayList<>(getChipsByInGamePlayerId(pls.getInGameId()));
 
         Integer chipsInFinalTileAcum = 0;

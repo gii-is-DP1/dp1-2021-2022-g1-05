@@ -51,6 +51,7 @@ public class LudoBoardService {
     @Transactional
     public boolean checkGreedy(PlayerLudoStats inGamePlayerStats, boolean flagDobles) {
         if(flagDobles){
+            inGamePlayerStats.setDoubleRolls(inGamePlayerStats.getDoubleRolls()+1);
             inGamePlayerStats.setTurnDoubleRolls(inGamePlayerStats.getTurnDoubleRolls()+1);
             inGamePlayerStats = playerLudoStatsService.saveStats(inGamePlayerStats);
         }
