@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -262,13 +263,31 @@ public class LudoChipService {
     }
 
 
-    public Boolean checkOcuppied(Integer square, List<LudoChip> chips){
-        for(int i=0;i<chips.size();i++){
-            if(chips.get(i).getGameState() != GameState.earlyGame && chips.get(i).getPosition()==square ){
-               return true;
-            }
+    public List<LudoChip> checkOcuppied(List<LudoChip> chips){
+        Set<LudoChip> toBeDisplaced = new HashSet<LudoChip>();
+        List<LudoChip> displacedOnes = new ArrayList<LudoChip>();
+        for(LudoChip chip:chips) {
+        	for(LudoChip chip2:chips) {
+        		if(chip.getPosition()==chip2.getPosition()) {
+        			toBeDisplaced.add(chip);
+        			toBeDisplaced.add(chip2);
+        		}
+        	}
         }
-        return false;
+        for(LudoChip chip:toBeDisplaced) {
+        	if(!displacedOnes.contains(chip)) {
+        		Boolean checker = true;
+        		for(LudoChip chip2:displacedOnes) {
+        			if(chip.getPosition()==chip2.getPosition()) {
+        				checker = false;
+        			}
+        		}
+        		if(checker) {
+        			displacedOnes.add(chip);
+        		}
+        	}
+        }
+        return displacedOnes;
     }
 
     public List<LudoChip> breakBlocks(List<LudoChip> ludoChips, Integer inGameId) {
