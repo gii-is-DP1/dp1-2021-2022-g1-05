@@ -77,7 +77,7 @@ public class LudoBoardController {
             List<LudoChip> ludoChips = new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
             PlayerLudoStats inGamePlayerStats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(
                 authenticatedUser.getUsername(), matchId).get();
-
+            model.put("chipsToBeDisplaced", ludoChipService.checkOcuppied(ludoChips));
             //putting things in the model
             model.put("dicesRolled", 1);
             populateModel(model, matchId, dicesToShow);
@@ -156,6 +156,7 @@ public class LudoBoardController {
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
             Integer matchId = (Integer) session.getAttribute("matchId");
             List<LudoChip> ludoChips = new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
+            model.put("chipsToBeDisplaced", ludoChipService.checkOcuppied(ludoChips));
             PlayerLudoStats inGamePlayerStats = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(
                 authenticatedUser.getUsername(), matchId).get();
 
@@ -207,6 +208,7 @@ public class LudoBoardController {
             PlayerLudoStats pls=playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(),matchId).get();
             Integer inGamePlayerId=pls.getInGameId();
             List<LudoChip> chips =new ArrayList<>(ludoChipService.findChipsByMatchId(matchId));
+            model.put("chipsToBeDisplaced", ludoChipService.checkOcuppied(chips));
             LudoChip chip=ludoChipService.findConcreteChip(matchId,inGameChipId,inGamePlayerId).get();
             Integer moveCode = ludoChipService.move(chip,dicesToCheck[diceIndex],chips,pls, matchId);
             dicesToCheck[diceIndex]=0;

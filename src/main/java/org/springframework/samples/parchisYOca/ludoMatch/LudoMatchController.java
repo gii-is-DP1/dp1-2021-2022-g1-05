@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.samples.parchisYOca.achievement.AchievementService;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoardService;
+import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChipService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
@@ -190,7 +191,7 @@ public class LudoMatchController {
                             HttpServletRequest request, HttpSession session, HttpServletResponse response) {
         response.addHeader("Refresh", REFRESH_RATE_MATCH);
         Boolean logged = userService.isAuthenticated();
-
+        List<LudoChip> chips = new ArrayList<LudoChip>();
         if(logged==true){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
@@ -210,8 +211,9 @@ public class LudoMatchController {
                 LudoBoard savedBoard = ludoBoardService.save(board, match.getStats());
                 match.setBoard(savedBoard);
             }
-            model.put("chips", ludoChipService.findChipsByMatchId(matchId));
-
+            chips = (List<LudoChip>) ludoChipService.findChipsByMatchId(matchId);
+            model.put("chips", chips);
+            model.put("chipsToBeDisplaced", ludoChipService.checkOcuppied(chips));
             if (session.getAttribute("dices") != null) {
                 int[] dices = (int[]) session.getAttribute("dices");
                 model.put("firstDice", dices[0]);
@@ -257,7 +259,6 @@ public class LudoMatchController {
             }
             model.put("ludoBoard", ludoMatchService.findludoMatchById(match.getId()).get().getBoard());
             model.put("diceIndex", 0);
-
             return view;
         }else{
             return "redirect:/";
