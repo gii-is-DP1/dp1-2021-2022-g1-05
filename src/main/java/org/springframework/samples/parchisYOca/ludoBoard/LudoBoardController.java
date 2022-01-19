@@ -91,7 +91,7 @@ public class LudoBoardController {
 
             //Checks if this is the third time in a turn they roll double dices
             if(ludoBoardService.checkGreedy(inGamePlayerStats,flagDobles)){
-                ludoChipService.ManageGreedy(inGamePlayerStats);
+                ludoChipService.manageGreedy(matchId, inGamePlayerStats);
                 session.setAttribute("especial", "You managed to roll doubles THREE TIMES? Preposterous, go back home.");
                 passTurn(inGamePlayerStats, matchId);
                 return "redirect:/ludoMatches/" + matchId;

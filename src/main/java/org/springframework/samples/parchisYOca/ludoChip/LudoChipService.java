@@ -52,6 +52,11 @@ public class LudoChipService {
     }
 
     @Transactional
+    public Optional<LudoChip> findById(Integer chipId) {
+        return ludoChipRepository.findById(chipId);
+    }
+
+    @Transactional
     public Optional<LudoChip> findConcreteChip(Integer matchId, Integer inGameChipId, Integer inGamePlayerId){
     	log.debug("Finding chip with inGameId '{}', inGamePlayerId '{}' and matchId '{}'",inGameChipId,inGamePlayerId,matchId);
         return ludoChipRepository.findChip(matchId,inGameChipId,inGamePlayerId);
@@ -61,6 +66,11 @@ public class LudoChipService {
     public Collection<LudoChip> findChipsByMatchId(Integer matchId) throws DataAccessException {
     	log.debug("Finding chips from Ludo match with id '{}'", matchId);
         return ludoChipRepository.findChipsByMatchId(matchId);
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<LudoChip> getChipsByInGamePlayerId(Integer matchId, Integer inGameId){
+        return ludoChipRepository.findChipsByInGamePlayerId(matchId, inGameId);
     }
 
     @Transactional
@@ -117,14 +127,12 @@ public class LudoChipService {
         return -1;
     }
 
-    @Transactional(readOnly = true)
-    public Collection<LudoChip> getChipsByInGamePlayerId(Integer inGameId){
-        return ludoChipRepository.findChipsByInGamePlayerId(inGameId);
-    }
-
     private Integer diceFlag(Integer firstDice, Integer secondDice) {
     	log.debug("Flaging the dices '{}','{}'", firstDice, secondDice);
-        if(firstDice == FIVE) {
+        if(firstDice == FIVE && secondDice == FIVE) {
+            log.debug("Both dices were 5");
+            return DOS_DADOS_5;
+        }else if(firstDice == FIVE) {
         	log.debug("First dice was 5");
             return PRIMER_DADO_5;
         } else if(secondDice == FIVE) {
@@ -133,9 +141,6 @@ public class LudoChipService {
         } else if(firstDice+secondDice == FIVE) {
         	log.debug("The sum of both dices was 5");
             return SUMA_DADOS_5;
-        } else if(firstDice == FIVE && secondDice == FIVE) {
-        	log.debug("Both dices were 5");
-            return DOS_DADOS_5;
         }
         return -1;
     }
@@ -164,7 +169,7 @@ public class LudoChipService {
         if(chip.getGameState()==GameState.midGame) {
             return moveMidGame(chip, movements, chips, pls, matchId);
         } else if(chip.getGameState()==GameState.endGame) {
-            return moveEndGame(chip, movements, pls);
+            return moveEndGame(chip, movements, pls, matchId);
         }
         return -1;
     }
@@ -185,7 +190,7 @@ public class LudoChipService {
         for(Integer j=0;j<=movements;j++) {
             if(checkFinalTiles(chip.getPosition()+j,chip)){
                 chip.setGameState(GameState.endGame);
-                chip.setPosition(0+movements-j-1);
+                chip.setPosition(movements-j);
                 save(chip);
                 pls.setWalkedSquares(pls.getWalkedSquares()+movements);
                 playerLudoStatsService.saveStats(pls);
@@ -200,7 +205,7 @@ public class LudoChipService {
     }
 
     @Transactional
-    protected Integer moveEndGame(LudoChip chip,Integer movements,PlayerLudoStats pls){
+    protected Integer moveEndGame(LudoChip chip,Integer movements,PlayerLudoStats pls, Integer matchId){
         pls.setLastChipMovedId(chip.getInGameChipId());
         chip.setPosition(chip.getPosition()+movements);
         save(chip);
@@ -209,7 +214,7 @@ public class LudoChipService {
             pls.setScoredTokens(pls.getScoredTokens()+1);
         }
 
-        List<LudoChip> thisPlayerChips = new ArrayList<>(getChipsByInGamePlayerId(pls.getInGameId()));
+        List<LudoChip> thisPlayerChips = new ArrayList<>(getChipsByInGamePlayerId(matchId, pls.getInGameId()));
 
         Integer chipsInFinalTileAcum = 0;
         for(LudoChip chipToCheck: thisPlayerChips) {
@@ -275,7 +280,7 @@ public class LudoChipService {
         List<LudoChip> displacedOnes = new ArrayList<LudoChip>();
         for(LudoChip chip:chips) {
         	for(LudoChip chip2:chips) {
-        		if(chip.getPosition()==chip2.getPosition()) {
+        		if(chip.getPosition()==chip2.getPosition() && !chip.getGameState().equals(GameState.earlyGame)) {
         			toBeDisplaced.add(chip);
         			toBeDisplaced.add(chip2);
         		}
@@ -313,8 +318,8 @@ public class LudoChipService {
     }
 
     @Transactional
-    public void ManageGreedy(PlayerLudoStats playerStats) {
-        List<LudoChip> playerChips=new ArrayList<>(getChipsByInGamePlayerId(playerStats.getInGameId()));
+    public void manageGreedy(Integer matchId, PlayerLudoStats playerStats) {
+        List<LudoChip> playerChips=new ArrayList<>(getChipsByInGamePlayerId(matchId, playerStats.getInGameId()));
         for(LudoChip chip: playerChips){
             if(chip.getInGameChipId()==playerStats.getLastChipMovedId()){
                 chip.setGameState(GameState.earlyGame);
