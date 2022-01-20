@@ -108,13 +108,14 @@ public class LudoMatchService {
         //Saves the relation between player and match
         PlayerLudoStats playerStats = new PlayerLudoStats();
         playerStats.setPlayer(player);
-        Set<PlayerLudoStats> statsSet = new HashSet<>();
+        List<PlayerLudoStats> statsSet = new ArrayList<>();
+
 
         //To assign the in game id
         if(ludoMatchDB.getStats() != null) {
             Integer playersInGame = ludoMatchDB.getStats().size();
             playerStats.setInGameId(playersInGame);
-            statsSet = ludoMatchDB.getStats();
+            statsSet.addAll(ludoMatchDB.getStats());
         }
 
         if(isOwner){
@@ -123,10 +124,11 @@ public class LudoMatchService {
         }
         PlayerLudoStats addedStats = playerLudoStatsService.saveStats(playerStats);
 
+
         statsSet.add(addedStats);
-        ludoMatchDB.setStats(statsSet);
-        ludoMatchDB = ludoMatchRepository.save(ludoMatchDB);
-        return ludoMatchDB;
+        ludoMatchDB.setStats(new HashSet<>(statsSet));
+        LudoMatch ludoMatchFinal = ludoMatchRepository.save(ludoMatchDB);
+        return ludoMatchFinal;
 
     }
 
@@ -153,13 +155,13 @@ public class LudoMatchService {
     }
 
     @Transactional
-    public void removeLudoStatsFromGame(PlayerLudoStats pls, Integer ludoMatchId) throws DataAccessException {
-        log.debug("Deleting PlayerLudoStats '{}' from matchId '{}'",pls.toString(),ludoMatchId);
-        LudoMatch lm = ludoMatchRepository.findById(ludoMatchId).get();
-        List<PlayerLudoStats> statsOfGame = new ArrayList<>(lm.getStats());
+    public void removeLudoStatsFromGame(PlayerLudoStats pls, LudoMatch ludoMatch) throws DataAccessException {
+        log.debug("Deleting PlayerLudoStats '{}' from matchId '{}'",pls.toString(),ludoMatch.getId());
+        System.out.println("Despues de entrar al metodo: "+ ludoMatch.getStats());
+        List<PlayerLudoStats> statsOfGame = new ArrayList<>(ludoMatch.getStats());
         statsOfGame.remove(pls);
-        lm.setStats(new HashSet<>(statsOfGame));
-        ludoMatchRepository.save(lm);
+        ludoMatch.setStats(new HashSet<>(statsOfGame));
+        ludoMatchRepository.save(ludoMatch);
     }
 
     @Transactional

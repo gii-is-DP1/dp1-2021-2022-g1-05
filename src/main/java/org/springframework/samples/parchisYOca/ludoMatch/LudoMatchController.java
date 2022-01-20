@@ -225,7 +225,6 @@ public class LudoMatchController {
 
             //Checks if everyone except one left
             Boolean everyoneExceptOneLeft = ludoMatchService.findEveryoneExceptOneLeft(match);
-            System.out.println(everyoneExceptOneLeft);
             if (stats.getPlayerLeft() == 0 && everyoneExceptOneLeft == true) {
                 stats.setHasWon(1);
                 playerLudoStatsService.saveStats(stats);
@@ -331,6 +330,7 @@ public class LudoMatchController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
             LudoMatch userMatch = ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()).get();
+            //TODO AQUI FALLO
             PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), userMatch.getId()).get();
 
             if(pls.getIsOwner() == 1 && userMatch.getStartDate() == null) {
@@ -339,7 +339,7 @@ public class LudoMatchController {
                 ludoMatchService.save(userMatch);
                 mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
             } else if (userMatch.getStartDate() == null) {
-                ludoMatchService.removeLudoStatsFromGame(pls, userMatch.getId());
+                ludoMatchService.removeLudoStatsFromGame(pls, userMatch);
                 mav.addObject("message", "You left the lobby");
             } else {
                 pls.setPlayerLeft(1);

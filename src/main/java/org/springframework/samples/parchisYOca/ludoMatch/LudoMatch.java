@@ -40,7 +40,7 @@ public class LudoMatch extends BaseEntity {
     private String matchCode;
     @NotAudited
     @OneToMany
-    @Size(min=1, max=4)
+    @Size(max=4)
     private Set<PlayerLudoStats> stats;
 
     @NotAudited
