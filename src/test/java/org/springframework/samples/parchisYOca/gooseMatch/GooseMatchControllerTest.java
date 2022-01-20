@@ -8,11 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.samples.parchisYOca.achievement.AchievementService;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
@@ -29,22 +25,16 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import testDataGenerator.TestDataGenerator;
+
+import java.util.*;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import testDataGenerator.TestDataGenerator;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 @WebMvcTest(controllers = GooseMatchController.class,
     excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
         classes = WebSecurityConfigurer.class),
@@ -477,7 +467,7 @@ public class GooseMatchControllerTest {
         given(this.gooseMatchService.findEveryoneExceptOneLeft(LOLA_MATCH)).willReturn(TRUE);
         given(this.playerGooseStatsService.findPlayerGooseStatsByUsername(LOLA)).willReturn(STATS_SET);
         given(this.playerGooseStatsService.sumStats(STATS_SET)).willReturn(LOLA_STATS);
-        
+
     	 MockHttpSession session =  new MockHttpSession();
     	 session.setAttribute("dices", dices);
          MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
@@ -543,7 +533,7 @@ public class GooseMatchControllerTest {
         given(this.gooseMatchService.findEveryoneExceptOneLeft(LOLA_MATCH)).willReturn(false);
         given(this.playerGooseStatsService.findPlayerGooseStatsByUsername(LOLA)).willReturn(STATS_SET);
         given(this.playerGooseStatsService.sumStats(STATS_SET)).willReturn(LOLA_STATS);
-        
+
     	 MockHttpSession session =  new MockHttpSession();
     	 session.setAttribute("dices", dices);
          MockHttpServletRequestBuilder builder = MockMvcRequestBuilders

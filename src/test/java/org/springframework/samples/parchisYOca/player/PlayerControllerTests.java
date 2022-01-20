@@ -24,7 +24,6 @@ import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
 import testDataGenerator.TestDataGenerator;
 
 import java.util.Date;

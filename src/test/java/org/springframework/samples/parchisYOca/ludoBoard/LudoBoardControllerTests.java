@@ -1,8 +1,6 @@
 package org.springframework.samples.parchisYOca.ludoBoard;
 
-import org.hibernate.envers.internal.tools.Triple;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,9 +15,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
-import org.springframework.samples.parchisYOca.gooseBoard.GooseBoardController;
-import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
-import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.ludoChip.GameState;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChipService;
@@ -27,7 +22,6 @@ import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatchService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
-import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.samples.parchisYOca.user.Authorities;
@@ -46,7 +40,6 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = LudoBoardController.class,
