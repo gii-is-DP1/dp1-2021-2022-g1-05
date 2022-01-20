@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStatsService;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class LudoBoardServiceTests {
 
     @Test
     @Transactional
-    public void testSave() {
+    public void testSave() throws InvalidPlayerNumberException {
         LudoBoard aux = new LudoBoard();
         PlayerLudoStats pls1 = new PlayerLudoStats();
         PlayerLudoStats pls2 = new PlayerLudoStats();
@@ -62,7 +63,7 @@ public class LudoBoardServiceTests {
         PlayerLudoStats pls5 = new PlayerLudoStats();
         Set<PlayerLudoStats> setStats = Set.of(pls1, pls2, pls3, pls4, pls5);
 
-        assertThrows(ArrayIndexOutOfBoundsException.class, () ->{
+        assertThrows(InvalidPlayerNumberException.class, () ->{
             ludoBoardService.save(aux, setStats);
         });
     }

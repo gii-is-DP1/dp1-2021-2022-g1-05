@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.samples.parchisYOca.achievement.AchievementService;
+import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoardService;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
@@ -188,7 +189,7 @@ public class LudoMatchController {
 
     @GetMapping(value = "/ludoMatches/{matchId}")
     public String showMatch(@PathVariable("matchId") Integer matchId, ModelMap model,
-                            HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+                            HttpServletRequest request, HttpSession session, HttpServletResponse response) throws InvalidPlayerNumberException {
         response.addHeader("Refresh", REFRESH_RATE_MATCH);
         Boolean logged = userService.isAuthenticated();
         List<LudoChip> chips = new ArrayList<LudoChip>();
