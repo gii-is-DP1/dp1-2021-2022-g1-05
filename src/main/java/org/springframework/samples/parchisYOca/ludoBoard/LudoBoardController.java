@@ -84,6 +84,7 @@ public class LudoBoardController {
             dicesToCheck[INDICE_PRIMER_DADO] = dicesToShow[INDICE_PRIMER_DADO];
             dicesToCheck[INDICE_SEGUNDO_DADO] = dicesToShow[INDICE_SEGUNDO_DADO];
             dicesToCheck[INDICE_SUMA_DADOS] = dicesToShow[INDICE_SUMA_DADOS];
+            session.setAttribute("dicesToCheck", dicesToCheck);
             boolean flagDobles = dicesToCheck[INDICE_PRIMER_DADO] == dicesToCheck[INDICE_SEGUNDO_DADO];
             session.setAttribute("flagDobles", flagDobles);
             Integer inGameId = inGamePlayerStats.getInGameId();
@@ -107,6 +108,7 @@ public class LudoBoardController {
                         Integer diceCode = ludoChipService.manageFives(inGameId,matchId, dicesToCheck[INDICE_PRIMER_DADO], dicesToCheck[INDICE_SEGUNDO_DADO]);
                         model.put("diceCode", diceCode);
                         responseToFives(diceCode, inGamePlayerStats, matchId, model, session, dicesToCheck);
+                        dicesToCheck = (int[])session.getAttribute("dicesToCheck");
                         if(diceCode == SUMA_DADOS_5 || diceCode == DOS_DADOS_5) {
                             return "redirect:/ludoMatches/" + matchId;
                         }
