@@ -2,6 +2,8 @@ package org.springframework.samples.parchisYOca.playerLudoStats;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 
 import java.util.Collection;
@@ -17,6 +19,9 @@ public interface PlayerLudoStatsRepository extends CrudRepository<PlayerLudoStat
 
     @Query(value = "SELECT DISTINCT playerLudoStats FROM PlayerLudoStats playerLudoStats WHERE playerLudoStats.player.user.username = :username")
     Collection<PlayerLudoStats> findPlayerLudoStatsByUsername(String username);
+
+    @Query(value = "SELECT DISTINCT stats FROM LudoMatch ludoMatch JOIN ludoMatch.stats stats WHERE ludoMatch.id = :id")
+    Collection<PlayerLudoStats> findPlayerLudoStatsByGameId(Integer id);
 
     Collection<PlayerLudoStats> findAll();
 }

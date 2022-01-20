@@ -365,6 +365,7 @@ public class GooseMatchController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
             GooseMatch userMatch = gooseMatchService.findLobbyByUsername(authenticatedUser.getUsername()).get();
+            Collection<PlayerGooseStats> pgsColl = playerGooseStatsService.findPlayerGooseStatsByGame(userMatch.getId());
             PlayerGooseStats pgs = playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(authenticatedUser.getUsername(), userMatch.getId()).get();
 
             if (pgs.getIsOwner() == 1 && userMatch.getStartDate() == null) {
@@ -373,7 +374,7 @@ public class GooseMatchController {
                 gooseMatchService.save(userMatch);
                 mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
             } else if (userMatch.getStartDate() == null) {
-                gooseMatchService.removeGooseStatsFromGame(pgs, userMatch.getId());
+                gooseMatchService.removeGooseStatsFromGame(pgs, pgsColl, userMatch.getId());
                 mav.addObject("message", "You left the lobby");
             } else {
                 pgs.setPlayerLeft(1);

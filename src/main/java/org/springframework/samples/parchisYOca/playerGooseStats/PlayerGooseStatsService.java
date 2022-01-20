@@ -126,11 +126,23 @@ public class PlayerGooseStatsService {
         return playerGooseStatsRepository.findPlayerGooseStatsByUsername(username);
     }
 
+    @Transactional(readOnly = true)
+    public Collection<PlayerGooseStats> findPlayerGooseStatsByGame(Integer id) throws DataAccessException {
+        log.debug("Finding {}'s PlayerGooseStats of game with id", id);
+        return playerGooseStatsRepository.findPlayerGooseStatsByGameId(id);
+    }
+
 
     @Transactional
     public PlayerGooseStats saveStats(PlayerGooseStats playerGooseStats) throws DataAccessException {
     	log.debug("Saving {}'s PlayerGooseStats", playerGooseStats.getPlayer().getUser().getUsername());
         return playerGooseStatsRepository.save(playerGooseStats);
+    }
+
+    @Transactional
+    public void removeStats(PlayerGooseStats playerGooseStats) throws DataAccessException {
+        log.debug("Removing {}'s PlayerGooseStats", playerGooseStats.getPlayer().getUser().getUsername());
+        playerGooseStatsRepository.delete(playerGooseStats);
     }
 
 }

@@ -307,7 +307,8 @@ public class GooseMatchServiceTest {
         Integer statsToRemoveId = 1;
         GooseMatch gm = gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE_1).get();
         Assertions.assertThat(gm.getStats().size()).isEqualTo(3);
-        gooseMatchService.removeGooseStatsFromGame(playerGooseStatsService.findById(statsToRemoveId).get(),gm.getId());
+        Collection<PlayerGooseStats> pgsColl = playerGooseStatsService.findPlayerGooseStatsByGame(gm.getId());
+        gooseMatchService.removeGooseStatsFromGame(playerGooseStatsService.findById(statsToRemoveId).get(),pgsColl,gm.getId());
         Assertions.assertThat(gm.getStats().size()).isEqualTo(2);
     }
 
