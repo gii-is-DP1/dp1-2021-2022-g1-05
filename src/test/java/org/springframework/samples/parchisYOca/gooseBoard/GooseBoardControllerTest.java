@@ -15,14 +15,12 @@ import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
-import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
 import org.springframework.samples.parchisYOca.user.Authorities;
 import org.springframework.samples.parchisYOca.user.User;
-import org.springframework.samples.parchisYOca.user.UserController;
 import org.springframework.samples.parchisYOca.user.UserService;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -122,8 +120,6 @@ public class GooseBoardControllerTest {
 
 	@BeforeEach
 	void setup() {
-		/*La mayor parte de esto es inutil pero no me apetece ver ahora
-		 que sobra y que no*/
 		Jaime = new Player();
 		User userJaime = new User();
 		userJaime.setUsername(JAIME);
@@ -151,6 +147,7 @@ public class GooseBoardControllerTest {
 		pacoStats.setPlayer(Paco);
 		pacoStats.setIsOwner(IS_OWNER);
         pacoStats.setHasTurn(-1);
+
 		Laura = new Player();
 		User userLaura = new User();
 		userLaura.setUsername(LAURA);
