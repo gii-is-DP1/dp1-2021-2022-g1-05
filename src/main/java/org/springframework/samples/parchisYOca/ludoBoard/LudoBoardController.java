@@ -215,12 +215,15 @@ public class LudoBoardController {
             int[] dicesToCheck = (int[]) session.getAttribute("dicesToCheck");
             Integer moveCode = ludoChipService.move(chip,dicesToCheck[diceIndex],chips,pls, matchId);
             dicesToCheck[diceIndex]=0;
+            session.setAttribute("dicesToCheck", dicesToCheck);
 
             if(moveCode==ATE_CHIP || moveCode==BLOCKED_AND_ATE){
                 dicesToCheck[diceIndex]=20;
+                session.setAttribute("dicesToCheck", dicesToCheck);
                 return "redirect:/ludoInGame/chooseChip/"+diceIndex;
             }else if(moveCode==LANDED_FINAL){
                 dicesToCheck[diceIndex]=10;
+                session.setAttribute("dicesToCheck", dicesToCheck);
                 return "redirect:/ludoInGame/chooseChip/"+diceIndex;
             }else if(moveCode==GOT_BLOCKED) {
                 session.setAttribute("especial", "You got blocked, so your chip landed right before the block");
