@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoardService;
 import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
@@ -93,7 +94,7 @@ public class LudoChipServiceTests {
     protected LudoChip chipToMove;
 
     @BeforeEach
-    public void addPlayersAndMatch() {
+    public void addPlayersAndMatch() throws InvalidPlayerNumberException {
         LudoMatch newMatch = new LudoMatch();
         String matchCode = RandomStringGenerator.getRandomString(MATCH_CODE_LENGTH);
         newMatch.setMatchCode(matchCode);

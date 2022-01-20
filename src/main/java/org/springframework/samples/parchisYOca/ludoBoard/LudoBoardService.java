@@ -3,6 +3,7 @@ package org.springframework.samples.parchisYOca.ludoBoard;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.parchisYOca.gooseBoard.exceptions.InvalidPlayerNumberException;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChipRepository;
 import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
@@ -33,10 +34,13 @@ public class LudoBoardService {
     }
 
     @Transactional(readOnly=true)
-    public LudoBoard save(LudoBoard ludoBoard, Set<PlayerLudoStats> playerLudoStats) throws DataAccessException {
+    public LudoBoard save(LudoBoard ludoBoard, Set<PlayerLudoStats> playerLudoStats) throws DataAccessException, InvalidPlayerNumberException {
         LudoBoard ludoBoardDb=ludoBoardRepository.save(ludoBoard);
         Set<LudoChip> chips = new HashSet<>();
         Integer playerNumber= playerLudoStats.size();
+        if(playerNumber>4||playerNumber<=1){
+            throw new InvalidPlayerNumberException();
+        }
         for(Integer i =0;i<playerNumber;i++){
             //Crear las 4 fichas para cada jugador
             for(Integer j=0;j<=3;j++){
