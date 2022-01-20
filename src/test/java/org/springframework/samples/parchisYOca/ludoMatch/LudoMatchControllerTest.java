@@ -11,6 +11,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.samples.parchisYOca.achievement.AchievementService;
 import org.springframework.samples.parchisYOca.configuration.SecurityConfiguration;
 import org.springframework.samples.parchisYOca.ludoBoard.LudoBoardService;
+import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
 import org.springframework.samples.parchisYOca.ludoChip.LudoChipService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
@@ -24,16 +25,25 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import testDataGenerator.TestDataGenerator;
-
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 @WebMvcTest(controllers = LudoMatchController.class,
@@ -53,12 +63,20 @@ public class LudoMatchControllerTest {
 	private static final String VALUE_2 = "The lobby is full!";
 	private static final String VALUE_3 = "Lobby not found!";
 	private static final String VALUE_4 = "The owner of the lobby left, so it was closed";
+	private static final String VALUE_5 = "Everyone except you left, so you won!";
+	private static final String VALUE_6 = "The game has ended!";
+	private static final String MENSAJE_DE_PRUEBA = "AAAAAAAAAAAAAAAAAAAA";
 	private static final User user = TestDataGenerator.generateUser(NAME, PSSWRD);
 	private static final Player player = TestDataGenerator.generatePlayer(user);
 	private static final String VIEW_NAME = "matches/joinMatchForm";
 	private static final String VIEW_NAME_MATCHES = "matches/ludoMatchLobby";
+	private static final String VIEW_MATCHES_STATS = "stats/adminMatchStats";
+	private static final String VIEW_LISTADO = "matches/listLudoMatches";
 	private static final User user2 = TestDataGenerator.generateUser(NAME2, PSSWRD2);
 	private static final Player player2 = TestDataGenerator.generatePlayer(user2);
+	private static final Integer MATCH_ID = 1;
+	public static Integer NUM_DICES=2;
+    public static Integer NUM_DICES_SIDES=6;
 	
 	@Autowired
     private MockMvc mockMvc;
@@ -296,5 +314,178 @@ public class LudoMatchControllerTest {
 		   mockMvc.perform(get("/ludoMatches/lobby/"+CODE))
 		   .andExpect(status().is3xxRedirection())
 		   .andExpect(redirectedUrl("/"));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testShowMatchNotLoggedIn() throws Exception {
+		   given(this.userService.isAuthenticated()).willReturn(false);
+		   mockMvc.perform(get("/ludoMatches/"+MATCH_ID))
+		   .andExpect(status().is3xxRedirection())
+		   .andExpect(redirectedUrl("/"));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testShowMatchLastPlayerLeft() throws Exception {
+		   LudoMatch match = TestDataGenerator.generateLudoMatch(CODE);
+		   PlayerLudoStats stat = TestDataGenerator.generatePlayerLudoStats(player);
+		   Set<PlayerLudoStats> stats = Set.of(stat);
+		   stat.setPlayerLeft(0);
+		   match.setId(MATCH_ID);
+		   match.setStartDate(null);
+		   match.setStats(stats);
+		   match.setEndDate(new Date());
+		   given(this.userService.isAuthenticated()).willReturn(true);
+		   given(this.ludoMatchService.findludoMatchById(MATCH_ID))
+		   .willReturn(Optional.of(match));
+		   MockHttpSession session = new MockHttpSession();
+		   int[] dices = new int[NUM_DICES+1];
+	        for (Integer i = 0; i<NUM_DICES; i++){
+	            dices[i] = 1+(int)Math.floor(Math.random()*NUM_DICES_SIDES);
+	        }
+	        List<LudoChip> chips = new ArrayList<LudoChip>();
+	        given(this.ludoChipService.findChipsByMatchId(MATCH_ID))
+	        .willReturn(chips);
+	        given(this.ludoChipService.checkOcuppied(chips))
+	        .willReturn(new ArrayList<LudoChip>());
+	        given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(NAME, MATCH_ID))
+	        .willReturn(Optional.of(stat));
+	        given(this.ludoMatchService.findEveryoneExceptOneLeft(match)).willReturn(true);
+	       session.setAttribute("dices", dices);
+	       given(this.playerLudoStatsService.sumStats(stats)).willReturn(stat);
+		   MockHttpServletRequestBuilder builder =
+				   MockMvcRequestBuilders.get("/ludoMatches/"+MATCH_ID)
+				   .session(session);
+		   mockMvc.perform(builder)
+		   .andExpect(status().isOk())
+		   .andExpect(model().attribute("message", VALUE_5))
+		   .andExpect(view().name("matches/ludoMatch"))
+		   .andExpect(model().attribute("firstDice", dices[0]))
+		   .andExpect(model().attribute("secondDice", dices[1]))
+		   .andExpect(model().attribute("sumDice", dices[2]));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testShowMatchMatchHasEnded() throws Exception {
+		   LudoMatch match = TestDataGenerator.generateLudoMatch(CODE);
+		   PlayerLudoStats stat = TestDataGenerator.generatePlayerLudoStats(player);
+		   Set<PlayerLudoStats> stats = Set.of(stat);
+		   stat.setPlayerLeft(0);
+		   match.setId(MATCH_ID);
+		   match.setStartDate(null);
+		   match.setStats(stats);
+		   match.setEndDate(new Date());
+		   given(this.userService.isAuthenticated()).willReturn(true);
+		   given(this.ludoMatchService.findludoMatchById(MATCH_ID))
+		   .willReturn(Optional.of(match));
+		   MockHttpSession session = new MockHttpSession();
+		   int[] dices = new int[NUM_DICES+1];
+	        for (Integer i = 0; i<NUM_DICES; i++){
+	            dices[i] = 1+(int)Math.floor(Math.random()*NUM_DICES_SIDES);
+	        }
+	        List<LudoChip> chips = new ArrayList<LudoChip>();
+	        given(this.ludoChipService.findChipsByMatchId(MATCH_ID))
+	        .willReturn(chips);
+	        given(this.ludoChipService.checkOcuppied(chips))
+	        .willReturn(new ArrayList<LudoChip>());
+	        given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(NAME, MATCH_ID))
+	        .willReturn(Optional.of(stat));
+	        given(this.ludoMatchService.findEveryoneExceptOneLeft(match)).willReturn(false);
+	       session.setAttribute("dices", dices);
+	       given(this.playerLudoStatsService.sumStats(stats)).willReturn(stat);
+		   MockHttpServletRequestBuilder builder =
+				   MockMvcRequestBuilders.get("/ludoMatches/"+MATCH_ID)
+				   .session(session);
+		   mockMvc.perform(builder)
+		   .andExpect(status().isOk())
+		   .andExpect(model().attribute("message", VALUE_6))
+		   .andExpect(view().name("matches/ludoMatch"))
+		   .andExpect(model().attribute("firstDice", dices[0]))
+		   .andExpect(model().attribute("secondDice", dices[1]))
+		   .andExpect(model().attribute("sumDice", dices[2]));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testShowMatch() throws Exception {
+		   LudoMatch match = TestDataGenerator.generateLudoMatch(CODE);
+		   PlayerLudoStats stat = TestDataGenerator.generatePlayerLudoStats(player);
+		   stat.setHasTurn(2);
+		   Set<PlayerLudoStats> stats = Set.of(stat);
+		   stat.setPlayerLeft(0);
+		   match.setId(MATCH_ID);
+		   match.setStartDate(null);
+		   match.setStats(stats);
+		   match.setEndDate(null);
+		   given(this.userService.isAuthenticated()).willReturn(true);
+		   given(this.ludoMatchService.findludoMatchById(MATCH_ID))
+		   .willReturn(Optional.of(match));
+		   MockHttpSession session = new MockHttpSession();
+		   int[] dices = new int[NUM_DICES+1];
+	        for (Integer i = 0; i<NUM_DICES; i++){
+	            dices[i] = 1+(int)Math.floor(Math.random()*NUM_DICES_SIDES);
+	        }
+	        List<LudoChip> chips = new ArrayList<LudoChip>();
+	        given(this.ludoChipService.findChipsByMatchId(MATCH_ID))
+	        .willReturn(chips);
+	        given(this.ludoChipService.checkOcuppied(chips))
+	        .willReturn(new ArrayList<LudoChip>());
+	        given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(NAME, MATCH_ID))
+	        .willReturn(Optional.of(stat));
+	        given(this.ludoMatchService.findEveryoneExceptOneLeft(match)).willReturn(false);
+	       session.setAttribute("dices", dices);
+	       session.setAttribute("especial", MENSAJE_DE_PRUEBA);
+	       given(this.playerLudoStatsService.sumStats(stats)).willReturn(stat);
+		   MockHttpServletRequestBuilder builder =
+				   MockMvcRequestBuilders.get("/ludoMatches/"+MATCH_ID)
+				   .session(session);
+		   mockMvc.perform(builder)
+		   .andExpect(status().isOk())
+		   .andExpect(model().attribute("message", MENSAJE_DE_PRUEBA))
+		   .andExpect(model().attribute("hasTurn", stat.getHasTurn()))
+		   .andExpect(view().name("matches/ludoMatch"))
+		   .andExpect(model().attribute("firstDice", dices[0]))
+		   .andExpect(model().attribute("secondDice", dices[1]))
+		   .andExpect(model().attribute("sumDice", dices[2]));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testCloseMatch() throws Exception {
+		   LudoMatch match = new LudoMatch();
+		   given(this.ludoMatchService.findludoMatchById(MATCH_ID))
+		   .willReturn(Optional.of(match));
+		   mockMvc.perform(get("/ludoMatches/close/"+MATCH_ID))
+		   .andExpect(status().is3xxRedirection())
+		   .andExpect(redirectedUrl("/ludoMatches?page=0"));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testShowStats() throws Exception {
+		   LudoMatch match = new LudoMatch();
+		   Set<PlayerLudoStats> stats = new HashSet<PlayerLudoStats>();
+		   for(int i=0; i<4; ++i) {
+			   User user = TestDataGenerator.generateUser(String.valueOf(i), PSSWRD+1);
+			   Player player = TestDataGenerator.generatePlayer(user);
+			   PlayerLudoStats stat = TestDataGenerator.generatePlayerLudoStats(player);
+			   stats.add(stat);
+		   }
+		   match.setStats(stats);
+		   given(this.ludoMatchService.findludoMatchById(MATCH_ID))
+		   .willReturn(Optional.of(match));
+		   mockMvc.perform(get("/ludoMatches/stats/"+MATCH_ID))
+		   .andExpect(status().isOk())
+		   .andExpect(view().name(VIEW_MATCHES_STATS))
+		   .andExpect(model().attribute("ludoStats", stats));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testListadoPartidas() throws Exception {
+		   List<LudoMatch> matches = List.of();
+		   Page<LudoMatch> slice = new PageImpl<LudoMatch>(matches);
+		   given(this.ludoMatchService.findAllPaging(any(Pageable.class)))
+		   .willReturn(slice);
+		   mockMvc.perform(get("/ludoMatches")
+				   .param("page", "0"))
+		   .andExpect(status().isOk())
+		   .andExpect(model().attribute("ludoMatches", slice.getContent()))
+		   .andExpect(view().name(VIEW_LISTADO));
 	   }
 }
