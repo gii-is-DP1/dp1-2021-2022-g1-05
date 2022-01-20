@@ -118,6 +118,7 @@ public class LudoBoardControllerTests {
     private static final Integer HASTURN=1;
     private static final int[] DICES = {3,2,5};
     private static final int[] DICES_NO_5={1,2,3};
+    private static final int[] DICES_0={-1,0,-1};
 
     private static final String MATCH_CODE = "abcdfg";
     private static final int[] DOUBLE_DICES = {3,3,6};
@@ -329,6 +330,23 @@ public class LudoBoardControllerTests {
         assertThat(session.getAttribute("especial")).isEqualTo("You got a double roll!! You can roll the dice again.");
     }
 
+    @WithMockUser(value = JAIME)
+    @Test
+    void testLudoDicesRolledNoMoreMoves() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+
+        session.setAttribute("dices", DICES_0);
+        session.setAttribute("fromLudo",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        given(this.userService.isAuthenticated()).willReturn(LOGGED_IN);
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/ludoInGame/dicesRolled")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/ludoMatches/" + MATCH_ID));
+
+    }
 
 
 
