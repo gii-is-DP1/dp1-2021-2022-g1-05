@@ -155,12 +155,11 @@ public class LudoMatchService {
     }
 
     @Transactional
-    public void removeLudoStatsFromGame(PlayerLudoStats pls, LudoMatch ludoMatch) throws DataAccessException {
+    public void removeLudoStatsFromGame(PlayerLudoStats pls, Collection<PlayerLudoStats> collection, LudoMatch ludoMatch) throws DataAccessException {
         log.debug("Deleting PlayerLudoStats '{}' from matchId '{}'",pls.toString(),ludoMatch.getId());
-        System.out.println("Despues de entrar al metodo: "+ ludoMatch.getStats());
-        List<PlayerLudoStats> statsOfGame = new ArrayList<>(ludoMatch.getStats());
-        statsOfGame.remove(pls);
-        ludoMatch.setStats(new HashSet<>(statsOfGame));
+        collection.remove(pls);
+        ludoMatch.setStats(new HashSet<>(collection));
+        playerLudoStatsService.removeStats(pls);
         ludoMatchRepository.save(ludoMatch);
     }
 
@@ -170,6 +169,9 @@ public class LudoMatchService {
         LudoMatch lm = ludoMatchRepository.findById(ludoMatchId).get();
         Set<PlayerLudoStats> emptyStats = new HashSet<>();
         lm.setStats(emptyStats);
+        for(PlayerLudoStats pls : lm.getStats()){
+            playerLudoStatsService.removeStats(pls);
+        }
         ludoMatchRepository.save(lm);
     }
 }

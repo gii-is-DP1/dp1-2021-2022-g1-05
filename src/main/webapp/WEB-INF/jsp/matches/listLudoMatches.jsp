@@ -28,6 +28,7 @@
         </div>
     </form:form>
     <h2>Listing ludo matches</h2>
+    <h3>(bear in mind that if the status of a game is Closed lobby, there wont be any stats)</h3>
 
     <table id="matchesTable" class="table table-striped">
         <thead>

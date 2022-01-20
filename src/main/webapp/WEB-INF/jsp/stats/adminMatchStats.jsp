@@ -56,7 +56,6 @@
                 <th>Eaten tokens</th>
                 <th>Double rolls</th>
                 <th>Greedy rolls</th>
-                <th>Created blocks</th>
                 <th>Scored tokens</th>
                 <th>Take outs</th>
                 <th>Walked squares</th>

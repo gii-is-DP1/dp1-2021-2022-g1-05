@@ -330,7 +330,7 @@ public class LudoMatchController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticatedUser = (User) authentication.getPrincipal(); //Gets user and logged in player
             LudoMatch userMatch = ludoMatchService.findLobbyByUsername(authenticatedUser.getUsername()).get();
-            //TODO AQUI FALLO
+            Collection<PlayerLudoStats> plsColl = playerLudoStatsService.findPlayerLudoStatsByGame(userMatch.getId());
             PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(authenticatedUser.getUsername(), userMatch.getId()).get();
 
             if(pls.getIsOwner() == 1 && userMatch.getStartDate() == null) {
@@ -339,7 +339,7 @@ public class LudoMatchController {
                 ludoMatchService.save(userMatch);
                 mav.addObject("message", "You were the owner and left the game, so the lobby was closed!");
             } else if (userMatch.getStartDate() == null) {
-                ludoMatchService.removeLudoStatsFromGame(pls, userMatch);
+                ludoMatchService.removeLudoStatsFromGame(pls, plsColl, userMatch);
                 mav.addObject("message", "You left the lobby");
             } else {
                 pls.setPlayerLeft(1);

@@ -218,7 +218,8 @@ public class LudoMatchServiceTests {
         Integer statsToRemoveId = 1;
         LudoMatch lm = ludoMatchService.findludoMatchByMatchCode(MATCH_CODE_1).get();
         Assertions.assertThat(lm.getStats().size()).isEqualTo(3);
-        ludoMatchService.removeLudoStatsFromGame(playerLudoStatsService.findById(statsToRemoveId).get(),lm);
+        Collection <PlayerLudoStats> plsColl = playerLudoStatsService.findPlayerLudoStatsByGame(lm.getId());
+        ludoMatchService.removeLudoStatsFromGame(playerLudoStatsService.findById(statsToRemoveId).get(),plsColl,lm);
         Assertions.assertThat(lm.getStats().size()).isEqualTo(2);
     }
 

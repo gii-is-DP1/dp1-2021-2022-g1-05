@@ -9,6 +9,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStatsService;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -155,12 +156,12 @@ public class GooseMatchService {
     }
 
     @Transactional
-    public void removeGooseStatsFromGame(PlayerGooseStats pgs, Integer gooseMatchId) throws DataAccessException {
+    public void removeGooseStatsFromGame(PlayerGooseStats pgs, Collection<PlayerGooseStats> pgsColl, Integer gooseMatchId) throws DataAccessException {
         log.debug("Deleting PlayerGooseStats '{}' from matchId '{}'",pgs.getId(),gooseMatchId);
         GooseMatch gm = gooseMatchRepository.findById(gooseMatchId).get();
-        List<PlayerGooseStats> statsOfGame = new ArrayList<>(gm.getStats());
-        statsOfGame.remove(pgs);
-        gm.setStats(new HashSet<>(statsOfGame));
+        pgsColl.remove(pgs);
+        gm.setStats(new HashSet<>(pgsColl));
+        playerGooseStatsService.removeStats(pgs);
         gooseMatchRepository.save(gm);
     }
 
@@ -170,6 +171,9 @@ public class GooseMatchService {
         GooseMatch gm = gooseMatchRepository.findById(gooseMatchId).get();
         Set<PlayerGooseStats> emptyStats = new HashSet<>();
         gm.setStats(emptyStats);
+        for(PlayerGooseStats pgs : gm.getStats()){
+            playerGooseStatsService.removeStats(pgs);
+        }
         gooseMatchRepository.save(gm);
     }
 }
