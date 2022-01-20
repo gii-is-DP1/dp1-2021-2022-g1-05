@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 
 @Service
-@Slf4j
 public class LudoChipService {
 
     private static final Map<Color,Integer> LAST_TILES = Map.of(Color.Red,33, Color.Yellow,67, Color.Green, 50,Color.Blue,16);
@@ -58,13 +57,11 @@ public class LudoChipService {
 
     @Transactional
     public Optional<LudoChip> findConcreteChip(Integer matchId, Integer inGameChipId, Integer inGamePlayerId){
-    	log.debug("Finding chip with inGameId '{}', inGamePlayerId '{}' and matchId '{}'",inGameChipId,inGamePlayerId,matchId);
         return ludoChipRepository.findChip(matchId,inGameChipId,inGamePlayerId);
     }
 
     @Transactional
     public Collection<LudoChip> findChipsByMatchId(Integer matchId) throws DataAccessException {
-    	log.debug("Finding chips from Ludo match with id '{}'", matchId);
         return ludoChipRepository.findChipsByMatchId(matchId);
     }
 
@@ -75,45 +72,35 @@ public class LudoChipService {
 
     @Transactional
     public LudoChip save(LudoChip ludoChip) {
-    	log.debug("Saving Ludo chip with inGameId '{}' and inGamePlayerId '{}'",ludoChip.getInGameChipId()
-    			,ludoChip.getInGamePlayerId());
         return ludoChipRepository.save(ludoChip);
     }
 
     @Transactional
     public Integer manageFives(Integer inGameId,Integer matchId, Integer firstDice, Integer secondDice){
-    	log.debug("Deciding if player with ingameId '{}' in Ludo match with id '{}' should be forced to move their chip with these rolls '{}','{}'"
-    			,inGameId,matchId, firstDice, secondDice);
         List<LudoChip> chipsInBase = new ArrayList<>();
         LudoBoard board=ludoMatchService.findludoMatchById(matchId).get().getBoard();
         List<LudoChip> allChips=new ArrayList<>(board.getChips());
-        log.debug("Checking which of these ({}) chips are in base", allChips);
         for(int i =0;i<allChips.size();i++){
             if(allChips.get(i).getInGamePlayerId()==inGameId&&allChips.get(i).getGameState().equals(GameState.earlyGame)){
                 chipsInBase.add(allChips.get(i));
             }
 
         }
-        log.debug("{} are the chips that are in base", chipsInBase);
 
         if(!chipsInBase.isEmpty()) {
             LudoChip chipToModify = chipsInBase.get(0);
             Color color = chipToModify.getColor();
             if(!checkCasilla(FIRST_TILES.get(color), allChips)) {
                 Integer result = diceFlag(firstDice, secondDice);
-                log.debug("Checking if starting tile is not occupied");
                 //Aumentar la estadística de fichas sacadas
                 PlayerLudoStats pls = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(chipToModify.getInGamePlayerId(), matchId).get();
                 pls.setTakeOuts(pls.getTakeOuts()+1);
 
                 if(result >= 0 && result < 3) {
-                	log.debug("Chip with id '{}' can move", chipToModify.getInGameChipId());
                     chipToModify.setGameState(GameState.midGame);
                     chipToModify.setPosition(FIRST_TILES.get(color));
                     save(chipToModify);
                 } else if(result == DOS_DADOS_5){
-                	log.debug("There were two 5 rolled so two chips must move");
-                	log.debug("Chip with id '{}' can move", chipToModify.getInGameChipId());
                     chipToModify.setGameState(GameState.midGame);
                     chipToModify.setPosition(FIRST_TILES.get(color));
                     save(chipToModify);
@@ -128,25 +115,19 @@ public class LudoChipService {
     }
 
     private Integer diceFlag(Integer firstDice, Integer secondDice) {
-    	log.debug("Flaging the dices '{}','{}'", firstDice, secondDice);
         if(firstDice == FIVE && secondDice == FIVE) {
-            log.debug("Both dices were 5");
             return DOS_DADOS_5;
         }else if(firstDice == FIVE) {
-        	log.debug("First dice was 5");
             return PRIMER_DADO_5;
         } else if(secondDice == FIVE) {
-        	log.debug("Second dice was 5");
             return SEGUNDO_DADO_5;
         } else if(firstDice+secondDice == FIVE) {
-        	log.debug("The sum of both dices was 5");
             return SUMA_DADOS_5;
         }
         return -1;
     }
 
     public Boolean checkCasilla(Integer square, List<LudoChip> chips){
-    	log.debug("Checking if tile number '{}' is occupied by any chip", square);
         Integer acumulador=0;
         for(int i=0;i<chips.size();i++){
             if(acumulador==2){
@@ -160,7 +141,6 @@ public class LudoChipService {
     }
 
     private Boolean checkFinalTiles(Integer square, LudoChip chip){
-        log.debug("Checking if tile number '{}' is the start of that colors endgame", square);
         return square==LAST_TILES.get(chip.getColor());
     }
 
@@ -263,7 +243,6 @@ public class LudoChipService {
     }
 
     public boolean noChipsOutOfHome(List<LudoChip> ludoChips, Integer inGameId) {
-    	log.debug("Checking if any of the chips of player with inGameId '{}' are not in base", inGameId);
         boolean res=true;
 
         for(LudoChip chip:ludoChips){
@@ -303,11 +282,11 @@ public class LudoChipService {
     }
 
     public List<LudoChip> breakBlocks(List<LudoChip> ludoChips, Integer inGameId) {
-    	log.debug("Checking if the chips of player with inGameId '{}' should break a block", inGameId);
+
         List<LudoChip> chipsToBreak = new ArrayList<>();
         for(LudoChip chipToCheck: ludoChips) {
             if(chipToCheck.getInGamePlayerId() == inGameId) {
-                if (chipToCheck.getGameState().equals(GameState.midGame)) { // || chipToCheck.getPosition() != LudoChip.FINAL_TILE
+                if (chipToCheck.getGameState().equals(GameState.midGame)) {
                     if(checkCasilla(chipToCheck.getPosition(), ludoChips)) {
                         chipsToBreak.add(chipToCheck);
                     }
