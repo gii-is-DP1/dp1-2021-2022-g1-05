@@ -15,6 +15,7 @@ import org.springframework.samples.parchisYOca.gooseChip.GooseChip;
 import org.springframework.samples.parchisYOca.gooseChip.GooseChipService;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
+import org.springframework.samples.parchisYOca.ludoChip.LudoChip;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
@@ -32,6 +33,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -104,7 +106,7 @@ public class GooseBoardControllerTest {
     private static final String JAIL_MESSAGE = "Jail";
     private static final String DOUBLE_ROLL_MESSAGE = "Double roll";
 
-    private static final Integer RANDOM_POSITION = 13;
+    private static final Integer RANDOM_POSITION = 3;
     private static final Integer RANDOM_GOOSE = 14 ;
     private static final Integer JAIL_POSITION = 56 ;
     private static final Integer END_MAZE = 30 ;
@@ -174,6 +176,7 @@ public class GooseBoardControllerTest {
 
         chips=new ArrayList<>();
         chip1.setInGameId(JAIME_INGAMEID);
+        chip1.setPosition(0);
         chip2.setInGameId(PACO_INGAMEID);
         chip3.setInGameId(LAURA_INGAMEID);
         chip4.setInGameId(CARMEN_INGAMEID);
@@ -237,6 +240,10 @@ public class GooseBoardControllerTest {
         session.setAttribute("matchId", MATCH_ID);
         int[] rolledDices = (int[])session.getAttribute("dices");
         boolean flagDobles=NO_DOUBLES;
+        GooseChip auxChip1 =new GooseChip();
+        auxChip1.setInGameId(JAIME_INGAMEID);
+        auxChip1.setPosition(0);
+
         given(gooseChipService.checkSpecials(JAIME,
             chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(RANDOM_POSITION,HASTURN,NORMAL_MOVE_MESSAGE));
 
@@ -245,6 +252,7 @@ public class GooseBoardControllerTest {
         mockMvc.perform(builder)
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+        assertThat(session.getAttribute("especial")).isEqualTo("You moved from the square "+ auxChip1.getPosition()+ " to the square " + RANDOM_POSITION);
     }
 
 	@WithMockUser(value = JAIME)
@@ -256,6 +264,11 @@ public class GooseBoardControllerTest {
 		session.setAttribute("matchId", MATCH_ID);
         int[] rolledDices = (int[])session.getAttribute("dices");
         boolean flagDobles=NO_DOUBLES;
+        GooseChip auxChip1=new GooseChip();
+        auxChip1.setInGameId(JAIME_INGAMEID);
+        auxChip1.setPosition(6);
+        chip1.setPosition(6);
+
         given(gooseChipService.checkSpecials(JAIME,
             chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(RANDOM_GOOSE,HASTURN,GOOSE_MESSAGE));
 
@@ -264,6 +277,10 @@ public class GooseBoardControllerTest {
 		mockMvc.perform(builder)
 		.andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+
+        assertThat(session.getAttribute("especial")).isEqualTo("You have landed on the special square " + GOOSE_MESSAGE.toLowerCase(Locale.ROOT)+ ", \n"
+            +"you have been moved from square " + String.valueOf(auxChip1.getPosition()+rolledDices[INDICE_SUMA_DADOS]) + " to the square "+RANDOM_GOOSE
+            +". You have an extra turn!");
 	}
     @WithMockUser(value = JAIME)
     @Test
@@ -282,6 +299,10 @@ public class GooseBoardControllerTest {
         mockMvc.perform(builder)
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+
+        assertThat(session.getAttribute("especial")).isEqualTo("You have landed on the special square " + JAIL_MESSAGE.toLowerCase(Locale.ROOT)+ ", \n"
+            +"you loose " + Math.abs(JAIL) + " turns :(");
+
     }
 
     @WithMockUser(value = JAIME)
@@ -293,6 +314,7 @@ public class GooseBoardControllerTest {
         session.setAttribute("matchId", MATCH_ID);
         int[] rolledDices = (int[])session.getAttribute("dices");
         boolean flagDobles=NO_DOUBLES;
+        chip1.setPosition(39);
         given(gooseChipService.checkSpecials(JAIME,
             chip1, rolledDices[INDICE_SUMA_DADOS], flagDobles)).willReturn(new Triple<Integer,Integer,String>(END_MAZE,NOTURN ,MAZE_MESSAGE));
         pacoStats.setHasTurn(0);
@@ -302,6 +324,9 @@ public class GooseBoardControllerTest {
         mockMvc.perform(builder)
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+
+        assertThat(session.getAttribute("especial")).isEqualTo("You have landed on the special square " + MAZE_MESSAGE.toLowerCase(Locale.ROOT)+ ", \n"
+            + "you have been moved to the square "+END_MAZE+ ". Today it's not your lucky day ¯\\('-')_/¯");
     }
     @WithMockUser(value = JAIME)
     @Test
@@ -320,6 +345,8 @@ public class GooseBoardControllerTest {
         mockMvc.perform(builder)
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+
+        assertThat(session.getAttribute("especial")).isEqualTo("You have landed on the square " +RANDOM_POSITION +" and you got a double roll!! You can roll the dice again");
     }
     @WithMockUser(value = JAIME)
     @Test
@@ -338,6 +365,9 @@ public class GooseBoardControllerTest {
         mockMvc.perform(builder)
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/gooseMatches/"+MATCH_ID));
+        assertThat(session.getAttribute("especial")).isEqualTo("You have landed on the special square " + DEATH_MESSAGE.toLowerCase(Locale.ROOT)+ ", \n"
+            + "you have been moved to the square "+START_POSITION+ ". Today it's not your lucky day ¯\\('-')_/¯");
+
     }
     @WithMockUser(value = PACO)
     @Test
