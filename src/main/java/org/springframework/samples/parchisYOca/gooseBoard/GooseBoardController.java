@@ -28,21 +28,13 @@ public class GooseBoardController {
     public static final int INDICE_SEGUNDO_DADO = 1;
     public static final int INDICE_SUMA_DADOS = 2;
 
-    private final GooseMatchService gooseMatchService;
-    private final PlayerService playerService;
     private final PlayerGooseStatsService playerGooseStatsService;
-    private final GooseBoardService gooseBoardService;
     private final GooseChipService gooseChipService;
     private final UserService userService;
 
     @Autowired
-    public GooseBoardController(GooseMatchService gooseMatchService, PlayerService playerService,
-                                PlayerGooseStatsService playerGooseStatsService,
-                                GooseBoardService gooseBoardService, GooseChipService gooseChipService, UserService userService){
-        this.gooseMatchService = gooseMatchService;
-        this.playerService = playerService;
+    public GooseBoardController(PlayerGooseStatsService playerGooseStatsService, GooseChipService gooseChipService, UserService userService){
         this.playerGooseStatsService = playerGooseStatsService;
-        this.gooseBoardService = gooseBoardService;
         this.gooseChipService = gooseChipService;
         this.userService = userService;
     }
