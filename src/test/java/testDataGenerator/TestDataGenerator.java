@@ -2,8 +2,11 @@ package testDataGenerator;
 
 import org.springframework.samples.parchisYOca.gooseBoard.GooseBoard;
 import org.springframework.samples.parchisYOca.gooseMatch.GooseMatch;
+import org.springframework.samples.parchisYOca.ludoBoard.LudoBoard;
+import org.springframework.samples.parchisYOca.ludoMatch.LudoMatch;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.playerGooseStats.PlayerGooseStats;
+import org.springframework.samples.parchisYOca.playerLudoStats.PlayerLudoStats;
 import org.springframework.samples.parchisYOca.user.User;
 
 import java.util.Date;
@@ -68,5 +71,19 @@ public class TestDataGenerator {
 		match.setStats(null);
 		match.setId(id);
 		return match;
+	}
+	public static LudoMatch generateLudoMatch(String code) {
+		LudoMatch match = new LudoMatch();
+		LudoBoard board = new LudoBoard();
+		match.setBoard(board);
+		match.setMatchCode(code);
+		match.setStartDate(new Date());
+		return match;
+	}
+	public static PlayerLudoStats generatePlayerLudoStats(Player player) {
+		PlayerLudoStats stats = new PlayerLudoStats();
+		stats.setPlayer(player);
+		stats.setIsOwner(1);
+		return stats;
 	}
 }

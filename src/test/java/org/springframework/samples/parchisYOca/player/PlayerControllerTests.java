@@ -25,6 +25,8 @@ import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import testDataGenerator.TestDataGenerator;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -257,4 +259,64 @@ public class PlayerControllerTests {
     	.andExpect(view().name("stats/userStatsInAMatch"))
     	.andExpect(model().attributeExists("gooseStats"));
     }
+	 @WithMockUser(value = USERNAME)
+	    @Test
+	    void testTotalStats() throws Exception {
+	    	mockMvc.perform(get("/stats"))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("stats/totalStats"))
+	    	.andExpect(model().attribute("numberOfLudoGames", 0))
+	    	.andExpect(model().attribute("numberOfGooseGames", 0));
+	    }
+
+	    @WithMockUser(value = USERNAME)
+	    @Test
+	    void testStatsOfPlayerInMatch() throws Exception {
+	    	mockMvc.perform(get("/players/"+ID+"/matchStats/"+MATCH_CODE))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("stats/userStatsInAMatch"))
+	    	.andExpect(model().attribute("gooseStats", juanGStats));
+	    }
+	    @WithMockUser(value = USERNAME)
+	    @Test
+	    void testGooseMatchesPlayed()  throws Exception {
+	    	mockMvc.perform(get("/players/"+ID+"/gooseMatchesPlayed").param("page", "0"))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("matches/listMatchesInProfile"))
+	    	.andExpect(model().attributeExists("matches"));
+	    }
+	    @WithMockUser(value = USERNAME)
+	    @Test
+	    void testLudoMatchesPlayed()  throws Exception {
+	    	mockMvc.perform(get("/players/"+ID+"/ludoMatchesPlayed").param("page", "0"))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("matches/listMatchesInProfile"))
+	    	.andExpect(model().attributeExists("matches"));
+	    }
+	    @WithMockUser(value = "spring")
+	    @Test
+	    void testProcessUpdatePlayerFormNegative() throws Exception {
+	    	mockMvc.perform(post("/players/"+ ID +"/edit"))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("players/UpdatePlayerForm"));
+	    }
+	    @WithMockUser(value = USERNAME)
+	    @Test
+	    void testStatsOfPlayerInMatchNotPresent() throws Exception {
+	    	given(this.gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE))
+	    	.willReturn(Optional.empty());
+	    	LudoMatch newMatch =  TestDataGenerator.generateLudoMatch(MATCH_CODE);
+	    	PlayerLudoStats stats = TestDataGenerator.generatePlayerLudoStats(Juan);
+	    	Set<PlayerLudoStats> statSet = Set.of(stats);
+	    	newMatch.setStats(statSet);
+	    	newMatch.setId(MATCH_ID);
+	    	given(this.ludoMatchService.findludoMatchByMatchCode(MATCH_CODE))
+	    	.willReturn(Optional.of(newMatch));
+	    	given(this.pLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(USERNAME, MATCH_ID))
+	    	.willReturn(Optional.of(stats));
+	    	mockMvc.perform(get("/players/"+ID+"/matchStats/"+MATCH_CODE))
+	    	.andExpect(status().isOk())
+	    	.andExpect(view().name("stats/userStatsInAMatch"))
+	    	.andExpect(model().attribute("ludoStats", stats));
+	    }
 }
