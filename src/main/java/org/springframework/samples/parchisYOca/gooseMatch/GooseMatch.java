@@ -36,6 +36,7 @@ public class GooseMatch extends BaseEntity {
     @Size(max=6)
     @Column(unique = true)
     private String matchCode;
+
     @NotAudited
     @OneToMany
     @Size(max=4)
