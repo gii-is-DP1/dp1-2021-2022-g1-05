@@ -1,5 +1,6 @@
 package org.springframework.samples.parchisYOca.achievement;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Slf4j
 public class AchievementService {
 
     @Autowired
@@ -31,30 +33,36 @@ public class AchievementService {
 
     @Transactional(readOnly = true)
     public Collection<Achievement> findAll() throws DataAccessException{
+        log.info("Finding all achievements");
         return achievementRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Slice<Achievement> findAllPaging(Pageable pageable) throws DataAccessException{
+        log.info("Finding all achievements with paging");
         return achievementRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
     public Optional<Achievement> findAchievementById(int achievementId) throws DataAccessException{
+        log.info("Finding achievement with id " + achievementId);
         return achievementRepository.findById(achievementId);
     }
 
     @Transactional(rollbackFor = AchievementAlreadyExists.class)
     public Achievement save(Achievement achievement) throws DataAccessException, NumberFormatException, AchievementAlreadyExists, NameAlreadyExists {
         //Line to check if the user input is a number
+        log.info("Saving achievement with name " + achievement.getName());
         Integer auxNumber = Integer.parseInt(achievement.getNumberToBeat());
 
         Iterable<Achievement> achievementIterable = findAll();
         for(Achievement a : achievementIterable){
             if(a.getNumberToBeat().equals(achievement.getNumberToBeat()) && a.getDescription().equals(achievement.getDescription())){
+                log.info("The achievement already exists");
                 throw new AchievementAlreadyExists();
             }
             if(a.getName().equals(achievement.getName())){
+                log.info("The name " + achievement.getName()+"already exists");
                 throw new NameAlreadyExists();
             }
         }
@@ -63,6 +71,7 @@ public class AchievementService {
 
     @Transactional
     public void delete(Achievement achievement) throws DataAccessException{
+        log.info("Deleting achievement with id "+achievement.getId());
         Collection<Player> players = playerService.findAll();
         for(Player p : players){
             Set<Achievement> achievements = p.getAchievements();
@@ -76,6 +85,7 @@ public class AchievementService {
     }
 
     public void checkGooseAchievements(PlayerGooseStats playerStats){
+        log.info("Checking goose achievements of player "+playerStats.getPlayer().getUser().getUsername());
         Player player = playerStats.getPlayer();
         Collection<Achievement> oldAchievements = player.getAchievements();
         Iterable<Achievement> achievements = findAll();
@@ -99,6 +109,7 @@ public class AchievementService {
     }
 
     public void checkLudoAchievements(PlayerLudoStats playerStats){
+        log.info("Checking ludo achievements of player "+playerStats.getPlayer().getUser().getUsername());
         Player player = playerStats.getPlayer();
         Collection<Achievement> oldAchievements = player.getAchievements();
         Iterable<Achievement> achievements = findAll();
