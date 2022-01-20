@@ -34,6 +34,8 @@ public class PlayerLudoStatsServiceTests {
     protected final String MATCH_CODE_2 = "JNPORL";
     protected final String MATCH_CODE_3 = "1FG4TH";
     protected final String MATCH_CODE_4 = "IDKWHO";
+    protected final Integer MATCH_ID = 1;
+    protected final Integer EMPTY_MATCH_ID = 30;
 
 
     @Autowired
@@ -143,6 +145,13 @@ public class PlayerLudoStatsServiceTests {
     public void testFindPlayerLudoStatsByInGameIdAndMatchId(){
         Assertions.assertThat(playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(3,2).isPresent());
         Assertions.assertThat(playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(10,10).isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void testFindLudoStatsByMatchId() {
+        Assertions.assertThat(playerLudoStatsService.findPlayerLudoStatsByGame(MATCH_ID).size()).isEqualTo(3);
+        Assertions.assertThat(playerLudoStatsService.findPlayerLudoStatsByGame(EMPTY_MATCH_ID).size()).isEqualTo(0);
     }
 
     @Test

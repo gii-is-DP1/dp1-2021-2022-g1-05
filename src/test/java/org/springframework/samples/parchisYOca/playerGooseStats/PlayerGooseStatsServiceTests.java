@@ -11,6 +11,7 @@ import org.springframework.samples.parchisYOca.gooseMatch.GooseMatchService;
 import org.springframework.samples.parchisYOca.player.Player;
 import org.springframework.samples.parchisYOca.player.PlayerService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -21,6 +22,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class PlayerGooseStatsServiceTests {
 
     protected final String USERNAME = "ManuK";
@@ -30,6 +32,8 @@ public class PlayerGooseStatsServiceTests {
     protected final String MATCH_CODE_2 = "JANORL";
     protected final String MATCH_CODE_3 = "123456";
     protected final String MATCH_CODE_4 = "9floep";
+    protected final Integer MATCH_ID = 1;
+    protected final Integer EMPTY_MATCH_ID = 30;
 
     @Autowired
     protected GooseMatchService gooseMatchService;
@@ -116,8 +120,15 @@ public class PlayerGooseStatsServiceTests {
     @Test
     @Transactional
     public void testFindGooseStatsByUsernameAndMatchId() {
-        Assertions.assertThat(playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(USERNAME, 1).isPresent());
-        Assertions.assertThat(playerGooseStatsService.findGooseStatsByUsernamedAndMatchId("", 1).isEmpty());
+        Assertions.assertThat(playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(USERNAME_2, 2));
+        Assertions.assertThat(playerGooseStatsService.findGooseStatsByUsernamedAndMatchId("", MATCH_ID).isEmpty());
+    }
+
+    @Test
+    @Transactional
+    public void testFindGooseStatsByMatchId() {
+        Assertions.assertThat(playerGooseStatsService.findPlayerGooseStatsByGame(MATCH_ID).size()).isEqualTo(3);
+        Assertions.assertThat(playerGooseStatsService.findPlayerGooseStatsByGame(EMPTY_MATCH_ID).size()).isEqualTo(0);
     }
 
     @Test
