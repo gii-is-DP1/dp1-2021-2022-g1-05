@@ -94,6 +94,8 @@ public class GooseMatchControllerTest {
     private static  GooseMatch LOLA_MATCH = TestDataGenerator.generateGooseMatch(LOBBY_CODE, STATS_SET, MATCH_ID);
     private static  Optional<GooseMatch> OP_LOLA_MATCH = Optional.of(LOLA_MATCH);
     private static Optional<GooseMatch> oGMatch = Optional.of(gMatch);
+    public static Integer NUM_DICES=2;
+    public static Integer NUM_DICES_SIDES=6;
     private Player Jaime;
     private Player Paco;
     private GooseMatch match;
@@ -447,6 +449,143 @@ public class GooseMatchControllerTest {
     	.andExpect(view().name("stats/adminMatchStats"))
     	.andExpect(model().attribute("gooseStats", OP_LOLA_MATCH.get().getStats()));
     }
-
+    @WithMockUser(value = LOLA)
+    @Test
+    void testInitCreationLobbyNotLoggedIn() throws Exception {
+    	given(this.userService.isAuthenticated()).willReturn(false);
+    	mockMvc.perform(get("/gooseMatches/lobby/"+MATCH_CODE))
+    	.andExpect(status().is3xxRedirection())
+    	.andExpect(redirectedUrl("/"));
+    }
+    @WithMockUser(value = LOLA)
+    @Test
+    void showMatchTestDicesAndMatchEndingWhenEveryOneLeft() throws Exception {
+    	given(this.userService.isAuthenticated()).willReturn(true);
+    	LOLA_MATCH.setId(MATCH_ID);
+    	LOLA_MATCH.setStartDate(new Date());
+    	LOLA_MATCH.setEndDate(new Date());
+    	LOLA_STATS.setPlayerLeft(0);
+    	LOLA_MATCH.setStats(STATS_SET);
+    	int[] dices = new int[NUM_DICES+1];
+        for (Integer i = 0; i<NUM_DICES; i++){
+            dices[i] = 1+(int)Math.floor(Math.random()*NUM_DICES_SIDES);
+        }
+        given(this.gooseMatchService.findGooseMatchById(MATCH_ID))
+        .willReturn(Optional.of(LOLA_MATCH));
+        given(this.playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(LOLA, MATCH_ID))
+        .willReturn(Optional.of(LOLA_STATS));
+        given(this.gooseMatchService.findEveryoneExceptOneLeft(LOLA_MATCH)).willReturn(TRUE);
+        given(this.playerGooseStatsService.findPlayerGooseStatsByUsername(LOLA)).willReturn(STATS_SET);
+        given(this.playerGooseStatsService.sumStats(STATS_SET)).willReturn(LOLA_STATS);
+        
+    	 MockHttpSession session =  new MockHttpSession();
+    	 session.setAttribute("dices", dices);
+         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+         		.get("/gooseMatches/"+MATCH_ID).session(session);
+         mockMvc.perform(builder)
+         .andExpect(status().isOk())
+         .andExpect(model().attribute("firstDice", dices[0]))
+         .andExpect(model().attribute("secondDice", dices[1]))
+         .andExpect(model().attribute("sumDice", dices[2]))
+         .andExpect(model().attribute("hasEnded",1))
+         .andExpect(model().attribute("message", "Everyone except you left, so you won!"));
+         assertThat(LOLA_STATS.getHasWon()).isEqualTo(1);
+    }
+    @WithMockUser(value = PACO)
+    @Test
+    void testFilterGooseMatchesNoDateValues() throws Exception {
+    	String date = "";
+        List<GooseMatch> lMatches = List.of(gMatch, LOLA_MATCH);
+        Page<GooseMatch> sliMatches = new PageImpl<GooseMatch>(lMatches);
+        given(this.gooseMatchService.findAllPaging(any(Pageable.class))).willReturn(sliMatches);
+    	mockMvc.perform(post("/gooseMatches")
+    			.param("page", "0")
+    			.param("filterBy", "whatever")
+    			.param("date", date))
+    	.andExpect(status().isOk())
+    	.andExpect(view().name("matches/listGooseMatches"))
+    	.andExpect(model().attribute("gooseMatches", sliMatches.getContent()));
+    }
+    @WithMockUser(value = PACO)
+    @Test
+    void testInitCreationLobbyUserIsInAnotherLobby() throws Exception {
+    	PlayerGooseStats newStats = TestDataGenerator.generateGooseStats(Jaime);
+    	Set<PlayerGooseStats> statSet = Set.of(newStats);
+    	GooseMatch newMatch = TestDataGenerator.generateGooseLobby(LOBBY_CODE);
+    	newMatch.setId(MATCH_ID);
+    	newMatch.setStartDate(null);
+    	newMatch.setStats(statSet);
+        given(this.userService.isAuthenticated()).willReturn(TRUE);
+        given(this.gooseMatchService.findGooseMatchByMatchCode(MATCH_CODE))
+        .willReturn(Optional.of(newMatch));
+        given(this.userService.isAuthenticated()).willReturn(TRUE);
+        mockMvc.perform(get("/gooseMatches/lobby/"+MATCH_CODE))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/"));
+    }
+    @WithMockUser(value = LOLA)
+    @Test
+    void showMatchTestDicesAndMatchEndingWhenNotEveryOneLeft() throws Exception {
+    	given(this.userService.isAuthenticated()).willReturn(true);
+    	LOLA_MATCH.setId(MATCH_ID);
+    	LOLA_MATCH.setStartDate(new Date());
+    	LOLA_MATCH.setEndDate(new Date());
+    	LOLA_STATS.setPlayerLeft(0);
+    	LOLA_MATCH.setStats(STATS_SET);
+    	int[] dices = new int[NUM_DICES+1];
+        for (Integer i = 0; i<NUM_DICES; i++){
+            dices[i] = 1+(int)Math.floor(Math.random()*NUM_DICES_SIDES);
+        }
+        given(this.gooseMatchService.findGooseMatchById(MATCH_ID))
+        .willReturn(Optional.of(LOLA_MATCH));
+        given(this.playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(LOLA, MATCH_ID))
+        .willReturn(Optional.of(LOLA_STATS));
+        given(this.gooseMatchService.findEveryoneExceptOneLeft(LOLA_MATCH)).willReturn(false);
+        given(this.playerGooseStatsService.findPlayerGooseStatsByUsername(LOLA)).willReturn(STATS_SET);
+        given(this.playerGooseStatsService.sumStats(STATS_SET)).willReturn(LOLA_STATS);
+        
+    	 MockHttpSession session =  new MockHttpSession();
+    	 session.setAttribute("dices", dices);
+         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+         		.get("/gooseMatches/"+MATCH_ID).session(session);
+         mockMvc.perform(builder)
+         .andExpect(status().isOk())
+         .andExpect(model().attribute("firstDice", dices[0]))
+         .andExpect(model().attribute("secondDice", dices[1]))
+         .andExpect(model().attribute("sumDice", dices[2]))
+         .andExpect(model().attribute("hasEnded",1))
+         .andExpect(model().attribute("message", "The game has ended!"));
+         assertThat(LOLA_STATS.getHasWon()).isEqualTo(1);
+    }
+    @WithMockUser(value = LOLA)
+    @Test
+    void showMatchSpecialIsSet() throws Exception {
+    	given(this.userService.isAuthenticated()).willReturn(true);
+    	LOLA_MATCH.setId(MATCH_ID);
+    	LOLA_MATCH.setStartDate(new Date());
+    	LOLA_MATCH.setEndDate(null);
+    	LOLA_STATS.setPlayerLeft(0);
+    	LOLA_MATCH.setStats(STATS_SET);
+    	int[] dices = new int[NUM_DICES+1];
+        for (Integer i = 0; i<NUM_DICES; i++){
+            dices[i] = 1+(int)Math.floor(Math.random()*NUM_DICES_SIDES);
+        }
+        given(this.gooseMatchService.findGooseMatchById(MATCH_ID))
+        .willReturn(Optional.of(LOLA_MATCH));
+        given(this.playerGooseStatsService.findGooseStatsByUsernamedAndMatchId(LOLA, MATCH_ID))
+        .willReturn(Optional.of(LOLA_STATS));
+    	 MockHttpSession session =  new MockHttpSession();
+    	 session.setAttribute("dices", dices);
+    	 String mensaje = "Mensaje especial";
+    	 session.setAttribute("especial", mensaje);
+         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders
+         		.get("/gooseMatches/"+MATCH_ID).session(session);
+         mockMvc.perform(builder)
+         .andExpect(status().isOk())
+         .andExpect(model().attribute("firstDice", dices[0]))
+         .andExpect(model().attribute("secondDice", dices[1]))
+         .andExpect(model().attribute("sumDice", dices[2]))
+         .andExpect(model().attribute("message", mensaje));
+    }
 }
 
