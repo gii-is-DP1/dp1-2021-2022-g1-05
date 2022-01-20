@@ -304,13 +304,14 @@ public class PlayerControllerTests {
 	    	.andExpect(view().name("matches/listMatchesInProfile"))
 	    	.andExpect(model().attributeExists("matches"));
 	    }
+
 	    @WithMockUser(value = "spring")
 	    @Test
 	    void testProcessUpdatePlayerFormNegative() throws Exception {
 	    	mockMvc.perform(post("/players/"+ ID +"/edit"))
-	    	.andExpect(status().isOk())
-	    	.andExpect(view().name("players/UpdatePlayerForm"));
+	    	.andExpect(status().is4xxClientError());
 	    }
+
 	    @WithMockUser(value = USERNAME)
 	    @Test
 	    void testStatsOfPlayerInMatchNotPresent() throws Exception {

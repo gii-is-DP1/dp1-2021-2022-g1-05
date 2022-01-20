@@ -149,7 +149,7 @@ public class AchievementServiceTests {
     @Transactional
     public void testDeleteNullAchievement(){
 
-        assertThrows(DataAccessException.class, () -> {
+        assertThrows(NullPointerException.class, () -> {
            achievementService.delete(null);
         });
     }

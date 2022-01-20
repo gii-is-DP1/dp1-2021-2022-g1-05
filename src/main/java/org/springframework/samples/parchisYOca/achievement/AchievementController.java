@@ -46,7 +46,7 @@ public class AchievementController {
     private PlayerService playerService;
 
     @GetMapping("/achievements")
-    public String listadoLogros(@RequestParam String page, ModelMap modelMap){
+    public String listAchievements(@RequestParam String page, ModelMap modelMap){
         String vista = "welcome";
         Boolean logged = userService.isAuthenticated();
 
@@ -71,7 +71,7 @@ public class AchievementController {
     }
 
     @GetMapping(path="/achievements/newAchievement/{game}")
-    public String crearLogro(@PathVariable("game") String game, ModelMap modelMap){
+    public String createAchivement(@PathVariable("game") String game, ModelMap modelMap){
         String view = "achievements/createAchievement";
         if(game.equals("goose")){
             modelMap.addAttribute("descriptions", GOOSE_DESCRIPTIONS);
@@ -83,7 +83,7 @@ public class AchievementController {
     }
 
     @PostMapping(path="/achievements/newAchievement/{game}")
-    public String salvarLogro(@PathVariable("game") String game,
+    public String saveAchievement(@PathVariable("game") String game,
                               @Valid Achievement achievement, BindingResult result, ModelMap modelMap){
         modelMap.addAttribute("achievement",achievement);
         if(game.equals("goose")){
@@ -115,7 +115,7 @@ public class AchievementController {
     }
 
     @GetMapping(path="/achievements/delete/{achievementId}")
-    public String borrarLogro(@PathVariable("achievementId") int achievementId){
+    public String deleteAchievement(@PathVariable("achievementId") int achievementId){
         Optional<Achievement> achievement = achievementService.findAchievementById(achievementId);
         if(achievement.isPresent()){
             achievementService.delete(achievement.get());

@@ -29,13 +29,13 @@ public class LudoBoardController {
     private final LudoChipService ludoChipService;
     private final LudoMatchService ludoMatchService;
     private final LudoBoardService ludoBoardService;
-    public static final Integer INDICE_PRIMER_DADO = 0;
-    public static final Integer INDICE_SEGUNDO_DADO = 1;
-    public static final Integer INDICE_SUMA_DADOS = 2;
-    public static final Integer PRIMER_DADO_5=0;
-    public static final Integer SEGUNDO_DADO_5=1;
-    public static final Integer SUMA_DADOS_5=2;
-    public static final Integer DOS_DADOS_5=3;
+    public static final Integer INDEX_FIRST_DICE = 0;
+    public static final Integer INDEX_SECOND_DICE = 1;
+    public static final Integer INDEX_SUM_OF_BOTH = 2;
+    public static final Integer FIRST_DICE_5=0;
+    public static final Integer SECOND_DICE_5=1;
+    public static final Integer SUM_DICES_5=2;
+    public static final Integer TWO_DICES_5=3;
     private static final String ALL_CHIPS_OF_A_PLAYER ="0123";
     private int[] dicesToCheck = new int[3];
 
@@ -60,9 +60,9 @@ public class LudoBoardController {
         LudoMatch match = ludoMatchService.findludoMatchById(matchId).get();
         model.put("stats", match.getStats());
         model.put("chips", ludoChipService.findChipsByMatchId(matchId));
-        model.put("firstDice", dicesToShow[INDICE_PRIMER_DADO]);
-        model.put("secondDice", dicesToShow[INDICE_SEGUNDO_DADO]);
-        model.put("sumDice", dicesToShow[INDICE_SUMA_DADOS]);
+        model.put("firstDice", dicesToShow[INDEX_FIRST_DICE]);
+        model.put("secondDice", dicesToShow[INDEX_SECOND_DICE]);
+        model.put("sumDice", dicesToShow[INDEX_SUM_OF_BOTH]);
         model.put("ludoBoard", ludoMatchService.findludoMatchById(match.getId()).get().getBoard());
     }
 
@@ -81,10 +81,10 @@ public class LudoBoardController {
             //putting things in the model
             model.put("dicesRolled", 1);
             populateModel(model, matchId, dicesToShow);
-            dicesToCheck[INDICE_PRIMER_DADO] = dicesToShow[INDICE_PRIMER_DADO];
-            dicesToCheck[INDICE_SEGUNDO_DADO] = dicesToShow[INDICE_SEGUNDO_DADO];
-            dicesToCheck[INDICE_SUMA_DADOS] = dicesToShow[INDICE_SUMA_DADOS];
-            boolean flagDobles = dicesToCheck[INDICE_PRIMER_DADO] == dicesToCheck[INDICE_SEGUNDO_DADO];
+            dicesToCheck[INDEX_FIRST_DICE] = dicesToShow[INDEX_FIRST_DICE];
+            dicesToCheck[INDEX_SECOND_DICE] = dicesToShow[INDEX_SECOND_DICE];
+            dicesToCheck[INDEX_SUM_OF_BOTH] = dicesToShow[INDEX_SUM_OF_BOTH];
+            boolean flagDobles = dicesToCheck[INDEX_FIRST_DICE] == dicesToCheck[INDEX_SECOND_DICE];
             session.setAttribute("flagDobles", flagDobles);
             Integer inGameId = inGamePlayerStats.getInGameId();
             session.setAttribute("especial", null);
@@ -102,12 +102,12 @@ public class LudoBoardController {
                     LudoChip loggedPlayerChip = lc;
 
                     //Comprobar si ha sacado 5 y tiene fichas en base
-                    if(dicesToCheck[INDICE_PRIMER_DADO] == 5 || dicesToCheck[INDICE_SEGUNDO_DADO] == 5 ||
-                        dicesToCheck[INDICE_SUMA_DADOS] == 5) {
-                        Integer diceCode = ludoChipService.manageFives(inGameId,matchId, dicesToCheck[INDICE_PRIMER_DADO], dicesToCheck[INDICE_SEGUNDO_DADO]);
+                    if(dicesToCheck[INDEX_FIRST_DICE] == 5 || dicesToCheck[INDEX_SECOND_DICE] == 5 ||
+                        dicesToCheck[INDEX_SUM_OF_BOTH] == 5) {
+                        Integer diceCode = ludoChipService.manageFives(inGameId,matchId, dicesToCheck[INDEX_FIRST_DICE], dicesToCheck[INDEX_SECOND_DICE]);
                         model.put("diceCode", diceCode);
                         responseToFives(diceCode, inGamePlayerStats, matchId, model, session);
-                        if(diceCode == SUMA_DADOS_5 || diceCode == DOS_DADOS_5) {
+                        if(diceCode == SUM_DICES_5 || diceCode == TWO_DICES_5) {
                             return "redirect:/ludoMatches/" + matchId;
                         }
                     }
@@ -116,7 +116,7 @@ public class LudoBoardController {
             //Si todas las fichas en casa no puedes mover, tu turno ha terminado
             if(ludoChipService.noChipsOutOfHome(ludoChips,inGameId)){
                 if(!flagDobles) {
-                    dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+                    dicesToCheck[INDEX_FIRST_DICE] = 0 ; dicesToCheck[INDEX_SECOND_DICE]=0;
                     passTurn(inGamePlayerStats, matchId);
                     session.setAttribute("especial", "You weren't able to take out any of your chips :(");
                 } else {
@@ -240,25 +240,25 @@ public class LudoBoardController {
     }
 
     private boolean checkDicesLeft(){
-        return dicesToCheck[INDICE_PRIMER_DADO]>0 || dicesToCheck[INDICE_SEGUNDO_DADO]>0;
+        return dicesToCheck[INDEX_FIRST_DICE]>0 || dicesToCheck[INDEX_SECOND_DICE]>0;
     }
 
     //Resetea los dados usados y muestra los mensajes pertinentes
     private void responseToFives(Integer diceCode, PlayerLudoStats inGamePlayerStats, Integer matchId, ModelMap model, HttpSession session) {
-        if(diceCode==PRIMER_DADO_5){
-            dicesToCheck[INDICE_PRIMER_DADO]=0;
+        if(diceCode==FIRST_DICE_5){
+            dicesToCheck[INDEX_FIRST_DICE]=0;
             model.addAttribute("message", "You rolled  5, so one of your chips got taken out");
         }
-        else if(diceCode==SEGUNDO_DADO_5){
-            dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+        else if(diceCode==SECOND_DICE_5){
+            dicesToCheck[INDEX_SECOND_DICE]=0;
             model.addAttribute("message", "You rolled  5, so one of your chips got taken out");
         }
-        else if(diceCode==SUMA_DADOS_5){
-            dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+        else if(diceCode==SUM_DICES_5){
+            dicesToCheck[INDEX_FIRST_DICE] = 0 ; dicesToCheck[INDEX_SECOND_DICE]=0;
             passTurn(inGamePlayerStats, matchId);
             session.setAttribute("especial", "Your roll sums 5, so one of your chips got taken out");
-        } else if(diceCode == DOS_DADOS_5){
-            dicesToCheck[INDICE_PRIMER_DADO] = 0 ; dicesToCheck[INDICE_SEGUNDO_DADO]=0;
+        } else if(diceCode == TWO_DICES_5){
+            dicesToCheck[INDEX_FIRST_DICE] = 0 ; dicesToCheck[INDEX_SECOND_DICE]=0;
             session.setAttribute("especial", "You rolled 5 on both dices, so two of your chips got taken out");
         }
     }
