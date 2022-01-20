@@ -66,6 +66,9 @@ public class LudoMatchControllerTest {
 	private static final String VALUE_5 = "Everyone except you left, so you won!";
 	private static final String VALUE_6 = "The game has ended!";
 	private static final String MENSAJE_DE_PRUEBA = "AAAAAAAAAAAAAAAAAAAA";
+	private static final String LOBBY_CLOSED_OWNER = "You were the owner and left the game, so the lobby was closed!";
+	private static final String LEFT_NOT_OWNER = "You left the lobby";
+	private static final String LEFT_MATCH = "You left the game!";
 	private static final User user = TestDataGenerator.generateUser(NAME, PSSWRD);
 	private static final Player player = TestDataGenerator.generatePlayer(user);
 	private static final String VIEW_NAME = "matches/joinMatchForm";
@@ -487,5 +490,118 @@ public class LudoMatchControllerTest {
 		   .andExpect(status().isOk())
 		   .andExpect(model().attribute("ludoMatches", slice.getContent()))
 		   .andExpect(view().name(VIEW_LISTADO));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testListadoPartidasFiltradoStartDate() throws Exception {
+		   String date = "2022-09-09";
+		   LudoMatch match = new LudoMatch();
+		   List<LudoMatch> matches = List.of(match);
+		   Page<LudoMatch> slice = new PageImpl<LudoMatch>(matches);
+		   given(this.ludoMatchService.findMatchesByStartDate(any(Date.class),any(Pageable.class)))
+		   .willReturn(slice);
+		   mockMvc.perform(post("/ludoMatches")
+				   .param("page", "0")
+				   .param("filterBy", "startDate")
+				   .param("date", date))
+		   .andExpect(status().isOk())
+		   .andExpect(model().attribute("ludoMatches", slice.getContent()))
+		   .andExpect(view().name(VIEW_LISTADO));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testListadoPartidasFiltradoEndDate() throws Exception {
+		   String date = "2022-09-09";
+		   LudoMatch match = new LudoMatch();
+		   List<LudoMatch> matches = List.of(match);
+		   Page<LudoMatch> slice = new PageImpl<LudoMatch>(matches);
+		   given(this.ludoMatchService.findMatchesByEndDate(any(Date.class),any(Pageable.class)))
+		   .willReturn(slice);
+		   mockMvc.perform(post("/ludoMatches")
+				   .param("page", "0")
+				   .param("filterBy", "endDate")
+				   .param("date", date))
+		   .andExpect(status().isOk())
+		   .andExpect(model().attribute("ludoMatches", slice.getContent()))
+		   .andExpect(view().name(VIEW_LISTADO));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testListadoPartidasFiltradoNoFiltering() throws Exception {
+		   String date = "";
+		   LudoMatch match = new LudoMatch();
+		   List<LudoMatch> matches = List.of(match);
+		   Page<LudoMatch> slice = new PageImpl<LudoMatch>(matches);
+		   given(this.ludoMatchService.findAllPaging(any(Pageable.class)))
+		   .willReturn(slice);
+		   mockMvc.perform(post("/ludoMatches")
+				   .param("page", "0")
+				   .param("filterBy", "endDate")
+				   .param("date", date))
+		   .andExpect(status().isOk())
+		   .andExpect(model().attribute("ludoMatches", slice.getContent()))
+		   .andExpect(view().name(VIEW_LISTADO));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testLeaveMatch() throws Exception {
+		   given(this.userService.isAuthenticated()).willReturn(false);
+		   mockMvc.perform(get("/ludoMatches/matchLeft"))
+		   .andExpect(status().isOk())
+		   .andExpect(view().name("welcome"));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testLeaveMatchLoggedInIsowner() throws Exception {
+		   PlayerLudoStats stat = TestDataGenerator.generatePlayerLudoStats(player);
+		   stat.setIsOwner(1);
+		   LudoMatch match = TestDataGenerator.generateLudoMatch(CODE);
+		   match.setStartDate(null);
+		   match.setId(MATCH_ID);
+		   given(this.userService.isAuthenticated()).willReturn(true);
+		   given(this.ludoMatchService.findLobbyByUsername(NAME))
+		   .willReturn(Optional.of(match));
+		   given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(NAME, MATCH_ID))
+		   .willReturn(Optional.of(stat));
+		   mockMvc.perform(get("/ludoMatches/matchLeft"))
+		   .andExpect(status().isOk())
+		   .andExpect(view().name("welcome"))
+		   .andExpect(model().attribute("message", LOBBY_CLOSED_OWNER));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testLeaveMatchLoggedInNotOwner() throws Exception {
+		   PlayerLudoStats stat = TestDataGenerator.generatePlayerLudoStats(player);
+		   stat.setIsOwner(0);
+		   LudoMatch match = TestDataGenerator.generateLudoMatch(CODE);
+		   match.setStartDate(null);
+		   match.setId(MATCH_ID);
+		   given(this.userService.isAuthenticated()).willReturn(true);
+		   given(this.ludoMatchService.findLobbyByUsername(NAME))
+		   .willReturn(Optional.of(match));
+		   given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(NAME, MATCH_ID))
+		   .willReturn(Optional.of(stat));
+		   mockMvc.perform(get("/ludoMatches/matchLeft"))
+		   .andExpect(status().isOk())
+		   .andExpect(view().name("welcome"))
+		   .andExpect(model().attribute("message", LEFT_NOT_OWNER));
+	   }
+	   @WithMockUser(value = NAME)
+	   @Test
+	   void testLeaveMatchGame() throws Exception {
+		   PlayerLudoStats stat = TestDataGenerator.generatePlayerLudoStats(player);
+		   stat.setIsOwner(0);
+		   LudoMatch match = TestDataGenerator.generateLudoMatch(CODE);
+		   match.setStartDate(new Date());
+		   match.setId(MATCH_ID);
+		   given(this.userService.isAuthenticated()).willReturn(true);
+		   given(this.ludoMatchService.findLobbyByUsername(NAME))
+		   .willReturn(Optional.of(match));
+		   given(this.playerLudoStatsService.findPlayerLudoStatsByUsernameAndMatchId(NAME, MATCH_ID))
+		   .willReturn(Optional.of(stat));
+		   mockMvc.perform(get("/ludoMatches/matchLeft"))
+		   .andExpect(status().isOk())
+		   .andExpect(view().name("welcome"))
+		   .andExpect(model().attribute("message", LEFT_MATCH));
 	   }
 }
