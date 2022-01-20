@@ -207,15 +207,24 @@ public class PlayerController {
 
     @PostMapping(value = "/players/{playerId}/edit")
     public String processUpdatePlayerForm(@Valid Player player, BindingResult result,
-                                         @PathVariable("playerId") int playerId) {
-        if (result.hasErrors()) {
+                                          @RequestParam(name="user.password") String password,
+                                          @RequestParam(name="email") String email,
+                                         @PathVariable("playerId") int playerId,
+                                          Map<String, Object> model) {
+        if(password.length() < 7 || !password.matches(".*[0-9].*")) {
+            model.put("message", "The password must be at least 7 characters long and contain a number");
             return VIEWS_PLAYER_UPDATE_FORM;
-        }
-        else {
+        }else if(playerService.findPlayerByEmail(email).isPresent()) {
+            model.put("message", "That email is already taken");
+            return VIEWS_PLAYER_UPDATE_FORM;
+        }else if (result.hasErrors()) {
+            return VIEWS_PLAYER_UPDATE_FORM;
+        } else {
             player.setId(playerId);
             this.playerService.savePlayer(player);
             return "redirect:/players/{playerId}";
         }
+
 }
 
     @GetMapping(path="/players/disable/{playerId}")
