@@ -3,6 +3,10 @@ package org.springframework.samples.parchisYOca.ludoBoard;
 import org.hibernate.envers.internal.tools.Triple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -35,8 +39,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -94,15 +100,15 @@ public class LudoBoardControllerTests {
     private PlayerLudoStats jaimeStats = new PlayerLudoStats();
 
     List<LudoChip> chips=new ArrayList<>();
-    private LudoChip chip1=new LudoChip();
-    private LudoChip chip2=new LudoChip();
-    private LudoChip chip3=new LudoChip();
-    private LudoChip chip4=new LudoChip();
-    private LudoChip chip5=new LudoChip();
-    private LudoChip chip6=new LudoChip();
-    private LudoChip chip7=new LudoChip();
-    private LudoChip chip8=new LudoChip();
-    List<LudoChip> blockChips=new ArrayList<>();
+    private static LudoChip chip1=new LudoChip();
+    private static LudoChip chip2=new LudoChip();
+    private static LudoChip chip3=new LudoChip();
+    private static LudoChip chip4=new LudoChip();
+    private static LudoChip chip5=new LudoChip();
+    private static LudoChip chip6=new LudoChip();
+    private static LudoChip chip7=new LudoChip();
+    private static LudoChip chip8=new LudoChip();
+    private static List<LudoChip> blockChips=new ArrayList<>();
 
 
     private static final Integer PACO_ID = 6;
@@ -119,6 +125,8 @@ public class LudoBoardControllerTests {
     private static final int[] DICES = {3,2,5};
     private static final int[] DICES_NO_5={1,2,3};
     private static final int[] DICES_0={-1,0,-1};
+    private static final int[] DICES_LANDED_FINAL={10,2,12};
+    private static final int[] DICES_ATE_CHIP={20,5,25};
 
     private static final String MATCH_CODE = "abcdfg";
     private static final int[] DOUBLE_DICES = {3,3,6};
@@ -126,11 +134,6 @@ public class LudoBoardControllerTests {
     private static final boolean NO_DOUBLES = false;
 
     private static LudoMatch match;
-
-
-
-
-
 
     @BeforeEach
     void setup(){
@@ -221,15 +224,14 @@ public class LudoBoardControllerTests {
         given(ludoChipService.noChipsOutOfHome(chips,JAIME_INGAMEID)).willReturn(false);
     }
 
-
-
     @WithMockUser(value = JAIME)
-    @Test
-    void testLudoDicesRolledNotLogged() throws Exception {
+    @ParameterizedTest(name = "{index} => entering URL: {0}")
+    @ValueSource(strings = {"/ludoInGame/dicesRolled", "/ludoInGame/chooseChip/0", "/ludoInGame/sumDice/0/0"})
+    void testAllMethodsNotLogged(String URL) throws Exception {
         MockHttpSession session = new MockHttpSession();
 
         given(this.userService.isAuthenticated()).willReturn(NOT_LOGGED);
-        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/ludoInGame/dicesRolled")
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(URL)
             .session(session);
         mockMvc.perform(builder)
             .andExpect(status().is3xxRedirection())
@@ -247,7 +249,6 @@ public class LudoBoardControllerTests {
         given(ludoBoardService.checkGreedy(jaimeStats,DOUBLES)).willReturn(TRUE);
         given(this.userService.isAuthenticated()).willReturn(LOGGED_IN);
 
-
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/ludoInGame/dicesRolled")
             .session(session);
         mockMvc.perform(builder)
@@ -255,9 +256,18 @@ public class LudoBoardControllerTests {
             .andExpect(redirectedUrl("/ludoMatches/" + MATCH_ID));
         assertThat(session.getAttribute("especial")).isEqualTo("You managed to roll doubles THREE TIMES? Preposterous, go back home.");
     }
+
+    private static Stream<Arguments> testLudoDicesRolled5() {
+        return Stream.of(
+            arguments(SUMA_DADOS_5, "Your roll sums 5, so one of your chips got taken out"),
+            arguments(DOS_DADOS_5, "You rolled 5 on both dices, so two of your chips got taken out")
+        );
+    }
+
     @WithMockUser(value = JAIME)
-    @Test
-    void testLudoDicesRolled5() throws Exception {
+    @ParameterizedTest(name = "{index} => expecting message: {1}")
+    @MethodSource
+    void testLudoDicesRolled5(Integer manageFivesResult, String message) throws Exception {
         MockHttpSession session = new MockHttpSession();
 
         session.setAttribute("dices", DICES);
@@ -265,21 +275,29 @@ public class LudoBoardControllerTests {
         session.setAttribute("matchId", MATCH_ID);
         given(this.userService.isAuthenticated()).willReturn(LOGGED_IN);
         given( ludoChipService.manageFives(JAIME_INGAMEID,MATCH_ID,
-            DICES[INDICE_PRIMER_DADO], DICES[INDICE_SEGUNDO_DADO])).willReturn(SUMA_DADOS_5);
+            DICES[INDICE_PRIMER_DADO], DICES[INDICE_SEGUNDO_DADO])).willReturn(manageFivesResult);
 
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/ludoInGame/dicesRolled")
             .session(session);
         mockMvc.perform(builder)
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/ludoMatches/" + MATCH_ID));
-        assertThat(session.getAttribute("especial")).isEqualTo("Your roll sums 5, so one of your chips got taken out");
+        assertThat(session.getAttribute("especial")).isEqualTo(message);
+    }
+
+    private static Stream<Arguments> testLudoDicesRolledNoChipsOutOfHome() {
+        return Stream.of(
+            arguments(DICES_NO_5, "You weren't able to take out any of your chips :("),
+            arguments(DOUBLE_DICES, "You couldn't take out any chips, but you rolled double, sou you get an extra turn!")
+        );
     }
 
     @WithMockUser(value = JAIME)
-    @Test
-    void testLudoDicesRolledNoChipsOutOfHome() throws Exception {
+    @ParameterizedTest(name = "{index} => with dices: {0} and expected message: {1}")
+    @MethodSource
+    void testLudoDicesRolledNoChipsOutOfHome(int[] dices, String message) throws Exception {
         MockHttpSession session = new MockHttpSession();
-        session.setAttribute("dices", DICES_NO_5);
+        session.setAttribute("dices", dices);
         session.setAttribute("fromLudo",TRUE);
         session.setAttribute("matchId", MATCH_ID);
         given(this.userService.isAuthenticated()).willReturn(LOGGED_IN);
@@ -290,17 +308,7 @@ public class LudoBoardControllerTests {
         mockMvc.perform(builder)
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/ludoMatches/" + MATCH_ID));
-        assertThat(session.getAttribute("especial")).isEqualTo("You weren't able to take out any of your chips :(");
-
-
-        session.setAttribute("dices", DOUBLE_DICES);
-        MockHttpServletRequestBuilder builder2 = MockMvcRequestBuilders.get("/ludoInGame/dicesRolled")
-            .session(session);
-        mockMvc.perform(builder2)
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/ludoMatches/" + MATCH_ID));
-        assertThat(session.getAttribute("especial")).isEqualTo("You couldn't take out any chips, but you rolled double, sou you get an extra turn!");
-
+        assertThat(session.getAttribute("especial")).isEqualTo(message);
     }
 
     @WithMockUser(value = JAIME)
@@ -348,6 +356,39 @@ public class LudoBoardControllerTests {
 
     }
 
+    public static Stream<Arguments> testLudoChooseChip() {
+        List<LudoChip> arbitraryListOfChipsToMove = List.of(chip1,chip2);
+        return Stream.of(
+            arguments(true, new ArrayList<>(), DICES, ALL_CHIPS_OF_A_PLAYER, null),
+            arguments(true, arbitraryListOfChipsToMove, DICES, "nullnull", "You got doubles so you must break a block!"),
+            arguments(false, null, DICES_ATE_CHIP, ALL_CHIPS_OF_A_PLAYER, "You ate a chip so you get another free 20 movements, on the house."),
+            arguments(false, null, DICES_LANDED_FINAL, ALL_CHIPS_OF_A_PLAYER, "You scored one of your chips so you get another free 10 moves!")
+        );
+    }
+
+    @WithMockUser(value = JAIME)
+    @ParameterizedTest(name = "{index}")
+    @MethodSource
+    void testLudoChooseChip(Boolean flagDobles,List<LudoChip> breakBlocksResult, int[] dices, String chipsToMove, String modelMessage) throws Exception {
+        MockHttpSession session = new MockHttpSession();
+
+        session.setAttribute("dices", dices);
+        session.setAttribute("dicesToCheck", dices);
+        session.setAttribute("fromLudo",TRUE);
+        session.setAttribute("matchId", MATCH_ID);
+        session.setAttribute("flagDobles", flagDobles);
+        given(this.userService.isAuthenticated()).willReturn(LOGGED_IN);
+        given(ludoChipService.breakBlocks(chips, JAIME_INGAMEID)).willReturn(breakBlocksResult);
+
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/ludoInGame/chooseChip/0")
+            .session(session);
+        mockMvc.perform(builder)
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(view().name("matches/ludoMatch"))
+            .andExpect(model().attribute("message", modelMessage))
+            .andExpect(model().attribute("chipsToMove", chipsToMove));
+
+    }
 
 
 
