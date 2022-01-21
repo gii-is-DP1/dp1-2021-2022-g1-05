@@ -39,6 +39,4 @@ public interface GooseMatchRepository extends CrudRepository<GooseMatch, Integer
     Collection<GooseMatch> findAll();
     Page<GooseMatch> findAll(Pageable pageable);
 
-
-
 }
