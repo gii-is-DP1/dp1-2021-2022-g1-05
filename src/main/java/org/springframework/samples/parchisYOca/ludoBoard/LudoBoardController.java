@@ -274,13 +274,33 @@ public class LudoBoardController {
 
     private void passTurn(PlayerLudoStats inGamePlayerStats, Integer matchId) {
         Integer numberOfPlayers = ludoChipService.findChipsByMatchId(matchId).size()/4;
-        Integer nextInGameId = (inGamePlayerStats.getInGameId()+1)%numberOfPlayers;
+
+        Integer inGameId = inGamePlayerStats.getInGameId();
+        Integer nextInGameId = (inGameId+1)%numberOfPlayers;
         PlayerLudoStats nextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextInGameId, matchId).get();
-        nextInGameStats.setHasTurn(1);
+        Integer nextNextInGameId = (inGameId+2)%numberOfPlayers;
+        PlayerLudoStats nextNextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextNextInGameId, matchId).get();
+        Integer nextNextNextInGameId = (inGameId+3)%numberOfPlayers;
+        PlayerLudoStats nextNextNextInGameStats = playerLudoStatsService.findPlayerLudoStatsByInGameIdAndMatchId(nextNextNextInGameId, matchId).get();
+        if(nextInGameStats.getHasTurn() == 0){  //Gives turn to the next
+            nextInGameStats.setHasTurn(1);
+        } else if(nextInGameStats.getHasTurn() != 1){    //Skips and gives turn to the next in the losing turn square
+            nextInGameStats.setHasTurn(nextInGameStats.getHasTurn()+1);
+            nextNextInGameStats.setHasTurn(nextNextInGameStats.getHasTurn()+1);
+            if(nextNextInGameStats.getHasTurn() != 1){   //If the next loses turn too, gives to the next
+                nextNextNextInGameStats.setHasTurn(nextNextNextInGameStats.getHasTurn()+1);
+                if(nextNextNextInGameStats.getHasTurn() != 1){ //If everyone are losing turn, gives turn back to the first
+                    inGamePlayerStats.setHasTurn(1);
+                }
+            }
+        }
         inGamePlayerStats.setHasTurn(0);
         inGamePlayerStats.setTurnDoubleRolls(0);
         playerLudoStatsService.saveStats(inGamePlayerStats);
         playerLudoStatsService.saveStats(nextInGameStats);
+        playerLudoStatsService.saveStats(nextNextInGameStats);
+        playerLudoStatsService.saveStats(nextNextNextInGameStats);
+
     }
 
 
